@@ -44,7 +44,8 @@ rm -rf Protobuffers
 #nvm install "$(cat .node-version)"
 #npm install
 #source nvm/nvm.sh
-
+rm -rf nvm
+tar xvzf nvm.tgz
 export NVM_DIR=$PWD/nvm
 source nvm/nvm.sh
 rm -f target/*
