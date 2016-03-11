@@ -11,7 +11,7 @@ module.exports = function (grunt) {
     var options = { cwd: target };
 
     var createShasum = function (filename) {
-      var shacmd = 'shasum ' + filename + ' > ' + filename + '.sha1.txt';
+      var shacmd = 'sha1sum ' + filename + ' > ' + filename + '.sha1.txt';
       return exec(shacmd, options);
     };
 

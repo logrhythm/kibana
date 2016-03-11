@@ -23,6 +23,10 @@ if [ $? -ne 0 ]; then
 fi
 
 %build
+cd %{name}
+sh scripts/kibanaBuild.sh %{proto_branch} %{protobuf_user}
+
+
 %install
 cd %{name}
 #extract the built tarball to the www location
