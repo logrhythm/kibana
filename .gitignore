@@ -4,7 +4,6 @@
 **/*.css
 nvm
 trash
-build
 .jruby
 .idea
 *.iml
