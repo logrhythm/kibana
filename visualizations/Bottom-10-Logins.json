@@ -1,0 +1,9 @@
+{
+   "title": "Bottom 10 Logins",
+   "visState": "{\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"3\",\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"Login\",\"size\":10,\"order\":\"asc\",\"orderBy\":\"custom\",\"orderAgg\":{\"id\":\"3-orderAgg\",\"type\":\"count\",\"schema\":\"orderAgg\",\"params\":{}}}},{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"TimeUpdated\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}}],\"listeners\":{}}",
+   "description": "",
+   "version": 1,
+   "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"index\":\"network_*\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[]}"
+   }
+}
