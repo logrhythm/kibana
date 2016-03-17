@@ -1,0 +1,11 @@
+ {
+   "title": "Ports Dashboard",
+   "hits": 0,
+   "description": "",
+   "panelsJSON": "[{\"col\":1,\"id\":\"Top-DestPorts-By-Bandwidth-(histogram)\",\"row\":1,\"size_x\":6,\"size_y\":5,\"type\":\"visualization\"},{\"id\":\"Top-Destination-Ports-by-Unique-Application-Count\",\"type\":\"visualization\",\"size_x\":6,\"size_y\":5,\"col\":7,\"row\":1},{\"id\":\"Ports-By-Application-Table\",\"type\":\"search\",\"size_x\":12,\"size_y\":3,\"col\":1,\"row\":6,\"columns\":[\"SrcPort\",\"DestPort\",\"Application\",\"TotalBytes\"],\"sort\":[\"TimeUpdated\",\"desc\"]}]",
+   "version": 1,
+   "timeRestore": false,
+   "kibanaSavedObjectMeta": {
+     "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"query\":\"DestPort:<=1024\",\"analyze_wildcard\":true}}}]}"
+   }
+ }

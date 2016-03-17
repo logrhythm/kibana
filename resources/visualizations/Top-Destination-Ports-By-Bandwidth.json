@@ -1,0 +1,9 @@
+{
+   "title": "Top Destination Ports By Bandwidth (histogram)",
+   "visState": "{\"aggs\":[{\"id\":\"1\",\"params\":{\"field\":\"TotalBytesDelta\"},\"schema\":\"metric\",\"type\":\"sum\"},{\"id\":\"3\",\"params\":{\"field\":\"DestPort\",\"order\":\"desc\",\"orderAgg\":{\"id\":\"3-orderAgg\",\"params\":{\"field\":\"TotalBytesDelta\",\"json\":\"\"},\"schema\":\"orderAgg\",\"type\":\"sum\"},\"orderBy\":\"custom\",\"size\":10},\"schema\":\"group\",\"type\":\"terms\"},{\"id\":\"2\",\"params\":{\"customInterval\":\"2h\",\"extended_bounds\":{},\"field\":\"TimeUpdated\",\"interval\":\"auto\",\"min_doc_count\":1},\"schema\":\"segment\",\"type\":\"date_histogram\"}],\"listeners\":{},\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"defaultYExtents\":false,\"mode\":\"stacked\",\"scale\":\"linear\",\"setYExtents\":false,\"shareYAxis\":true,\"times\":[],\"yAxis\":{}},\"type\":\"histogram\"}",
+   "description": "",
+   "version": 1,
+   "kibanaSavedObjectMeta": {
+     "searchSourceJSON": "{\"index\":\"network_*\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[]}"
+   }
+}
