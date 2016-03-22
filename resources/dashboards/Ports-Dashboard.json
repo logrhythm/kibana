@@ -2,7 +2,7 @@
    "title": "Ports Dashboard",
    "hits": 0,
    "description": "",
-   "panelsJSON": "[{\"col\":1,\"id\":\"Top-Destination-Ports-By-Bandwidth-\(histogram\).json\",\"row\":1,\"size_x\":6,\"size_y\":5,\"type\":\"visualization\"},{\"id\":\" Top-Destination-Ports-By-Application-\(histogram\).json\",\"type\":\"visualization\",\"size_x\":6,\"size_y\":5,\"col\":7,\"row\":1},{\"id\":\"Ports-Table.json\",\"type\":\"search\",\"size_x\":12,\"size_y\":3,\"col\":1,\"row\":6,\"columns\":[\"SrcPort\",\"DestPort\",\"Application\",\"TotalBytes\"],\"sort\":[\"TimeUpdated\",\"desc\"]}]",
+   "panelsJSON": "[{\"col\":1,\"id\":\"Top-Destination-Ports-By-Bandwidth-(histogram)\",\"row\":1,\"size_x\":6,\"size_y\":5,\"type\":\"visualization\"},{\"id\":\" Top-Destination-Ports-By-Application-(histogram)\",\"type\":\"visualization\",\"size_x\":6,\"size_y\":5,\"col\":7,\"row\":1},{\"id\":\"Ports-Table\",\"type\":\"search\",\"size_x\":12,\"size_y\":3,\"col\":1,\"row\":6,\"columns\":[\"SrcPort\",\"DestPort\",\"Application\",\"TotalBytes\"],\"sort\":[\"TimeUpdated\",\"desc\"]}]",
    "version": 1,
    "timeRestore": false,
    "kibanaSavedObjectMeta": {
