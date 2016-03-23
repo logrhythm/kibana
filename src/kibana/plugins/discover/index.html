@@ -1,5 +1,38 @@
 <div ng-controller="discover" class="app-container">
   <navbar>
+      <!--TIMEPICKER START-->
+      <ul ng-if="setupComplete" ng-show="timefilter.enabled" class="nav navbar-nav navbar-right navbar-timepicker">
+        <li>
+          <a  ng-click="toggleRefresh()"
+              ng-show="timefilter.refreshInterval.value > 0">
+            <i class="fa" ng-class="timefilter.refreshInterval.pause ? 'fa-play' : 'fa-pause'"></i>
+          </a>
+        </li>
+
+        <li class="to-body" ng-class="{active: timefilter.timepickerActiveTab === 'filter'}">
+          <a  ng-click="toggleTimepicker('filter')" aria-haspopup="true" aria-expanded="false" class="navbar-timepicker-time-desc LR-timepicker">
+            <i aria-hidden="true" class="fa fa-clock-o"></i>
+            <pretty-duration from="timefilter.time.from" to="timefilter.time.to"></pretty-duration>
+          </a>
+        </li>
+        
+        <li ng-class="{active: timefilter.timepickerActiveTab === 'interval'}"
+            ng-show="timefilter.refreshInterval.value > 0 || timefilter.timepickerActiveTab"
+            class="to-body">
+          <a  ng-click="toggleTimepicker('interval')"
+              class="navbar-timepicker-auto-refresh-desc LR-timepicker">
+            <span ng-show="timefilter.refreshInterval.value === 0"><i class="fa fa-repeat"></i> Auto-refresh</span>
+            <span ng-show="timefilter.refreshInterval.value > 0">{{timefilter.refreshInterval.display}}</span>
+          </a>
+        </li>
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right navbar-timepicker" >
+        <li ng-show="httpActive.length" class="navbar-text hidden-xs LR-hidden-load">
+          <div class="spinner"></div>
+        </li>
+      </ul>
+      <!--TIMEPICKER END-->
     <form role="form" class="fill inline-form" ng-submit="fetch()" name="discoverSearch">
       <div class="typeahead" kbn-typeahead="discover">
         <div class="input-group"

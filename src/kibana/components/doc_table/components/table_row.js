@@ -9,6 +9,9 @@ define(function (require) {
   require('components/doc_viewer/doc_viewer');
   require('filters/trust_as_html');
   require('filters/short_dots');
+  require('netmon_libs/custom_modules/download/services/downloadButtonService');
+  require('netmon_libs/custom_modules/download/services/downloadQueueManager');
+  require('netmon_libs/custom_modules/download/services/downloadModalManager');
 
 
   // guesstimate at the minimum number of chars wide cells in the table should be
@@ -22,7 +25,8 @@ define(function (require) {
    * <tr ng-repeat="row in rows" kbn-table-row="row"></tr>
    * ```
    */
-  module.directive('kbnTableRow', function ($compile) {
+  module.directive('kbnTableRow', function ($compile, DownloadButtonService, 
+      DownloadQueueManager, DownloadModalManager) {
     var noWhiteSpace = require('utils/no_white_space');
     var openRowHtml = require('text!components/doc_table/components/table_row/open.html');
     var detailsHtml = require('text!components/doc_table/components/table_row/details.html');
@@ -35,16 +39,18 @@ define(function (require) {
         columns: '=',
         filter: '=',
         indexPattern: '=',
-        row: '=kbnTableRow'
+        row: '=kbnTableRow',
+        tableId: '='
       },
       link: function ($scope, $el) {
         $el.after('<tr>');
         $el.empty();
 
         var init = function () {
+          $scope.downloadQueueManager = DownloadQueueManager;
+          $scope.downloadModalManager = DownloadModalManager;
           createSummaryRow($scope.row, $scope.row._id);
         };
-
         // when we compile the details, we use this $scope
         var $detailsScope;
 
@@ -79,6 +85,8 @@ define(function (require) {
 
           $compile($detailsTr)($detailsScope);
         };
+        
+
 
         $scope.$watchCollection('columns', function () {
           createSummaryRow($scope.row, $scope.row._id);
@@ -105,13 +113,14 @@ define(function (require) {
           }
 
           $scope.columns.forEach(function (column) {
-            newHtmls.push(cellTemplate({
-              timefield: false,
-              sourcefield: (column === '_source'),
-              formatted: _displayField(row, column, true)
-            }));
+              var templ = cellTemplate({
+                timefield: false,
+                sourcefield: (column === '_source'),
+                formatted: _displayField(row, column, true)
+            });
+            newHtmls.push($compile(templ)($scope));
           });
-
+          
           var $cells = $el.children();
           newHtmls.forEach(function (html, i) {
             var $cell = $cells.eq(i);
@@ -120,7 +129,6 @@ define(function (require) {
             var reuse = _.find($cells.slice(i + 1), function (cell) {
               return $.data(cell, 'discover:html') === html;
             });
-
             var $target = reuse ? $(reuse).detach() : $(html);
             $target.data('discover:html', html);
             var $before = $cells.eq(i - 1);
@@ -153,20 +161,30 @@ define(function (require) {
         function _displayField(row, fieldName, breakWords) {
           var indexPattern = $scope.indexPattern;
           var text = indexPattern.formatField(row, fieldName);
-
+          var downloadButton = DownloadButtonService.getButtonType(row, fieldName);
           if (breakWords) {
             text = addWordBreaks(text, MIN_LINE_LENGTH);
 
             if (text.length > MIN_LINE_LENGTH) {
-              return truncateByHeightTemplate({
-                body: text
-              });
+                text =  truncateByHeightTemplate({
+                      body: text
+                });
             }
           }
+          
+          var obj = {
+              text : text,
+              downloadButton : downloadButton,
+              row : row,
+          };
+          
+          if ($scope.tableId) {
+              obj.tableID = $scope.tableId;
+          }
+          return obj;
 
-          return text;
         }
-
+        
         init();
       }
     };

@@ -2,6 +2,7 @@
   <div class="panel-heading">
     <span class="panel-title">{{savedObj.title}}</span>
     <div class="btn-group">
+      <span ng-show="panel.type ==='search'">{{numSelected()}}</span>
       <a aria-label="Edit" ng-show="!appEmbedded && editUrl" ng-href="{{editUrl}}">
         <i aria-hidden="true" class="fa fa-pencil"></i>
       </a>

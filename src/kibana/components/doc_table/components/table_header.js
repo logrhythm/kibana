@@ -3,8 +3,12 @@ define(function (require) {
   var module = require('modules').get('app/discover');
 
   require('filters/short_dots');
-
-  module.directive('kbnTableHeader', function (shortDotsFilter) {
+  require('netmon_libs/custom_modules/download/services/downloadQueueManager');
+  require('netmon_libs/custom_modules/download/services/captureSelectModalManager');
+  
+  module.directive('kbnTableHeader', function (shortDotsFilter, DownloadQueueManager,
+      CaptureSelectModalManager) {
+          
     var headerHtml = require('text!components/doc_table/components/table_header.html');
     return {
       restrict: 'A',
@@ -12,10 +16,14 @@ define(function (require) {
         columns: '=',
         sorting: '=',
         indexPattern: '=',
+        tableId: '='
       },
       template: headerHtml,
       controller: function ($scope) {
-
+        $scope.downloadQueueManager = DownloadQueueManager;
+        $scope.captureSelectModalManager = CaptureSelectModalManager;
+        
+  
         var sortableField = function (field) {
           if (!$scope.indexPattern) return;
           var sortable = _.deepGet($scope.indexPattern.fields.byName[field], 'sortable');

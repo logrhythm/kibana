@@ -2,9 +2,9 @@ define(function (require) {
   var _ = require('lodash');
 
   var PER_PAGE_DEFAULT = 10;
-
+  require('netmon_libs/custom_modules/download/services/downloadQueueManager');
   require('modules').get('kibana')
-  .directive('paginate', function ($parse, $compile) {
+  .directive('paginate', function ($parse, $compile, DownloadQueueManager) {
     return {
       restrict: 'E',
       scope: true,
@@ -22,7 +22,7 @@ define(function (require) {
           }
 
           var paginate = $scope.paginate;
-
+          paginate.downloadQueueManager = DownloadQueueManager;
           // add some getters to the controller powered by attributes
           paginate.getList = $parse(attrs.list);
           paginate.perPageProp = attrs.perPageProp;
@@ -33,9 +33,12 @@ define(function (require) {
           } else {
             $scope.showSelector = true;
           }
+          if (attrs.tableId) {
+              paginate.tableID = attrs.tableId;
+          }
 
           paginate.otherWidthGetter = $parse(attrs.otherWidth);
-
+          
           paginate.init();
         }
       },
@@ -126,12 +129,18 @@ define(function (require) {
 
             $scope.pages.push(page);
           });
-
+          
           // set the new page, or restore the previous page number
           if ($scope.page && $scope.page.i < $scope.pages.length) {
             $scope.page = $scope.pages[$scope.page.i];
           } else {
             $scope.page = $scope.pages[0];
+          }
+          
+          if (self.tableID) {
+              self.downloadQueueManager.setPageDirectory(self.tableID, $scope.pages);
+              self.downloadQueueManager.setCurrentPage(self.tableID, $scope.page);
+              self.downloadQueueManager.clearDownloadQueue(self.tableID);
           }
         };
 
@@ -139,6 +148,9 @@ define(function (require) {
           if (!page) {
             $scope.otherPages = null;
             return;
+          }
+          if (self.tableID) {
+              self.downloadQueueManager.setCurrentPage(self.tableID, $scope.page);
           }
 
           // setup the list of the other pages to link to
@@ -183,6 +195,7 @@ define(function (require) {
             return true;
           }
         }
+
       }
     };
   })

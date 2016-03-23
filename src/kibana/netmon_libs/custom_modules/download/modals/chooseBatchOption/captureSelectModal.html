@@ -1,0 +1,25 @@
+  <div class="modal-header">
+     <h3>Select Captures</h3>
+  </div>
+  <div class="modal-body" ng-init="formData.selected='page'">
+      <form>
+        <div class="form-group">
+            <div class="radio">
+                <label class="radio">
+                  <input name="radioGroup" value="page" ng-model="formData.selected" type="radio"> Select all pcaps on this page.
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="radio">
+                <label class="radio">
+                  <input name="radioGroup" value="all" ng-model="formData.selected" type="radio"> Select all {{data.length}} pcaps.
+                </label>
+            </div>
+        </div>
+    </form>
+ </div>
+  <div class="modal-footer">
+     <button class="btn btn-primary-orig" type="button" ng-click="ok()">Confirm</button>
+     <button class="btn btn-default" type="button" ng-click="cancel()">Cancel</button>
+  </div>

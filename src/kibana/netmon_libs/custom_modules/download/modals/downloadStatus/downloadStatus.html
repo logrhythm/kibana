@@ -1,0 +1,41 @@
+<div style="max-height:700px; overflow-y:auto">
+   <div class="{{downloadModalManager.getModalHeaderClass()}}">
+      <h3>{{downloadModalManager.getModalHeader()}}</h3>
+   </div>
+   <div class="modal-body">
+      <p>{{downloadModalManager.getModalBody()}}</p>
+      <table class="table table-striped table-condensed">
+         <tr ng-repeat="session in downloadModalManager.getFilesToDownload()">
+            <td class="col-md-7">{{fileDownloader.formatFileNameForModal(session)}}</td>
+            <td class="col-md-1">
+               <img src="/analyze/common/img/load-white.gif" ng-if="downloadModalManager.getDownloadStatus(session) == 'downloading' || downloadModalManager.getDownloadStatus(session) == 'locating'"/>
+               <i ng-if="downloadModalManager.getDownloadStatus(session) == 'waiting'" class="fa fa-clock-o"></i>
+               <i ng-if="downloadModalManager.getDownloadStatus(session) === 'success'" class="fa fa-check"></i>
+               <i ng-if="downloadModalManager.getDownloadStatus(session) === 'failure'" class="fa fa-exclamation-triangle"></i>
+            </td>
+            <td class="col-md-4">
+               <p ng-if="downloadModalManager.getDownloadStatus(session) === 'downloading'">
+               <small>{{downloadStatus[session]['message']}} bytes downloaded</small>
+               </p>
+               <p ng-if="downloadModalManager.getDownloadStatus(session) === 'waiting'">
+               In Queue
+               </p>
+               <p ng-if="downloadModalManager.getDownloadStatus(session) === 'locating'">
+               Locating pcap...
+               </p>
+               <p ng-show="downloadModalManager.getDownloadStatus(session) === 'failure'">
+               {{downloadModalManager.getDownloadMessage(session)}}
+               </p>
+               <p ng-show="downloadModalManager.getDownloadStatus(session) === 'success'">
+               Download successful
+               </p>
+            </td>
+         </tr>
+      </table>
+   </div>
+   <div class="modal-footer">
+      <small style="float:left; color:#FF0000"><i class="fa fa-exclamation-triangle"></i> Files may be incomplete, corrupted, or contain malware.</small>
+      <button class="btn btn-warning" ng-show="downloadModalManager.getModalLoadingStatus()" ng-click="cancel()">{{downloadModalManager.getModalCloseButton()}}</button>
+      <button class="btn btn-default" data-dismiss="modal" ng-show="!downloadModalManager.getModalLoadingStatus()" ng-click="close()">Close</button>
+   </div>
+</div>

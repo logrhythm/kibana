@@ -1,12 +1,13 @@
 <div
   ng-if="hits.length"
   ng-class="{ loading: searchSource.activeFetchCount > 0 }">
-  <paginate ng-if="!infiniteScroll" list="hits" per-page="50" top-controls="true">
+  <paginate ng-if="!infiniteScroll" list="hits" per-page="50" top-controls="true" table-id="{{tableID}}">
     <table class="kbn-table table" ng-if="indexPattern">
       <thead
         kbn-table-header
         columns="columns"
         index-pattern="indexPattern"
+        table-id="tableID"
         sorting="sorting">
       </thead>
       <tbody>
@@ -16,6 +17,7 @@
           sorting="sorting"
           index-pattern="indexPattern"
           filter="filter"
+          table-id="tableID"
           class="discover-table-row"></tr>
       </tbody>
     </table>

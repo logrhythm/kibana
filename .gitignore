@@ -12,3 +12,4 @@ build
 *.log
 esvm
 .htpasswd
+src/kibana/netmon_libs/fieldMap.js
