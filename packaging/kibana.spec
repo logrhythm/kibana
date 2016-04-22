@@ -33,12 +33,26 @@ mkdir -p %{buildroot}/etc/init
 tar xvf target/%{name}-%{kibana_version}-linux-x64.tar.gz -C %{buildroot}/usr/local/
 cp init/kibana.conf %{buildroot}/etc/init
 cp -r resources/ %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/
-cp scripts/setDefaultIndex.sh %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/
-cp scripts/loadAssets.sh %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/
-cp scripts/refreshKibanaIndex.sh %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/
+mkdir -p %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/scripts
+cp scripts/setDefaultIndex.py %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/scripts
+cp scripts/loadAssets.py %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/scripts
+cp scripts/util.py %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/scripts
+cp scripts/__init__.py %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/scripts
 ln -sf /usr/local/%{name}-%{kibana_version}-linux-x64 %{buildroot}/usr/local/www/probe/%{name}-%{kibana_version}-linux-x64
 
+
 %post
+if [ -e /usr/local/%{name}-%{kibana_version}-linux-x64/setDefaultIndex.sh ]; then
+   rm /usr/local/%{name}-%{kibana_version}-linux-x64/setDefaultIndex.sh
+fi
+
+if [ -e /usr/local/%{name}-%{kibana_version}-linux-x64/loadAssets.sh ]; then
+   rm /usr/local/%{name}-%{kibana_version}-linux-x64/loadAssets.sh
+fi
+
+if [ -e /usr/local/%{name}-%{kibana_version}-linux-x64/refreshKibanaIndex.sh ]; then
+   rm /usr/local/%{name}-%{kibana_version}-linux-x64/refreshKibanaIndex.sh
+fi
 
 %postun
 
