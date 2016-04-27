@@ -1,0 +1,9 @@
+{
+   "title": "Top Destination Ports By Application (histogram)",
+   "visState": "{\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"Application\"}},{\"id\":\"2\",\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"DestPort\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\"}},{\"id\":\"3\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"TimeUpdated\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}}],\"listeners\":{}}",
+   "description": "",
+   "version": 1,
+   "kibanaSavedObjectMeta": {
+     "searchSourceJSON": "{\"index\":\"network_*\",\"query\":{\"query_string\":{\"query\":\"DestPort:<1024 AND _exists_:Application\",\"analyze_wildcard\":true}},\"filter\":[]}"
+   }
+}
