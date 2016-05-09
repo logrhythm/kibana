@@ -1,0 +1,11 @@
+{
+   "hits": 0, 
+   "timeRestore": false, 
+   "description": "", 
+   "title": "Top Level Domains Dashboard", 
+   "panelsJSON": "[{\"id\":\"Top-10-TLD-(pie)\",\"type\":\"visualization\",\"size_x\":5,\"size_y\":4,\"col\":1,\"row\":1},{\"id\":\"Bottom-10-TLD-(histogram)\",\"type\":\"visualization\",\"size_x\":7,\"size_y\":4,\"col\":6,\"row\":5},{\"id\":\"Bottom-10-TLD-(pie)\",\"type\":\"visualization\",\"size_x\":5,\"size_y\":4,\"col\":1,\"row\":5},{\"id\":\"Top-10-TLD-(histogram)\",\"type\":\"visualization\",\"size_x\":7,\"size_y\":4,\"col\":6,\"row\":1},{\"id\":\"Top-Level-Domain-Table\",\"type\":\"search\",\"size_x\":12,\"size_y\":3,\"col\":1,\"row\":9,\"columns\":[\"SrcIP\",\"DestIP\",\"TopLevelDomain_NM\",\"Application\",\"Duration\",\"Session\"],\"sort\":[\"TimeUpdated\",\"desc\"]}]", 
+   "version": 1, 
+   "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+   }
+}

@@ -1,0 +1,9 @@
+{
+   "visState": "{\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"TopLevelDomain_NM\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"custom\",\"orderAgg\":{\"id\":\"2-orderAgg\",\"type\":\"count\",\"schema\":\"orderAgg\",\"params\":{}}}},{\"id\":\"3\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"TimeUpdated\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}}],\"listeners\":{}}", 
+   "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"index\":\"[network_]YYYY_MM_DD\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+   }, 
+   "version": 1, 
+   "description": "", 
+   "title": "Top 10 TLD (histogram)"
+}
