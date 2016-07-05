@@ -1,0 +1,21 @@
+{
+   "sort": [
+      "TimeUpdated", 
+      "desc"
+   ], 
+   "hits": 0, 
+   "description": "", 
+   "title": "Top Level Domain  Table", 
+   "version": 1, 
+   "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"index\":\"[network_]YYYY_MM_DD\",\"query\":{\"query_string\":{\"query\":\"_exists_:TopLevelDomain_NM\",\"analyze_wildcard\":true}},\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"fragment_size\":2147483647},\"filter\":[]}"
+   }, 
+   "columns": [
+      "SrcIP", 
+      "DestIP", 
+      "TopLevelDomain_NM", 
+      "Application", 
+      "Duration", 
+      "Session"
+   ]
+}
