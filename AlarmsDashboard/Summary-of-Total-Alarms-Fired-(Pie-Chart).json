@@ -1,0 +1,9 @@
+{
+   "visState": "{\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"4\",\"type\":\"filters\",\"schema\":\"segment\",\"params\":{\"filters\":[{\"input\":{\"query\":{\"query_string\":{\"query\":\"RuleName:\\\"deep script\\\"\",\"analyze_wildcard\":true}}},\"label\":\"DPA\"},{\"input\":{\"query\":{\"query_string\":{\"query\":\"!RuleName:\\\"deep script\\\"\",\"analyze_wildcard\":true}}},\"label\":\"QueryRule\"}]}},{\"id\":\"3\",\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"RuleSeverity\",\"size\":3,\"order\":\"desc\",\"orderBy\":\"1\"}},{\"id\":\"2\",\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"RuleName.raw\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}", 
+   "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"index\":\"[events_]YYYY_MM_DD\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+   }, 
+   "version": 1, 
+   "description": "", 
+   "title": "Summary of Total Alarms Fired (Pie Chart)"
+}

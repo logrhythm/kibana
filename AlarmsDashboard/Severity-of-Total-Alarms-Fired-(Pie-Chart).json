@@ -1,0 +1,9 @@
+{
+   "visState": "{\"type\":\"pie\",\"params\":{\"addLegend\":true,\"addTooltip\":true,\"isDonut\":false,\"shareYAxis\":true},\"aggs\":[{\"id\":\"1\",\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"RuleSeverity\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}", 
+   "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"index\":\"[events_]YYYY_MM_DD\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+   }, 
+   "version": 1, 
+   "description": "", 
+   "title": "Severity of Total Alarms Fired (Pie Chart)"
+}
