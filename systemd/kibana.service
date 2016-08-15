@@ -25,15 +25,15 @@ PermissionsStartOnly=true
 ExecStartPre=/usr/bin/touch /var/log/probe/KibanaStartup.log
 ExecStartPre=/usr/bin/chown nginx:nginx /var/log/probe/KibanaStartup.log
 
-Environment=CONFIG_PATH=/usr/local/kibana-4.1.4-linux-x64/config/kibana.yml
+Environment=CONFIG_PATH=/usr/local/kibana-4.1.10-linux-x64/config/kibana.yml
 Environment=NODE_ENV=production
 
-WorkingDirectory=/usr/local/kibana-4.1.4-linux-x64/
+WorkingDirectory=/usr/local/kibana-4.1.10-linux-x64/
 
-ExecStart=/usr/local/kibana-4.1.4-linux-x64/node/bin/node /usr/local/kibana-4.1.4-linux-x64/src/bin/kibana.js
+ExecStart=/usr/local/kibana-4.1.10-linux-x64/node/bin/node /usr/local/kibana-4.1.10-linux-x64/src/bin/kibana.js
 
-ExecStartPost=/usr/bin/python /usr/local/kibana-4.1.4-linux-x64/scripts/setDefaultIndex.py
-ExecStartPost=/usr/bin/python /usr/local/kibana-4.1.4-linux-x64/scripts/loadAssets.py
+ExecStartPost=/usr/bin/python /usr/local/kibana-4.1.10-linux-x64/scripts/setDefaultIndex.py
+ExecStartPost=/usr/bin/python /usr/local/kibana-4.1.10-linux-x64/scripts/loadAssets.py
 
 Restart=on-failure
 

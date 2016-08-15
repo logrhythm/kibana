@@ -37,7 +37,7 @@ class ElasticsearchUtil:
   KIBANA_INDEX = ".kibana"
   INDEX_PATTERN_TYPE = "index-pattern"
   CONFIG_TYPE = "config"
-  KIBANA_VERSION = "4.1.4"
+  KIBANA_VERSION = "4.1.10"
   es = elasticsearch.Elasticsearch(max_retries=1, timeout=ES_REQUEST_TIMEOUT)
 
   LOG_FILE="/var/log/probe/KibanaStartup.log"

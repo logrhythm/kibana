@@ -14,9 +14,10 @@ module.exports = function (grunt) {
     buildApp: __dirname + '/build/kibana', // build directory for the app
     configFile: __dirname + '/src/server/config/kibana.yml',
 
-    nodeVersion: '0.10.35',
+    nodeVersion: '4.4.7',
     platforms: ['linux-x64'],
-
+    
+    
     unitTestDir: __dirname + '/test/unit',
     testUtilsDir: __dirname + '/test/utils',
     bowerComponentsDir: __dirname + '/src/kibana/bower_components',
