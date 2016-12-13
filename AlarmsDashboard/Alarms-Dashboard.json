@@ -1,0 +1,11 @@
+{
+   "hits": 0, 
+   "timeRestore": false, 
+   "description": "", 
+   "title": "Alarms Dashboard", 
+   "panelsJSON": "[{\"col\":9,\"id\":\"Severity-of-Total-Alarms-Fired-(Pie-Chart)\",\"row\":4,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":5,\"id\":\"DPA-Alarms-Fired-(Count)\",\"row\":6,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Total-Alarms-Fired-(Count)\",\"row\":6,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Count-of-Total-Alarms-Fired-by-Name-(Pie-Chart)\",\"row\":4,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"columns\":[\"RuleName\",\"RuleSeverity\",\"Application\",\"Session\",\"TotalBytes\",\"Captured\"],\"id\":\"Alarms-Table\",\"row\":8,\"size_x\":12,\"size_y\":5,\"sort\":[\"TimeUpdated\",\"desc\"],\"type\":\"search\"},{\"col\":5,\"id\":\"Count-of-DPA-Alarms-Fired-by-Name-(Bar-Chart)\",\"row\":1,\"size_x\":4,\"size_y\":3,\"type\":\"visualization\"},{\"col\":9,\"id\":\"Count-of-QueryRules-Fired-by-Name-(Bar-Chart)\",\"row\":1,\"size_x\":4,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Count-of-Total-Alarms-Fired-by-Name-(Bar-Chart)\",\"row\":1,\"size_x\":4,\"size_y\":3,\"type\":\"visualization\"},{\"id\":\"Summary-of-Total-Alarms-Fired-(Pie-Chart)\",\"type\":\"visualization\",\"size_x\":4,\"size_y\":2,\"col\":5,\"row\":4},{\"id\":\"QueryRules-Fired-(Count)\",\"type\":\"visualization\",\"size_x\":4,\"size_y\":2,\"col\":9,\"row\":6}]", 
+   "version": 1, 
+   "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+   }
+}

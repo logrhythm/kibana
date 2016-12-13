@@ -1,0 +1,9 @@
+{
+   "visState": "{\"type\":\"histogram\",\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"defaultYExtents\":false,\"mode\":\"stacked\",\"scale\":\"linear\",\"setYExtents\":false,\"shareYAxis\":true,\"times\":[],\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"TimeUpdated\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"RuleName.raw\",\"size\":20,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}", 
+   "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"index\":\"[events_]YYYY_MM_DD\",\"query\":{\"query_string\":{\"query\":\"!RuleName:\\\"deep script\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+   }, 
+   "version": 1, 
+   "description": "", 
+   "title": "Count of QueryRules Fired by Name (Bar Chart)"
+}
