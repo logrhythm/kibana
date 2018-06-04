@@ -4,17 +4,17 @@ import sys
 import argparse
 import json
 from util import ElasticsearchUtil
-from util import Logger
+from util import LogConfig
 from util import Utility
 
 EXPORT_LOG = "/tmp/ExportAssets.log"
 
 esUtil = ElasticsearchUtil(EXPORT_LOG)
-logger = Logger(log_file=EXPORT_LOG)
+logger = LogConfig(log_file=EXPORT_LOG)
 logging, rotating_handler = logger.configure_and_return_logging()
 UTIL = Utility(log_file=EXPORT_LOG)
 
-OUTPUT_DIR = os.path.dirname(os.path.realpath(__file__)) 
+OUTPUT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 INDEX = esUtil.KIBANA_INDEX
 TYPE = None
@@ -72,7 +72,7 @@ def get_dashboard_panels(panels_str):
    panels_with_type = {}
    db_panels_json = json.loads(UTIL.remove_all_char(string=panels_str, to_remove="\\"))
    for index, panel in enumerate(db_panels_json):
-      
+
       panel_id = UTIL.safe_list_read(list_ob=db_panels_json[index], key='id')
       panel_type = UTIL.safe_list_read(list_ob=db_panels_json[index], key='type')
       panels_with_type[panel_id] = panel_type
@@ -111,11 +111,11 @@ def main(argv):
    argParser.add_argument("-v", "--visualization", dest="viz_name", metavar="VIZUALIZATION_NAME", help="Export a single visualization")
    argParser.add_argument("-s", "--search", dest="search_name", metavar="SEARCH_NAME", help="Export a single search")
    argParser.add_argument("-o", "--outputdir", dest="directory", metavar="DIR_NAME", help="Specify an output directory for the exported file")
-   
+
    args = argParser.parse_args()
 
    santize_input_args(arg_parser=argParser, args=args)
-   
+
    global OUTPUT_DIR
    global FILE_PATHS_AND_CONTENTS
    global TYPE

@@ -1,0 +1,21 @@
+{
+   "sort": [
+      "TimeUpdated", 
+      "desc"
+   ], 
+   "hits": 0, 
+   "description": "", 
+   "title": "Application Family Table", 
+   "version": 1, 
+   "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"index\":\"[network_]YYYY_MM_DD\",\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"fragment_size\":2147483647},\"filter\":[],\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}}}"
+   }, 
+   "columns": [
+      "SrcIP", 
+      "DestIP", 
+      "Application", 
+      "ApplicationFamily", 
+      "TotalBytesDelta", 
+      "PacketsDelta"
+   ]
+}
