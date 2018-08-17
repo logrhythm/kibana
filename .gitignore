@@ -3,9 +3,13 @@
 .node_binaries
 node_modules
 trash
+<<<<<<< HEAD
+build
+=======
 bundles
 target
 /build
+>>>>>>> c7e08ea770e835975ecda41c96016daf798c7f6e
 .jruby
 .idea
 *.iml

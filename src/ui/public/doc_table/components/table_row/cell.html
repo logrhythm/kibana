@@ -7,7 +7,18 @@ if (timefield) {
 } else {
   attributes='class="discover-table-datafield"';
 }
+if (formatted.tableID) {
+    if (formatted.downloadButton && formatted.downloadButton === 'pcap') {
+        formatted.text = '<span ng-click="downloadModalManager.download(\'' + formatted.tableID + '\',row)" aria-hidden="true" class="fa fa-arrow-circle-o-down fa-lg" style="padding-right:5px"></span>';
+        formatted.text += '<input type="checkbox"' + 
+            'ng-checked="downloadQueueManager.isBoxChecked(\'' + formatted.tableID + '\',row)"' + 
+            'ng-click="downloadQueueManager.toggleCaptureSelection(\'' + formatted.tableID + '\',row)"' + 
+            'style="margin-top: -1px" />'
+    } else if (formatted.downloadButton && formatted.downloadButton === 'file') {
+        formatted.text = '<span aria-hidden="true" class="fa fa-download fa-lg" ng-click="downloadModalManager.downloadReconstructedFile(row)"></span>';
+    }
+}
 %>
-<td <%= attributes %>>
-  <%= formatted %>
+<td <%= attributes %> >
+  <%= formatted.text %>
 </td>

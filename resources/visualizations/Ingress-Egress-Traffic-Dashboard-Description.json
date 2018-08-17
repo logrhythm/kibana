@@ -1,0 +1,9 @@
+{
+   "visState": "{\"type\":\"markdown\",\"params\":{\"markdown\":\"### Data will only be visible in this dashboard if you enable the Flow_IdentifyTrafficDirection system rule.    \\n\\nTraffic direction is determined by evaluating the source and destination IP and the number of bytes sent and received.  \\n\\n* **Egress** traffic indicates that twice as many bytes are moving from your internal network to an external network. \\n* **Ingress** traffic indicates that twice as many bytes are  moving from an external network into your internal network.\\n* **Lateral** traffic has source and destination IPs inside your internal network.  \\n* **Other** traffic has no IP addresses, has IPV6 addresses, or the byte flow is relatively equal in both directions.\\n\\nYour internal network is defined by the IP ranges in the  Flow_IdentifyTrafficDirection system rule.\"},\"aggs\":[],\"listeners\":{}}", 
+   "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+   }, 
+   "version": 3, 
+   "description": "", 
+   "title": "Ingress Egress Traffic Dashboard Description"
+}

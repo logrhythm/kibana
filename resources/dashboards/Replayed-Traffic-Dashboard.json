@@ -1,0 +1,11 @@
+{
+   "hits": 0, 
+   "timeRestore": false, 
+   "description": "", 
+   "title": "Replayed Traffic Dashboard", 
+   "panelsJSON": "[{\"col\":9,\"id\":\"Top-Applications-By-Packet-Count\",\"row\":2,\"size_x\":4,\"size_y\":3,\"type\":\"visualization\"},{\"id\":\"Top-Applications-By-Bandwidth-(histogram)\",\"type\":\"visualization\",\"size_x\":8,\"size_y\":3,\"col\":1,\"row\":2},{\"id\":\"Replayed-Traffic-Dashboard-Description\",\"type\":\"visualization\",\"size_x\":12,\"size_y\":1,\"col\":1,\"row\":1},{\"id\":\"Top-10-Dest-Ports-By-Flow-Count\",\"type\":\"visualization\",\"size_x\":4,\"size_y\":3,\"col\":9,\"row\":5},{\"id\":\"Top-10-Dest-Ports-Data\",\"type\":\"visualization\",\"size_x\":8,\"size_y\":3,\"col\":1,\"row\":5},{\"id\":\"Replayed-Traffic-Table\",\"type\":\"search\",\"size_x\":12,\"size_y\":5,\"col\":1,\"row\":8,\"columns\":[\"SrcIP\",\"DestIP\",\"Application\",\"Duration\",\"FlowCompleted\",\"Session\",\"PcapFilename\"],\"sort\":[\"TimeUpdated\",\"desc\"]}]", 
+   "version": 2, 
+   "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"filter\":[{\"meta\":{\"negate\":false,\"index\":\"[network_]YYYY_MM_DD\",\"key\":\"Replayed\",\"value\":\"true\",\"disabled\":false},\"query\":{\"match\":{\"Replayed\":{\"query\":true,\"type\":\"phrase\"}}}},{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}}}]}"
+   }
+}

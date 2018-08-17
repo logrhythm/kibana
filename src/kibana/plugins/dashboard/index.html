@@ -1,0 +1,114 @@
+<div dashboard-app class="app-container dashboard-container">
+  <navbar ng-show="!appEmbedded">
+    <span class="name" ng-if="dash.id" bindonce bo-bind="dash.title" tooltip="{{dash.title}}"></span>
+    <ul ng-if="setupComplete" ng-show="timefilter.enabled" class="nav navbar-nav navbar-right navbar-timepicker">
+      <li>
+        <a  ng-click="toggleRefresh()"
+            ng-show="timefilter.refreshInterval.value > 0">
+          <i class="fa" ng-class="timefilter.refreshInterval.pause ? 'fa-play' : 'fa-pause'"></i>
+        </a>
+      </li>
+
+      <li class="to-body" ng-class="{active: timefilter.timepickerActiveTab === 'filter'}">
+        <a  ng-click="toggleTimepicker('filter')" aria-haspopup="true" aria-expanded="false" class="navbar-timepicker-time-desc LR-timepicker">
+          <i aria-hidden="true" class="fa fa-clock-o"></i>
+          <pretty-duration from="timefilter.time.from" to="timefilter.time.to"></pretty-duration>
+        </a>
+      </li>
+      
+      <li ng-class="{active: timefilter.timepickerActiveTab === 'interval'}"
+          ng-show="timefilter.refreshInterval.value > 0 || timefilter.timepickerActiveTab"
+          class="to-body">
+        <a  ng-click="toggleTimepicker('interval')"
+            class="navbar-timepicker-auto-refresh-desc LR-timepicker">
+          <span ng-show="timefilter.refreshInterval.value === 0"><i class="fa fa-repeat"></i> Auto-refresh</span>
+          <span ng-show="timefilter.refreshInterval.value > 0">{{timefilter.refreshInterval.display}}</span>
+        </a>
+      </li>
+    </ul>
+
+    <ul class="nav navbar-nav navbar-right navbar-timepicker" >
+      <li ng-show="httpActive.length" class="navbar-text hidden-xs LR-hidden-load">
+        <div class="spinner"></div>
+      </li>
+    </ul>
+    <form name="queryInput"
+      class="fill inline-form"
+      ng-submit="filterResults()"
+      role="form">
+
+      <div class="typeahead" kbn-typeahead="dashboard">
+        <div class="input-group"
+          ng-class="queryInput.$invalid ? 'has-error' : ''">
+
+          <input type="text"
+            placeholder="Filter..."
+            aria-label="Filter input"
+            class="form-control"
+            ng-model="state.query"
+            input-focus
+            kbn-typeahead-input
+            validate-query>
+          <button type="submit" class="btn btn-default" ng-disabled="queryInput.$invalid" aria-label="Filter dashboards">
+            <span aria-hidden="true" class="fa fa-search"></span>
+          </button>
+          <button type="button" class="btn btn-default"
+          style="margin-left:3px"
+          ng-disabled="queryInput.$invalid" aria-label="Save as Rule" ng-click="saveRuleManager.openSaveRuleModal(state.query)">
+           <span aria-hidden="true">Save Rule</span>
+          </button>
+        </div>
+
+        <kbn-typeahead-items></kbn-typeahead-items>
+      </div>
+
+    </form>
+
+    <div class="button-group" role="toolbar">
+      <kbn-tooltip text="New Dashboard" placement="bottom" append-to-body="1">
+        <button ng-click="newDashboard()" aria-label="New Dashboard"><i aria-hidden="true" class="fa fa-file-new-o"></i></button>
+      </kbn-tooltip>
+      <kbn-tooltip text="Save Dashboard" placement="bottom" append-to-body="1">
+        <button
+          aria-label="Save Dashboard"
+          aria-haspopup="true"
+          aria-expanded="{{ configTemplate.is('save') }}"
+          ng-class="{active: configTemplate.is('save')}"
+          ng-click="configTemplate.toggle('save');">
+          <i aria-hidden="true" class="fa fa-save"></i>
+        </button>
+      </kbn-tooltip>
+      <kbn-tooltip text="Load Saved Dashboard" placement="bottom" append-to-body="1">
+        <button
+          aria-label="Load Saved Dashboard"
+          aria-haspopup="true"
+          aria-expanded="{{ configTemplate.is('load') }}"
+          ng-class="{active: configTemplate.is('load')}"
+          ng-click="configTemplate.toggle('load');">
+          <i aria-hidden="true" class="fa fa-folder-open-o"></i>
+        </button>
+      </kbn-tooltip>
+      <kbn-tooltip text="Add Visualization" placement="bottom" append-to-body="1">
+        <button
+          aria-label="Add Visualization"
+          aria-haspopup="true"
+          aria-expanded="{{ configTemplate.is('pickVis') }}"
+          ng-class="{active: configTemplate.is('pickVis')}"
+          ng-click="configTemplate.toggle('pickVis');">
+          <i aria-hidden="true" class="fa fa-plus-circle"></i>
+        </button>
+      </kbn-tooltip>
+    </div>
+  </navbar>
+
+  <config config-template="configTemplate" config-object="opts"></config>
+
+  <filter-bar state="state"></filter-bar>
+
+  <div ng-show="!state.panels.length" class="text-center start-screen">
+    <h2>Ready to get started?</h2>
+    <p>Click the <a class="btn btn-xs navbtn-inverse" ng-click="configTemplate.open('pickVis'); toggleAddVisualization = !toggleAddVisualization" aria-label="Add visualization"><i aria-hidden="true" class="fa fa-plus-circle"></i></a> button in the menu bar above to add a visualization to the dashboard. <br/>If you haven't setup a visualization yet visit the <a href="#/visualize" title="Visualize">"Visualize"</a> tab to create your first visualization.</p>
+  </div>
+
+  <dashboard-grid></dashboard-grid>
+</div>

@@ -48,6 +48,11 @@ module.exports = function (grunt) {
         'Nonsense@0.1.2': ['Public-Domain'],
         'pkginfo@0.2.3': ['MIT'],
         'uglify-js@2.2.5': ['BSD'],
+<<<<<<< HEAD
+        'amdefine@0.1.1': ['BSD-3-Clause', 'MIT'],
+        'amdefine@1.0.0': ['BSD-3-Clause', 'MIT']
+=======
+>>>>>>> c7e08ea770e835975ecda41c96016daf798c7f6e
       }
     }
   };

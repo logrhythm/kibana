@@ -3,8 +3,13 @@ module.exports = function (grunt) {
 
   // build, then zip and upload to s3
   grunt.registerTask('release', [
+<<<<<<< HEAD
+    'npm_shrinkwrap_exists',
+    'distribute:load_s3_config',
+=======
     '_release:confirmUpload',
     '_release:loadS3Config',
+>>>>>>> c7e08ea770e835975ecda41c96016daf798c7f6e
     'build',
     's3:release',
     '_release:complete'

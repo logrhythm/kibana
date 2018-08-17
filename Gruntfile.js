@@ -15,6 +15,15 @@ module.exports = function (grunt) {
     testUtilsDir: __dirname + '/src/testUtils',
     configFile: __dirname + '/src/config/kibana.yml',
 
+<<<<<<< HEAD
+    nodeVersion: '4.4.7',
+    platforms: ['linux-x64'],
+    
+    
+    unitTestDir: __dirname + '/test/unit',
+    testUtilsDir: __dirname + '/test/utils',
+    bowerComponentsDir: __dirname + '/src/kibana/bower_components',
+=======
     karmaBrowser: (function () {
       if (grunt.option('browser')) {
         return grunt.option('browser');
@@ -29,6 +38,7 @@ module.exports = function (grunt) {
           return 'Firefox';
       }
     }()),
+>>>>>>> c7e08ea770e835975ecda41c96016daf798c7f6e
 
     nodeVersion: grunt.file.read('.node-version').trim(),
 

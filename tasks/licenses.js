@@ -27,6 +27,33 @@ module.exports = function (grunt) {
       return pkgInfo;
     }
 
+<<<<<<< HEAD
+    function dequeue(output) {
+      checkQueueLength--;
+      _.extend(result, output);
+
+      if (!checkQueueLength) {
+        var licenseStats = _.map(result, processPackage);
+        var invalidLicenses = _.filter(licenseStats, function (pkg) { return !pkg.valid;});
+
+        if (grunt.option('only-invalid')) {
+          grunt.log.debug(JSON.stringify(invalidLicenses, null, 2));
+        } else {
+          grunt.log.debug(JSON.stringify(licenseStats, null, 2));
+        }
+
+
+        if (invalidLicenses.length) {
+          grunt.fail.warn('Non-confirming licenses: ' + _.pluck(invalidLicenses, 'name').join(', ') +
+            '. Use --only-invalid for details.', invalidLicenses.length);
+        }
+        done();
+      }
+    }
+
+    bowerLicense.init(options, dequeue);
+=======
+>>>>>>> c7e08ea770e835975ecda41c96016daf798c7f6e
     npmLicense.init(options, function (allDependencies) {
       // Only check production NPM dependencies, not dev
       npm.load({production: true}, function () {

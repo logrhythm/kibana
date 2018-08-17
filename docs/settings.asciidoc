@@ -183,14 +183,21 @@ include::string-formatter.asciidoc[]
 
 ==== Numeric Field Formatters
 
+<<<<<<< HEAD
+Numeric fields support the `Url`, `String`, `Bytes`, `Number`, and `Percentage` formatters.
+=======
 Numeric fields support the `Url`, `String`, `Bytes`, `Number`, `Percentage`, and `Color` formatters.
+>>>>>>> c7e08ea770e835975ecda41c96016daf798c7f6e
 
 include::string-formatter.asciidoc[]
 
 include::url-formatter.asciidoc[]
 
+<<<<<<< HEAD
+=======
 include::color-formatter.asciidoc[]
 
+>>>>>>> c7e08ea770e835975ecda41c96016daf798c7f6e
 The `Bytes`, `Number`, and `Percentage` formatters enable you to choose the display formats of numbers in this field using 
 the https://adamwdraper.github.io/Numeral-js/[numeral.js] standard format definitions.
 

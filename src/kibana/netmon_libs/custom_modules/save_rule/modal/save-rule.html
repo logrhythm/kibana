@@ -1,0 +1,129 @@
+<div ng-switch="modalState.state">
+
+   <!-- Confirm save -->
+   <div ng-switch-when="unconfirmed">
+      <div class="modal-header">
+         <h3>Create Rule</h3>
+      </div>
+      <div class="modal-body" ng-if="!!modalState.loading">
+         <div class="loading">
+            <img ng-src="{{loadingIconPath}}" />
+         </div>
+      </div>
+      <div class="modal-body" ng-if="!modalState.loading">
+       <p>In the last 24 hours, this rule would have triggered <strong>{{ modalState.numMatches | number }}</strong> time(s).</p>
+       <p>Are you sure you want to create the rule {{ savableRule.id }}?</p>
+      </div>
+      <div class="modal-footer">
+         <button class="btn btn-primary-orig" type="button" ng-click="saveRule(savableRule)" ng-if="!modalState.loading">Confirm</button>
+         <button class="btn btn-default-orig" type="button" ng-click="cancel()">Cancel</button>
+      </div>
+   </div>
+
+   <!-- Save success -->
+   <div ng-switch-when="saved">
+      <div class="modal-header">
+         <h3>Save Complete</h3>
+      </div>
+      <div class="modal-body" ng-if="!!modalState.loading">
+         <div class="loading">
+            <img ng-src="{{loadingIconPath}}" />
+         </div>
+      </div>
+      <div class="modal-body" ng-if="!modalState.loading">
+         Rule saved successfully.
+      </div>
+      <div class="modal-footer">
+         <button class="btn btn-default-orig" type="button" ng-click="cancel()">Close</button>
+      </div>
+   </div>
+
+   <!-- Error state -->
+   <div ng-switch-when="error">
+      <div class="modal-header">
+         <h3>Error</h3>
+      </div>
+      <div class="modal-body" ng-if="!!modalState.loading">
+         <div class="loading">
+            <img ng-src="{{loadingIconPath}}" />
+         </div>
+      </div>
+      <div class="modal-body" ng-if="!modalState.loading">
+         {{ modalState.error }}
+      </div>
+      <div class="modal-footer">
+         <button class="btn btn-default-orig" type="button" ng-click="cancel()">Close</button>
+      </div>
+   </div>
+
+   <!-- Save form -->
+   <div ng-switch-default>
+      <div class="modal-header">
+         <h3>Create Rule</h3>
+      </div>
+      <div class="modal-body" ng-if="!!modalState.loading">
+         <div class="loading">
+            <img ng-src="{{loadingIconPath}}" />
+         </div>
+      </div>
+      <div class="modal-body" ng-if="!modalState.loading">
+         <form name="$parent.saveRuleForm" class="form-horizontal LR-rule-modal">
+            <input type="hidden" name="enabled" ng-model="savableRule.enabled" />
+            <div class="form-group">
+               <label
+                  for="inputName"
+                  ng-class="{ error : validators.hasErrors(saveRuleForm.name) }">
+                  Name
+               </label>
+               <input
+                  type="text"
+                  name="name"
+                  id="inputName"
+                  class="form-control"
+                  ng-model="savableRule.id"
+                  ui-validate="{ required : 'validators.required($value)', basicCharacters : 'validators.basicCharacters($value)', uniqueRule : 'validators.uniqueRule($value, savableRule.id)' }"
+                />
+               <div class="formValidatorError"  ng-show="validators.showError(saveRuleForm.name, 'required')">Name is required.</div>
+               <div class="formValidatorError" ng-show="validators.showError(saveRuleForm.name, 'basicCharacters')">Only alphanumeric characters, spaces, dashes, or underscores are allowed.</div>
+               <div class="formValidatorError" ng-show="validators.showError(saveRuleForm.name, 'uniqueRule')">There is already a saved rule with this name.</div>
+            </div>
+            <div class="form-group">
+               <label
+                  for="severitySelect"
+                  ng-class="{ error : validators.hasErrors(saveRuleForm.severity) }">
+                  Severity
+               </label>
+               <select
+                  id="severitySelect"
+                  name="severity"
+                  class="form-control"
+                  ng-model="savableRule.severity"
+                  ui-validate="{ required : 'validators.required($value)' }">
+                  <option value="">Choose Severity...</option>
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+               </select>
+               <div class="formValidatorError" ng-show="validators.showError(saveRuleForm.severity, 'required')">Severity is required.</div>
+            </div>
+            <div class="form-group">
+               <label
+                  for="search-box"
+                  ng-class="{ error : validators.hasErrors(saveRuleForm.query) }">
+                  Search
+               </label>
+               <textarea name="query" class="form-control" rows="2" ng-model="savableRule.query" ui-validate="{ required : 'validators.required($value)', notAllQuery: 'validators.notAllQuery($value)', validQuery : 'validators.validQuery($value)' }"></textarea>
+               <div class="formValidatorError" ng-show="validators.showError(saveRuleForm.query, 'required')">Search is required.</div>
+               <div class="formValidatorError" ng-show="validators.showError(saveRuleForm.query, 'notAllQuery')">Search for '*' is not allowed.</div>
+               <div class="formValidatorError" ng-show="validators.showError(saveRuleForm.query, 'validQuery')">Invalid search.</div>
+            </div>
+         </div>
+      </form>
+      <div class="modal-footer">
+         <button class="btn btn-primary-orig" type="button" ng-click="openConfirmSaveRuleModal(savableRule, saveRuleForm)" ng-disabled="saveRuleForm.$invalid">Save</button>
+         <button class="btn btn-default-orig" type="button" ng-click="cancel()">Close</button>
+      </div>
+    </div>
+
+
+</div>

@@ -1,0 +1,11 @@
+{
+   "hits": 0,
+   "timeRestore": false,
+   "description": "",
+   "title": "Traffic Profile Dashboard",
+   "panelsJSON": "[{\"col\":4,\"id\":\"Top-Applications-By-Sessions-(pie)\",\"row\":1,\"size_x\":3,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Top-Applications-By-Metadata-Impact-(pie)\",\"row\":1,\"size_x\":3,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Top-Applications-By-Bandwidth-(pie)\",\"row\":1,\"size_x\":3,\"size_y\":3,\"type\":\"visualization\"},{\"col\":10,\"id\":\"Top-Applications-By-Packet-Count\",\"row\":1,\"size_x\":3,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Top-Applications-By-Sessions-(histogram)\",\"row\":4,\"size_x\":4,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Sum-of-Repeated-Field-Count-by-Application-(histogram)\",\"row\":7,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"col\":5,\"id\":\"Average-Repeated-Elements-in-a-Message-(All-Reports)-(line)\",\"row\":4,\"size_x\":4,\"size_y\":3,\"type\":\"visualization\"},{\"id\":\"Average-Message-Size-(All-Reports)-(line)\",\"type\":\"visualization\",\"size_x\":4,\"size_y\":3,\"col\":9,\"row\":4}]",
+   "version": 4,
+   "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+   }
+}

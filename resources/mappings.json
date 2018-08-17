@@ -1,0 +1,31 @@
+{
+	"fieldFormatMap": {
+		"Duration": {
+			"id":"number",
+			"params": {
+				"pattern":"00:00:00"
+			}
+		},
+		"AttachSize": {
+			"id": "bytes"
+		},
+		"TotalBytesDelta": {
+			"id": "bytes"
+		},
+		"TotalBytes": {
+			"id":"bytes"
+		},
+		"SrcBytes": {
+			"id":"bytes"
+		},
+		"SrcBytesDelta": {
+			"id":"bytes"
+		},
+		"DestBytes": {
+			"id":"bytes"
+		},
+		"DestBytesDelta": {
+			"id":"bytes"
+		}
+	}
+}

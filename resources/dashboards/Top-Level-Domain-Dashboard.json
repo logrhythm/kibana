@@ -1,0 +1,11 @@
+{
+   "hits": 0, 
+   "timeRestore": false, 
+   "description": "", 
+   "title": "Top Level Domain Dashboard", 
+   "panelsJSON": "[{\"col\":1,\"columns\":[\"SrcIP\",\"DestIP\",\"Application\",\"Duration\",\"Session\",\"Domain_TLD_NM\",\"Domain_SLD_NM\",\"Domain_FQDN_NM\"],\"id\":\"Top-Level-Domain-Table\",\"row\":10,\"size_x\":12,\"size_y\":5,\"sort\":[\"TimeUpdated\",\"desc\"],\"type\":\"search\"},{\"col\":5,\"id\":\"High-Bandwidth-Top-Level-Domains\",\"row\":1,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":9,\"id\":\"Low-Bandwidth-Top-Level-Domains\",\"row\":1,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Top-10-Top-Level-Domains-By-Bandwidth\",\"row\":5,\"size_x\":6,\"size_y\":5,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Top-10-Second-Level-Domains-By-Bandwidth\",\"row\":5,\"size_x\":6,\"size_y\":5,\"type\":\"visualization\"},{\"id\":\"Top-Level-Domain-Dashboard-Description\",\"type\":\"visualization\",\"size_x\":4,\"size_y\":4,\"col\":1,\"row\":1}]", 
+   "version": 1, 
+   "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}}}]}"
+   }
+}

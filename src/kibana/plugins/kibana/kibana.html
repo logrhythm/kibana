@@ -1,0 +1,11 @@
+<kbn-notifications list="notifList"></kbn-notifications>
+<div class="content" style="display: none;">
+  <config
+    ng-show="timefilter.enabled"
+    config-template="globalConfigTemplate"
+    config-object="timefilter"
+    config-close="toggleTimepicker">
+  </config>
+
+  <div class="application" ng-view></div>
+</div>

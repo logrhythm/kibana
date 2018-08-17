@@ -1,0 +1,11 @@
+{
+   "hits": 0,
+   "timeRestore": false,
+   "description": "",
+   "title": "Traffic Endpoints Dashboard",
+   "panelsJSON": "[{\"id\":\"Support-Table\",\"type\":\"search\",\"size_x\":12,\"size_y\":3,\"col\":1,\"row\":4,\"columns\":[\"Application\",\"SrcIP\",\"DestIP\",\"Duration\"],\"sort\":[\"TimeUpdated\",\"asc\"]},{\"id\":\"Top-SrcIP-By-Metadata-Impact-(pie)\",\"type\":\"visualization\",\"size_x\":3,\"size_y\":3,\"col\":1,\"row\":1},{\"id\":\"Top-DestIP-By-Metadata-Impact-(pie)\",\"type\":\"visualization\",\"size_x\":3,\"size_y\":3,\"col\":4,\"row\":1},{\"id\":\"Top-DestIP-By-Session-(pie)\",\"type\":\"visualization\",\"size_x\":3,\"size_y\":3,\"col\":10,\"row\":1},{\"id\":\"Top-SrcIP-By-Session-(pie)\",\"type\":\"visualization\",\"size_x\":3,\"size_y\":3,\"col\":7,\"row\":1}]",
+   "version": 4,
+   "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}}}]}"
+   }
+}

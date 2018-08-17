@@ -1,0 +1,11 @@
+{
+	"fieldFormatMap": {
+      "Session": {
+          "id":"url",
+          "params": {
+              "urlTemplate":"/analyze/dashboard/Analyze-Dashboard/Session:{{value}}",
+              "labelTemplate":"{{value}}"
+          }
+      }
+   }
+}

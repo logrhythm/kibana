@@ -1,0 +1,11 @@
+{
+   "hits": 0, 
+   "timeRestore": false, 
+   "description": "", 
+   "title": "Ingress Egress Traffic Dashboard", 
+   "panelsJSON": "[{\"id\":\"Ingress-Egress-Traffic-Dashboard-Description\",\"type\":\"visualization\",\"size_x\":6,\"size_y\":3,\"col\":1,\"row\":1},{\"id\":\"Egress-Traffic-By-Application\",\"type\":\"visualization\",\"size_x\":6,\"size_y\":3,\"col\":1,\"row\":4},{\"id\":\"Egress-Traffic-By-Source-IP\",\"type\":\"visualization\",\"size_x\":6,\"size_y\":3,\"col\":1,\"row\":7},{\"id\":\"Ingress-Traffic-By-Application\",\"type\":\"visualization\",\"size_x\":6,\"size_y\":3,\"col\":7,\"row\":4},{\"id\":\"Ingress-Traffic-By-Source-IP\",\"type\":\"visualization\",\"size_x\":6,\"size_y\":3,\"col\":7,\"row\":7},{\"id\":\"Traffic-Direction-By-Bandwidth\",\"type\":\"visualization\",\"size_x\":6,\"size_y\":3,\"col\":7,\"row\":1},{\"id\":\"Traffic-Direction-Table\",\"type\":\"search\",\"size_x\":12,\"size_y\":6,\"col\":1,\"row\":10,\"columns\":[\"TrafficDirection_NM\",\"Application\",\"DestIP\",\"SrcIP\",\"TotalBytes\",\"Session\"],\"sort\":[\"TimeUpdated\",\"desc\"]}]", 
+   "version": 2, 
+   "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}}}]}"
+   }
+}

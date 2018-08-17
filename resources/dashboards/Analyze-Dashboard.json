@@ -1,0 +1,11 @@
+{
+   "hits": 0, 
+   "timeRestore": false, 
+   "description": "", 
+   "title": "Analyze Dashboard", 
+   "panelsJSON": "[{\"col\":10,\"id\":\"Top-Applications-By-Bandwidth-(pie)\",\"row\":1,\"size_x\":3,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Top-Applications-By-Bandwidth-(histogram)\",\"row\":1,\"size_x\":9,\"size_y\":6,\"type\":\"visualization\"},{\"id\":\"Analyze-Table\",\"type\":\"search\",\"size_x\":12,\"size_y\":4,\"col\":1,\"row\":7,\"columns\":[\"SrcIP\",\"DestIP\",\"Application\",\"Duration\",\"FlowCompleted\",\"Session\"],\"sort\":[\"TimeUpdated\",\"desc\"]},{\"id\":\"Top-Applications-By-Packet-Count\",\"type\":\"visualization\",\"size_x\":3,\"size_y\":3,\"col\":10,\"row\":4}]", 
+   "version": 2, 
+   "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+   }
+}
