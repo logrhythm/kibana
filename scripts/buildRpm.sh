@@ -12,7 +12,7 @@ GIT_BRANCH="$1"
 VERSION="$GIT_BRANCH.$GIT_VERSION"
 PWD=`pwd`
 
-rm -rf ~/rpmbuild
+sudo rm -rf ~/rpmbuild
 rpmdev-setuptree
 cp packaging/$PACKAGE.spec ~/rpmbuild/SPECS
 rm -f $PACKAGE-$VERSION.tar.gz

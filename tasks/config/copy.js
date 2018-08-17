@@ -1,4 +1,5 @@
 module.exports = function (grunt) {
+<<<<<<< HEAD
   var version = grunt.config.get('pkg.version');
   var platforms = grunt.config.get('platforms');
 
@@ -89,9 +90,27 @@ module.exports = function (grunt) {
     },
 
     versioned_dist: {
+=======
+  return {
+    devSource: {
+>>>>>>> c7e08ea770e835975ecda41c96016daf798c7f6e
       options: { mode: true },
-      files: []
+      src: [
+        'src/**',
+        'bin/**',
+        'webpackShims/**',
+        'config/kibana.yml',
+        '!src/**/__tests__/**',
+        '!src/testUtils/**',
+        '!src/fixtures/**',
+        '!src/plugins/devMode/**',
+        '!src/plugins/testsBundle/**',
+        '!src/cli/cluster/**',
+      ],
+      dest: 'build/kibana',
+      expand: true
     },
+<<<<<<< HEAD
 
     plugin_readme: {
       files: [
@@ -107,22 +126,7 @@ module.exports = function (grunt) {
       dest: '<%= build %>/dist/kibana/src/npm-shrinkwrap.json'
     }
 
+=======
+>>>>>>> c7e08ea770e835975ecda41c96016daf798c7f6e
   };
-
-  platforms.forEach(function (platform) {
-    config.versioned_dist.files.push({
-      expand: true,
-      cwd: '<%= build %>/dist/kibana',
-      src: '**',
-      dest: '<%= build %>/dist/kibana-' + version + '-' + platform
-    });
-    config.versioned_dist.files.push({
-      expand: true,
-      cwd: '<%= root %>/.node_binaries/' + platform,
-      src: '**',
-      dest: '<%= build %>/dist/kibana-' + version + '-' + platform + '/node'
-    });
-  });
-
-  return config;
 };

@@ -1,27 +1,32 @@
-If you have a bugfix or new feature that you would like to contribute to Kibana, please **find or open an issue about it before you start working on it.** Talk about what you would like to do. It may be that somebody is already working on it, or that there are particular issues that you should know about before implementing the change.
+# Contributing to Kibana
+
+## How issues work
+At any given time the Kibana team at Elastic is working on dozens of features and enhancements to Kibana and other projects at Elastic. When you file an issue we'll take the time to digest it, consider solutions, and weigh its applicability to both the broad Kibana user base and our own goals for the project. Once we've completed that process we will assign the issue a priority.
+
+- **P1**: A high priority issue that affects almost all Kibana users. Bugs that would cause incorrect results, security issues and features that would vastly improve the user experience for everyone. Work arounds for P1s generally don't exist without a code change.
+- **P2**: A broadly applicable, high visibility, issue that enhances the usability of Kibana for a majority users.
+- **P3**: Nice-to-have bug fixes or functionality. Work arounds for P3 items generally exist.
+- **P4**: Niche and special interest issues that may not fit our core goals. We would take a high quality pull for this if implemented in such a way that it does not meaningfully impact other functionality or existing code. Issues may also be labeled P4 if they would be better implemented in Elasticsearch.
+- **P5**: Highly niche or in opposition to our core goals. Should usually be closed. This doesn't mean we wouldn't take a pull for it, but if someone really wanted this they would be better off working on a plugin. The Kibana team will usually not work on P5 issues but may be willing to assist plugin developers on IRC.
+
+#### How to express the importance of an issue
+Let's just get this out there: **Feel free to +1 an issue**. That said, a +1 isn't a vote. We keep up on highly commented issues, but comments are but one of many reasons we might, or might not, work on an issue. A solid write up of your use case is more likely to make your case than a comment that says *+10000*.
+
+#### My issue isn't getting enough attention
+First of all, sorry about that, we want you to have a great time with Kibana! You should join us on IRC (#kibana on freenode) and chat about it. Github is terrible for conversations. With that out of the way, there are a number of variables that go into deciding what to work on. These include priority, impact, difficulty, applicability to use cases, and last, and importantly: What we feel like working on.
+
+### I want to help!
+**Now we're talking**. If you have a bugfix or new feature that you would like to contribute to Kibana, please **find or open an issue about it before you start working on it.** Talk about what you would like to do. It may be that somebody is already working on it, or that there are particular issues that you should know about before implementing the change.
 
 We enjoy working with contributors to get their code accepted. There are many approaches to fixing a problem and it is important to find the best approach before writing too much code.
 
-The process for contributing to any of the Elasticsearch repositories is similar.
+## How to contribute code
 
 ### Sign the contributor license agreement
 
 Please make sure you have signed the [Contributor License Agreement](http://www.elastic.co/contributor-agreement/). We are not asking you to assign copyright to us, but to give us the right to distribute your code without restriction. We ask this of all contributors in order to assure our users of the origin and continuing existence of the code. You only need to sign the CLA once.
 
 ### Development Environment Setup
-
-- Install node.js (we recommend using [nvm](https://github.com/creationix/nvm))
-
-  ```sh
-  ## follow directions at https://github.com/creationix/nvm, then
-  nvm install 0.10
-  ```
-
-- Install grunt and bower globally (as root if not using nvm)
-
-  ```sh
-  npm install -g grunt-cli bower
-  ```
 
 - Clone the kibana repo and move into it
 
@@ -30,47 +35,172 @@ Please make sure you have signed the [Contributor License Agreement](http://www.
   cd kibana
   ```
 
-- Install node and bower dependencies
+- Install the version of node.js listed in the `.node-version` file (this is made easy with tools like [nvm](https://github.com/creationix/nvm) and [avn](https://github.com/wbyoung/avn))
 
   ```sh
-  npm install && bower install
+  nvm install "$(cat .node-version)"
+  ```
+
+- Install dependencies
+
+  ```sh
+  npm install
+  ```
+
+- Start elasticsearch
+
+  Note: you need to have a java binary in `PATH` or set `JAVA_HOME`.
+
+  ```sh
+  npm run elasticsearch
   ```
 
 - Start the development server.
 
   ```sh
-  grunt dev # use the "--with-es" flag to install & start elasticsearch too
+  npm start
   ```
+
+#### `config/kibana.dev.yml`
+
+The `config/kibana.yml` file stores user configuration directives. Since this file is checked into source control, however, developer preferences can't be saved without the risk of accidentally committing the modified version. To make customizing configuration easier during development, the Kibana CLI will look for a `config/kibana.dev.yml` file if run with the `--dev` flag. This file behaves just like the non-dev version and accepts any of the [standard settings](https://www.elastic.co/guide/en/kibana/master/kibana-server-properties.html).
+
+The `config/kibana.dev.yml` file is very commonly used to store some opt-in/**unsafe** optimizer tweaks which can significantly increase build performance. Below is a commonly used `config/kibana.dev.yml` file, but additional options can be found [in #4611](https://github.com/elastic/kibana/pull/4611#issue-99706918).
+
+```yaml
+optimize:
+  sourceMaps: '#cheap-source-map' # options -> http://webpack.github.io/docs/configuration.html#devtool
+  unsafeCache: true
+  lazyPrebuild: false
+```
+
+#### SSL
+
+When Kibana runs in development mode it will automatically use bundled SSL certificates. These certificates won't be trusted by your OS by default which will likely cause your browser to complain about the cert. You can deal with this in a few ways:
+
+  1. Supply your own cert using the `config/kibana.dev.yml` file.
+  1. Configure your OS to trust the cert:
+    - OSX: https://www.accuweaver.com/2014/09/19/make-chrome-accept-a-self-signed-certificate-on-osx/
+    - Window: http://stackoverflow.com/a/1412118
+    - Linux: http://unix.stackexchange.com/a/90607
+  1. Click through the warning and accept future warnings.
+  1. Disable SSL with the `--no-ssl` flag:
+    - `npm start -- --no-ssl`
+
 
 #### Linting
 
-A note about linting: We use both [jshint](http://jshint.com/) and [jscs](http://jscs.info/) to check that the [styleguide](STYLEGUIDE.md) is being followed. They run in a pre-commit hook and as a part of the tests, but most contributors integrate these linters with their code editors for real-time feedback.
+A note about linting: We use [eslint](http://eslint.org) to check that the [styleguide](STYLEGUIDE.md) is being followed. It runs in a pre-commit hook and as a part of the tests, but most contributors integrate it with their code editors for real-time feedback.
 
-Here are some hints for setting up the linters in your favorite editor:
+Here are some hints for getting eslint setup in your favorite editor:
 
-| Editor | JSHint | JSCS |
+| Editor | Plugin |
 | --- | --- | --- |
-| Sublime | [SublimeLinter-jshint](https://github.com/SublimeLinter/SublimeLinter-jshint#installation) | [SublimeLinter-jscs](https://github.com/SublimeLinter/SublimeLinter-jscs#installation) |
-| Atom | [linter-jshint](https://github.com/AtomLinter/linter-jshint#installation) | [linter-jscs](https://github.com/AtomLinter/linter-jscs#installation) |
-| IntelliJ | Settings » Languages & Frameworks » JavaScript » Code Quality Tools » JSHint (be sure to check "Use config files") | « |
-| vi | ask @simianhacker | « |
+| Sublime | [SublimeLinter-eslint](https://github.com/roadhump/SublimeLinter-eslint#installation) |
+| Atom | [linter-eslint](https://github.com/AtomLinter/linter-eslint#installation) |
+| IntelliJ | Settings » Languages & Frameworks » JavaScript » Code Quality Tools » ESLint |
+| vi | [scrooloose/syntastic](https://github.com/scrooloose/syntastic) |
 
+Another tool we use for enforcing consistent coding style is Editorconfig, which can be set up by installing a plugin in your editor that dynamically updates its configuration. Take a look at the [Editorconfig](http://editorconfig.org/#download) site to find a plugin for your editor, and browse our [`.editorconfig`](https://github.com/elastic/kibana/blob/master/.editorconfig) file to see what config rules we set up.
 
 ### Testing and building
 
 To ensure that your changes will not break other functionality, please run the test suite and build process before submitting your pull request.
 
-Before running the tests you will need to install the projects dependencies as described below.
+Before running the tests you will need to install the projects dependencies as described above.
 
 Once that is complete just run:
 
 ```sh
-grunt test build
+npm run test && npm run build
 ```
 
-Distributable, built packages can be found in `target/` after the build completes.
+#### Testing and debugging tests
 
-### Submit a pull request
+The standard `npm run test` task runs several sub tasks and can take several minutes to complete, making debugging failures pretty painful. In order to ease the pain specialized tasks provide alternate methods for running the tests.
+
+<dl>
+  <dt><code>npm run test:quick</code></dt>
+  <dd>Runs both server and browser tests, but skips linting</dd>
+
+  <dt><code>npm run test:server</code> or <code>npm run test:browser</code></dt>
+  <dd>Runs the tests for just the server or browser</dd>
+
+  <dt><code>npm run test:dev</code></dt>
+  <dd>
+    Initializes an environment for debugging the browser tests. Includes an dedicated instance of the kibana server for building the test bundle, and a karma server. When running this task the build is optimized for the first time and then a karma-owned instance of the browser is opened. Click the "debug" button to open a new tab that executes the unit tests.
+    <br>
+    <img src="http://i.imgur.com/DwHxgfq.png">
+  </dd>
+
+  <dt><code>npm run mocha [test file or dir]</code> or <code>npm run mocha:debug [test file or dir]</code></dt>
+  <dd>
+    Run a one off test with the local project version of mocha, babel compilation, and optional debugging. Great
+    for development and fixing individual tests.
+  </dd>
+</dl>
+
+Distributable packages can be found in `target/` after the build completes.
+
+#### Building OS packages
+
+Packages are built using fpm, pleaserun, dpkg, and rpm.  fpm and pleaserun can be installed using gem.  Package building has only been tested on Linux and is not supported on any other platform.
+```sh
+gem install pleaserun
+apt-get install ruby-dev
+gem install fpm
+npm run build:ospackages
+```
+
+To specify a package to build you can add `rpm` or `deb` as an argument.
+```sh
+npm run build:ospackages -- --rpm
+```
+
+### Functional UI Testing
+
+#### Handy references
+
+- https://theintern.github.io/
+- https://theintern.github.io/leadfoot/Element.html
+
+#### Running tests using npm task:
+
+*The Selenium server that is started currently only runs the tests in Firefox*
+
+To run the functional UI tests use the following commands
+
+<dl>
+
+  <dt><code>npm run test:ui</code></dt>
+  <dd>Run the functional UI tests one time and exit. This is used by the CI systems and is great for quickly checking that things pass. It is essentially a combination of the next two tasks.</dd>
+
+  <dt><code>npm run test:ui:server</code></dt>
+  <dd>Start the server required for the <code>test:ui:runner</code> tasks. Once the server is started <code>test:ui:runner</code> can be run multiple times without waiting for the server to start.</dd>
+
+  <dt><code>npm run test:ui:runner</code></dt>
+  <dd>Execute the front-end selenium tests. This requires the server started by the <code>test:ui:server</code> task.</dd>
+
+</dl>
+
+#### Running tests locally with your existing (and already running) ElasticSearch, Kibana, and Selenium Server:
+
+Set your es and kibana ports in `test/intern.js` to 9220 and 5620, respectively. You can configure your Selenium server to run the tests on Chrome,IE, or other browsers here.
+
+Once you've got the services running, execute the following:
+
+```sh
+npm run test:ui:runner
+```
+
+#### General notes:
+
+- Using Page Objects pattern (https://theintern.github.io/intern/#writing-functional-test)
+- At least the initial tests for the Settings, Discover, and Visualize tabs all depend on a very specific set of logstash-type data (generated with makelogs).  Since that is a static set of data, all the Discover and Visualize tests use a specific Absolute time range.  This guarantees the same results each run.
+- These tests have been developed and tested with Chrome and Firefox browser.  In theory, they should work on all browsers (that's the benefit of Intern using Leadfoot).
+- These tests should also work with an external testing service like https://saucelabs.com/ or https://www.browserstack.com/ but that has not been tested.
+
+## Submitting a pull request
 
 Push your local changes to your forked copy of the repository and submit a pull request. In the pull request, describe what your changes do and mention the number of the issue where discussion has taken place, eg “Closes #123″.
 

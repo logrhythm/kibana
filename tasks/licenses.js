@@ -1,6 +1,5 @@
 var _ = require('lodash');
 var npm = require('npm');
-var bowerLicense = require('bower-license');
 var npmLicense = require('license-checker');
 
 module.exports = function (grunt) {
@@ -11,7 +10,7 @@ module.exports = function (grunt) {
     var done = this.async();
 
     var result = {};
-    var options = {start: process.cwd(), json: true };
+    var options = { start: process.cwd(), json: true };
     var checkQueueLength = 2;
 
     function processPackage(info, dependency) {
@@ -24,10 +23,11 @@ module.exports = function (grunt) {
           return true;
         }
         return false;
-      })();
+      }());
       return pkgInfo;
     }
 
+<<<<<<< HEAD
     function dequeue(output) {
       checkQueueLength--;
       _.extend(result, output);
@@ -52,6 +52,8 @@ module.exports = function (grunt) {
     }
 
     bowerLicense.init(options, dequeue);
+=======
+>>>>>>> c7e08ea770e835975ecda41c96016daf798c7f6e
     npmLicense.init(options, function (allDependencies) {
       // Only check production NPM dependencies, not dev
       npm.load({production: true}, function () {
@@ -73,8 +75,24 @@ module.exports = function (grunt) {
           _.each(getDependencies(npmList.dependencies), function (packageAndVersion) {
             productionDependencies[packageAndVersion] = allDependencies[packageAndVersion];
           });
-          dequeue(productionDependencies);
 
+          var licenseStats = _.map(productionDependencies, processPackage);
+          var invalidLicenses = _.filter(licenseStats, function (pkg) { return !pkg.valid; });
+
+          if (!grunt.option('only-invalid')) {
+            grunt.log.debug(JSON.stringify(licenseStats, null, 2));
+          }
+
+
+          if (invalidLicenses.length) {
+            grunt.log.debug(JSON.stringify(invalidLicenses, null, 2));
+            grunt.fail.warn(
+              'Non-confirming licenses: ' + _.pluck(invalidLicenses, 'name').join(', '),
+              invalidLicenses.length
+            );
+          }
+
+          done();
         });
       });
     });
