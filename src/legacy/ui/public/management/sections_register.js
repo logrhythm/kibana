@@ -40,7 +40,7 @@ management.register('elasticsearch', {
 });
 
 management.register('kibana', {
-  display: 'NetMon',
+  display: 'Kibana',
   order: 30,
   icon: 'logoKibana',
 });
