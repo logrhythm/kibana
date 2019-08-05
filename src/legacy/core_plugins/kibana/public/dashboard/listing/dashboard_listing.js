@@ -22,11 +22,7 @@ import PropTypes from 'prop-types';
 import { injectI18n, FormattedMessage } from '@kbn/i18n/react';
 import { i18n } from '@kbn/i18n';
 
-import {
-  EuiLink,
-  EuiButton,
-  EuiEmptyPrompt,
-} from '@elastic/eui';
+import { EuiLink, EuiButton, EuiEmptyPrompt } from '@elastic/eui';
 
 import { TableListView } from './../../table_list_view';
 
@@ -38,7 +34,6 @@ export const EMPTY_FILTER = '';
 // This component does not try to tackle these problems (yet) and is just feature matching the legacy component
 // TODO support server side sorting/paging once title and description are sortable on the server.
 class DashboardListingUi extends React.Component {
-
   constructor(props) {
     super(props);
   }
@@ -54,21 +49,15 @@ class DashboardListingUi extends React.Component {
         listingLimit={this.props.listingLimit}
         initialFilter={this.props.initialFilter}
         noItemsFragment={this.getNoItemsMessage()}
-        entityName={
-          i18n.translate('kbn.dashboard.listing.table.entityName', {
-            defaultMessage: 'dashboard'
-          })
-        }
-        entityNamePlural={
-          i18n.translate('kbn.dashboard.listing.table.entityNamePlural', {
-            defaultMessage: 'dashboards'
-          })
-        }
-        tableListTitle={
-          i18n.translate('kbn.dashboard.listing.dashboardsTitle', {
-            defaultMessage: 'Dashboards'
-          })
-        }
+        entityName={i18n.translate('kbn.dashboard.listing.table.entityName', {
+          defaultMessage: 'dashboard',
+        })}
+        entityNamePlural={i18n.translate('kbn.dashboard.listing.table.entityNamePlural', {
+          defaultMessage: 'dashboards',
+        })}
+        tableListTitle={i18n.translate('kbn.dashboard.listing.dashboardsTitle', {
+          defaultMessage: 'Dashboards',
+        })}
       />
     );
   }
@@ -109,13 +98,13 @@ class DashboardListingUi extends React.Component {
               <p>
                 <FormattedMessage
                   id="kbn.dashboard.listing.createNewDashboard.combineDataViewFromKibanaAppDescription"
-                  defaultMessage="You can combine data views from any Kibana app into one dashboard and see everything in one place."
+                  defaultMessage="You can combine data views from any NetMon-UI app into one dashboard and see everything in one place."
                 />
               </p>
               <p>
                 <FormattedMessage
                   id="kbn.dashboard.listing.createNewDashboard.newToKibanaDescription"
-                  defaultMessage="New to Kibana? {sampleDataInstallLink} to take a test drive."
+                  defaultMessage="New to NetMon-UI? {sampleDataInstallLink} to take a test drive."
                   values={{
                     sampleDataInstallLink: (
                       <EuiLink href="#/home/tutorial_directory/sampleData">
@@ -146,7 +135,6 @@ class DashboardListingUi extends React.Component {
         />
       </div>
     );
-
   }
 
   getTableColumns() {
@@ -154,7 +142,7 @@ class DashboardListingUi extends React.Component {
       {
         field: 'title',
         name: i18n.translate('kbn.dashboard.listing.table.titleColumnName', {
-          defaultMessage: 'Title'
+          defaultMessage: 'Title',
         }),
         sortable: true,
         render: (field, record) => (
@@ -164,16 +152,16 @@ class DashboardListingUi extends React.Component {
           >
             {field}
           </EuiLink>
-        )
+        ),
       },
       {
         field: 'description',
         name: i18n.translate('kbn.dashboard.listing.table.descriptionColumnName', {
-          defaultMessage: 'Description'
+          defaultMessage: 'Description',
         }),
         dataType: 'string',
         sortable: true,
-      }
+      },
     ];
     return tableColumns;
   }

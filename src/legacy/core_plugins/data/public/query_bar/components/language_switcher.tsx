@@ -92,7 +92,7 @@ export class QueryLanguageSwitcher extends Component<Props, State> {
                 id="data.query.queryBar.syntaxOptionsDescription"
                 defaultMessage="The {docsLink} (KQL) offers a simplified query
                 syntax and support for scripted fields. KQL also provides autocomplete if you have
-                a Basic license or above. If you turn off KQL, Kibana uses Lucene."
+                a Basic license or above. If you turn off KQL, NetMon-UI uses Lucene."
                 values={{
                   docsLink: (
                     <EuiLink href={kueryQuerySyntaxDocs} target="_blank">

@@ -57,7 +57,7 @@ export default async function manageUuid(server) {
   }
 
   // detect if uuid exists already from before a restart
-  const logToServer = (msg) => server.log(['server', 'uuid', fileName], msg);
+  const logToServer = msg => server.log(['server', 'uuid', fileName], msg);
   const dataFileUuid = await detectUuid();
   let serverConfigUuid = config.get('server.uuid'); // check if already set in config
 
@@ -65,21 +65,23 @@ export default async function manageUuid(server) {
     // data uuid found
     if (serverConfigUuid === dataFileUuid) {
       // config uuid exists, data uuid exists and matches
-      logToServer(`Kibana instance UUID: ${dataFileUuid}`);
+      logToServer(`NetMon-UI instance UUID: ${dataFileUuid}`);
       return;
     }
 
     if (!serverConfigUuid) {
       // config uuid missing, data uuid exists
       serverConfigUuid = dataFileUuid;
-      logToServer(`Resuming persistent Kibana instance UUID: ${serverConfigUuid}`);
+      logToServer(`Resuming persistent NetMon-UI instance UUID: ${serverConfigUuid}`);
       config.set('server.uuid', serverConfigUuid);
       return;
     }
 
     if (serverConfigUuid !== dataFileUuid) {
       // config uuid exists, data uuid exists but mismatches
-      logToServer(`Updating Kibana instance UUID to: ${serverConfigUuid} (was: ${dataFileUuid})`);
+      logToServer(
+        `Updating NetMon-UI instance UUID to: ${serverConfigUuid} (was: ${dataFileUuid})`
+      );
       return writeUuid(serverConfigUuid);
     }
   }
@@ -92,6 +94,6 @@ export default async function manageUuid(server) {
     config.set('server.uuid', serverConfigUuid);
   }
 
-  logToServer(`Setting new Kibana instance UUID: ${serverConfigUuid}`);
+  logToServer(`Setting new NetMon-UI instance UUID: ${serverConfigUuid}`);
   return writeUuid(serverConfigUuid);
 }

@@ -76,7 +76,7 @@ export function updateLandingPage(version) {
               <h1>
                 <FormattedMessage
                   id="kbn.management.landing.header"
-                  defaultMessage="Kibana management"
+                  defaultMessage="NetMon-UI management"
                   values={{ version }}
                 />
               </h1>
@@ -84,7 +84,7 @@ export function updateLandingPage(version) {
             <EuiText>
               <FormattedMessage
                 id="kbn.management.landing.subhead"
-                defaultMessage="Manage your indices, index patterns, saved objects, Kibana settings, and more."
+                defaultMessage="Manage your indices, index patterns, saved objects, NetMon-UI settings, and more."
               />
             </EuiText>
           </div>
@@ -125,7 +125,7 @@ export const destroyReact = id => {
   node && unmountComponentAtNode(node);
 };
 
-uiModules.get('apps/management').directive('kbnManagementApp', function (Private, $location) {
+uiModules.get('apps/management').directive('kbnManagementApp', function(Private, $location) {
   return {
     restrict: 'E',
     template: appTemplate,
@@ -136,7 +136,7 @@ uiModules.get('apps/management').directive('kbnManagementApp', function (Private
       pageTitle: '=',
     },
 
-    link: function ($scope) {
+    link: function($scope) {
       timefilter.disableAutoRefreshSelector();
       timefilter.disableTimeRangeSelector();
       $scope.sections = management.visibleItems;
@@ -158,10 +158,10 @@ uiModules.get('apps/management').directive('kbnManagementApp', function (Private
   };
 });
 
-uiModules.get('apps/management').directive('kbnManagementLanding', function (kbnVersion) {
+uiModules.get('apps/management').directive('kbnManagementLanding', function(kbnVersion) {
   return {
     restrict: 'E',
-    link: function ($scope) {
+    link: function($scope) {
       $scope.sections = management.visibleItems;
       $scope.kbnVersion = kbnVersion;
     },

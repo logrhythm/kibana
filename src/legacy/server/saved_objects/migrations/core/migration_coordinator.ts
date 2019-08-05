@@ -96,10 +96,10 @@ function handleIndexExists(error: any, log: Logger) {
   const index = _.get(error, 'body.error.index');
 
   log.warning(
-    `Another Kibana instance appears to be migrating the index. Waiting for ` +
-      `that migration to complete. If no other Kibana instance is attempting ` +
+    `Another NetMon instance appears to be migrating the index. Waiting for ` +
+      `that migration to complete. If no other NetMon instance is attempting ` +
       `migrations, you can get past this message by deleting index ${index} and ` +
-      `restarting Kibana.`
+      `restarting NetMon.`
   );
 
   return true;

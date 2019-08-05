@@ -20,13 +20,7 @@
 import React, { Fragment } from 'react';
 import { getDocLink } from 'ui/documentation_links';
 
-import {
-  EuiCode,
-  EuiIcon,
-  EuiLink,
-  EuiText,
-  EuiSpacer,
-} from '@elastic/eui';
+import { EuiCode, EuiIcon, EuiLink, EuiText, EuiSpacer } from '@elastic/eui';
 
 import { FormattedMessage } from '@kbn/i18n/react';
 
@@ -40,24 +34,27 @@ export const ScriptingSyntax = () => (
       <p>
         <FormattedMessage
           id="common.ui.fieldEditor.syntax.defaultLabel.defaultDetail"
-          defaultMessage="By default, Kibana scripted fields use {painless}, a simple and secure scripting language designed
+          defaultMessage="By default, NetMon-UI scripted fields use {painless}, a simple and secure scripting language designed
           specifically for use with Elasticsearch, to access values in the document use the following format:"
           values={{
             painless: (
-              <EuiLink
-                target="_blank"
-                href={getDocLink('scriptedFields.painless')}
-              >
-                <FormattedMessage id="common.ui.fieldEditor.syntax.defaultLabel.painlessLink" defaultMessage="Painless" />
-                {' '}<EuiIcon type="link" />
+              <EuiLink target="_blank" href={getDocLink('scriptedFields.painless')}>
+                <FormattedMessage
+                  id="common.ui.fieldEditor.syntax.defaultLabel.painlessLink"
+                  defaultMessage="Painless"
+                />{' '}
+                <EuiIcon type="link" />
               </EuiLink>
-            )
+            ),
           }}
         />
       </p>
       <p>
         <EuiCode>
-          <FormattedMessage id="common.ui.fieldEditor.syntax.default.formatLabel" defaultMessage="doc['some_field'].value" />
+          <FormattedMessage
+            id="common.ui.fieldEditor.syntax.default.formatLabel"
+            defaultMessage="doc['some_field'].value"
+          />
         </EuiCode>
       </p>
       <p>
@@ -67,48 +64,51 @@ export const ScriptingSyntax = () => (
           you'll be up to speed in no time!"
           values={{
             javaAPIs: (
-              <EuiLink
-                target="_blank"
-                href={getDocLink('scriptedFields.painlessApi')}
-              >
-                <FormattedMessage id="common.ui.fieldEditor.syntax.painlessLabel.javaAPIsLink" defaultMessage="native Java APIs" />&nbsp;
+              <EuiLink target="_blank" href={getDocLink('scriptedFields.painlessApi')}>
+                <FormattedMessage
+                  id="common.ui.fieldEditor.syntax.painlessLabel.javaAPIsLink"
+                  defaultMessage="native Java APIs"
+                />
+                &nbsp;
                 <EuiIcon type="link" />
               </EuiLink>
             ),
             syntax: (
-              <EuiLink
-                target="_blank"
-                href={getDocLink('scriptedFields.painlessSyntax')}
-              >
-                <FormattedMessage id="common.ui.fieldEditor.syntax.painlessLabel.syntaxLink" defaultMessage="syntax" />&nbsp;
+              <EuiLink target="_blank" href={getDocLink('scriptedFields.painlessSyntax')}>
+                <FormattedMessage
+                  id="common.ui.fieldEditor.syntax.painlessLabel.syntaxLink"
+                  defaultMessage="syntax"
+                />
+                &nbsp;
                 <EuiIcon type="link" />
               </EuiLink>
-            )
+            ),
           }}
         />
       </p>
       <p>
         <FormattedMessage
           id="common.ui.fieldEditor.syntax.kibanaLabel"
-          defaultMessage="Kibana currently imposes one special limitation on the painless scripts you write. They cannot contain named
+          defaultMessage="NetMon-UI currently imposes one special limitation on the painless scripts you write. They cannot contain named
           functions."
         />
       </p>
       <p>
         <FormattedMessage
           id="common.ui.fieldEditor.syntax.lucene.commonLabel.commonDetail"
-          defaultMessage="Coming from an older version of Kibana? The {lucene} you know and love are still available. Lucene expressions
+          defaultMessage="Coming from an older version of NetMon-UI? The {lucene} you know and love are still available. Lucene expressions
           are a lot like JavaScript, but limited to basic arithmetic, bitwise and comparison operations."
           values={{
             lucene: (
-              <EuiLink
-                target="_blank"
-                href={getDocLink('scriptedFields.luceneExpressions')}
-              >
-                <FormattedMessage id="common.ui.fieldEditor.syntax.lucene.commonLabel.luceneLink" defaultMessage="Lucene Expressions" />
-                &nbsp;<EuiIcon type="link" />
+              <EuiLink target="_blank" href={getDocLink('scriptedFields.luceneExpressions')}>
+                <FormattedMessage
+                  id="common.ui.fieldEditor.syntax.lucene.commonLabel.luceneLink"
+                  defaultMessage="Lucene Expressions"
+                />
+                &nbsp;
+                <EuiIcon type="link" />
               </EuiLink>
-            )
+            ),
           }}
         />
       </p>
@@ -157,7 +157,9 @@ export const ScriptingSyntax = () => (
           <FormattedMessage
             id="common.ui.fieldEditor.syntax.lucene.operations.bitwiseLabel"
             defaultMessage="Bitwise operators: {operators}"
-            values={{ operators: <code>| & ^ ~ &#x3C;&#x3C; &#x3E;&#x3E; &#x3E;&#x3E;&#x3E;</code> }}
+            values={{
+              operators: <code>| & ^ ~ &#x3C;&#x3C; &#x3E;&#x3E; &#x3E;&#x3E;&#x3E;</code>,
+            }}
           />
         </li>
         <li>
@@ -185,7 +187,11 @@ export const ScriptingSyntax = () => (
           <FormattedMessage
             id="common.ui.fieldEditor.syntax.lucene.operations.trigLabel"
             defaultMessage="Trigonometric library functions: {operators}"
-            values={{ operators: <code>acosh acos asinh asin atanh atan atan2 cosh cos sinh sin tanh tan</code> }}
+            values={{
+              operators: (
+                <code>acosh acos asinh asin atanh atan atan2 cosh cos sinh sin tanh tan</code>
+              ),
+            }}
           />
         </li>
         <li>

@@ -33,7 +33,7 @@ export function getContentType(body) {
 }
 
 export function send(method, path, data) {
-  const wrappedDfd = $.Deferred();  // eslint-disable-line new-cap
+  const wrappedDfd = $.Deferred(); // eslint-disable-line new-cap
 
   const isGetRequest = /^get$/i.test(method);
   if (data && isGetRequest) {
@@ -50,17 +50,18 @@ export function send(method, path, data) {
     dataType: 'text', // disable automatic guessing
   };
 
-
   $.ajax(options).then(
-    function (data, textStatus, jqXHR) {
+    function(data, textStatus, jqXHR) {
       wrappedDfd.resolveWith(this, [data, textStatus, jqXHR]);
     },
-    function (jqXHR, textStatus, errorThrown) {
+    function(jqXHR, textStatus, errorThrown) {
       if (jqXHR.status === 0) {
-        jqXHR.responseText = '\n\nFailed to connect to Console\'s backend.\nPlease check the Kibana server is up and running';
+        jqXHR.responseText =
+          "\n\nFailed to connect to Console's backend.\nPlease check the NetMon server is up and running";
       }
       wrappedDfd.rejectWith(this, [jqXHR, textStatus, errorThrown]);
-    });
+    }
+  );
   return wrappedDfd;
 }
 

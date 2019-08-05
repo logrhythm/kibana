@@ -287,7 +287,7 @@ function assertIsSupportedIndex(indexInfo: FullIndexInfo) {
 
   if (!isV7Index) {
     throw new Error(
-      `Index ${indexInfo.indexName} belongs to a version of Kibana ` +
+      `Index ${indexInfo.indexName} belongs to a version of NetMon-UI ` +
         `that cannot be automatically migrated. Reset it or use the X-Pack upgrade assistant.`
     );
   }

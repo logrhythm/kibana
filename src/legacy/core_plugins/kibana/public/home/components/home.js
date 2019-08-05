@@ -46,7 +46,10 @@ export class Home extends Component {
   constructor(props) {
     super(props);
 
-    const isWelcomeEnabled = !(chrome.getInjected('disableWelcomeScreen') || props.localStorage.getItem(KEY_ENABLE_WELCOME) === 'false');
+    const isWelcomeEnabled = !(
+      chrome.getInjected('disableWelcomeScreen') ||
+      props.localStorage.getItem(KEY_ENABLE_WELCOME) === 'false'
+    );
 
     this.state = {
       // If welcome is enabled, we wait for loading to complete
@@ -134,7 +137,6 @@ export class Home extends Component {
     return (
       <EuiPage restrictWidth={1200}>
         <EuiPageBody className="eui-displayBlock">
-
           <AddData
             apmUiEnabled={apmUiEnabled}
             mlEnabled={mlEnabled}
@@ -194,7 +196,7 @@ export class Home extends Component {
               <EuiButton href="#/home/feature_directory">
                 <FormattedMessage
                   id="kbn.home.directories.notFound.viewFullButtonLabel"
-                  defaultMessage="View full directory of Kibana plugins"
+                  defaultMessage="View full directory of NetMon-UI plugins"
                 />
               </EuiButton>
             </EuiFlexItem>
@@ -211,12 +213,7 @@ export class Home extends Component {
   }
 
   renderWelcome() {
-    return (
-      <Welcome
-        onSkip={this.skipWelcome}
-        urlBasePath={this.props.urlBasePath}
-      />
-    );
+    return <Welcome onSkip={this.skipWelcome} urlBasePath={this.props.urlBasePath} />;
   }
 
   render() {

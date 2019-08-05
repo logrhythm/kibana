@@ -21,73 +21,68 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 
-import {
-  EuiForm,
-  EuiFormRow,
-  EuiSwitch,
-} from '@elastic/eui';
+import { EuiForm, EuiFormRow, EuiSwitch } from '@elastic/eui';
 
 import { FormattedMessage } from '@kbn/i18n/react';
 
 export class OptionsTab extends Component {
-
   setVisParam = (paramName, paramValue) => {
     const params = _.cloneDeep(this.props.editorState.params);
     params[paramName] = paramValue;
     this.props.stageEditorParams(params);
-  }
+  };
 
-  handleUpdateFiltersChange = (evt) => {
+  handleUpdateFiltersChange = evt => {
     this.setVisParam('updateFiltersOnChange', evt.target.checked);
-  }
+  };
 
-  handleUseTimeFilter = (evt) => {
+  handleUseTimeFilter = evt => {
     this.setVisParam('useTimeFilter', evt.target.checked);
-  }
+  };
 
-  handlePinFilters = (evt) => {
+  handlePinFilters = evt => {
     this.setVisParam('pinFilters', evt.target.checked);
-  }
+  };
 
   render() {
     return (
       <EuiForm>
-        <EuiFormRow
-          id="updateFiltersOnChange"
-        >
+        <EuiFormRow id="updateFiltersOnChange">
           <EuiSwitch
-            label={<FormattedMessage
-              id="inputControl.editor.optionsTab.updateFilterLabel"
-              defaultMessage="Update Kibana filters on each change"
-            />}
+            label={
+              <FormattedMessage
+                id="inputControl.editor.optionsTab.updateFilterLabel"
+                defaultMessage="Update NetMon-UI filters on each change"
+              />
+            }
             checked={this.props.editorState.params.updateFiltersOnChange}
             onChange={this.handleUpdateFiltersChange}
             data-test-subj="inputControlEditorUpdateFiltersOnChangeCheckbox"
           />
         </EuiFormRow>
 
-        <EuiFormRow
-          id="useTimeFilter"
-        >
+        <EuiFormRow id="useTimeFilter">
           <EuiSwitch
-            label={<FormattedMessage
-              id="inputControl.editor.optionsTab.useTimeFilterLabel"
-              defaultMessage="Use time filter"
-            />}
+            label={
+              <FormattedMessage
+                id="inputControl.editor.optionsTab.useTimeFilterLabel"
+                defaultMessage="Use time filter"
+              />
+            }
             checked={this.props.editorState.params.useTimeFilter}
             onChange={this.handleUseTimeFilter}
             data-test-subj="inputControlEditorUseTimeFilterCheckbox"
           />
         </EuiFormRow>
 
-        <EuiFormRow
-          id="pinFilters"
-        >
+        <EuiFormRow id="pinFilters">
           <EuiSwitch
-            label={<FormattedMessage
-              id="inputControl.editor.optionsTab.pinFiltersLabel"
-              defaultMessage="Pin filters for all applications"
-            />}
+            label={
+              <FormattedMessage
+                id="inputControl.editor.optionsTab.pinFiltersLabel"
+                defaultMessage="Pin filters for all applications"
+              />
+            }
             checked={this.props.editorState.params.pinFilters}
             onChange={this.handlePinFilters}
             data-test-subj="inputControlEditorPinFiltersCheckbox"
@@ -100,5 +95,5 @@ export class OptionsTab extends Component {
 
 OptionsTab.propTypes = {
   scope: PropTypes.object.isRequired,
-  stageEditorParams: PropTypes.func.isRequired
+  stageEditorParams: PropTypes.func.isRequired,
 };

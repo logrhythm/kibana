@@ -23,9 +23,7 @@ import { banners } from '../../notify';
 import { NoDefaultIndexPattern } from '../../errors';
 import { IndexPatternsGetProvider } from '../_get';
 import uiRoutes from '../../routes';
-import {
-  EuiCallOut,
-} from '@elastic/eui';
+import { EuiCallOut } from '@elastic/eui';
 import { clearTimeout } from 'timers';
 import { i18n } from '@kbn/i18n';
 
@@ -43,13 +41,16 @@ function displayBanner() {
       <EuiCallOut
         color="warning"
         iconType="iInCircle"
-        title={
-          i18n.translate('common.ui.indexPattern.bannerLabel',
-            //eslint-disable-next-line max-len
-            { defaultMessage: 'In order to visualize and explore data in Kibana, you\'ll need to create an index pattern to retrieve data from Elasticsearch.' })
-        }
+        title={i18n.translate(
+          'common.ui.indexPattern.bannerLabel',
+          //eslint-disable-next-line max-len
+          {
+            defaultMessage:
+              "In order to visualize and explore data in NetMon-UI, you'll need to create an index pattern to retrieve data from Elasticsearch.",
+          }
+        )}
       />
-    )
+    ),
   });
 
   // hide the message after the user has had a chance to acknowledge it -- so it doesn't permanently stick around
@@ -60,7 +61,7 @@ function displayBanner() {
 }
 
 // eslint-disable-next-line import/no-default-export
-export default function (opts) {
+export default function(opts) {
   opts = opts || {};
   const whenMissingRedirectTo = opts.whenMissingRedirectTo || null;
 
@@ -73,34 +74,33 @@ export default function (opts) {
         return;
       }
 
-      return getIds()
-        .then(function (patterns) {
-          let defaultId = config.get('defaultIndex');
-          let defined = !!defaultId;
-          const exists = _.contains(patterns, defaultId);
+      return getIds().then(function(patterns) {
+        let defaultId = config.get('defaultIndex');
+        let defined = !!defaultId;
+        const exists = _.contains(patterns, defaultId);
 
-          if (defined && !exists) {
-            config.remove('defaultIndex');
-            defaultId = defined = false;
-          }
+        if (defined && !exists) {
+          config.remove('defaultIndex');
+          defaultId = defined = false;
+        }
 
-          if (!defined) {
-            // If there is any index pattern created, set the first as default
-            if (patterns.length >= 1) {
-              defaultId = patterns[0];
-              config.set('defaultIndex', defaultId);
-            } else {
-              throw new NoDefaultIndexPattern();
-            }
+        if (!defined) {
+          // If there is any index pattern created, set the first as default
+          if (patterns.length >= 1) {
+            defaultId = patterns[0];
+            config.set('defaultIndex', defaultId);
+          } else {
+            throw new NoDefaultIndexPattern();
           }
-        });
+        }
+      });
     })
     .afterWork(
       // success
       null,
 
       // failure
-      function (err, kbnUrl) {
+      function(err, kbnUrl) {
         const hasDefault = !(err instanceof NoDefaultIndexPattern);
         if (hasDefault || !whenMissingRedirectTo) throw err; // rethrow
 
