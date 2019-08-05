@@ -57,7 +57,7 @@ export default async function manageUuid(server) {
   }
 
   // detect if uuid exists already from before a restart
-  const logToServer = msg => server.log(['server', 'uuid', fileName], msg);
+  const logToServer = (msg) => server.log(['server', 'uuid', fileName], msg);
   const dataFileUuid = await detectUuid();
   let serverConfigUuid = config.get('server.uuid'); // check if already set in config
 
@@ -79,9 +79,7 @@ export default async function manageUuid(server) {
 
     if (serverConfigUuid !== dataFileUuid) {
       // config uuid exists, data uuid exists but mismatches
-      logToServer(
-        `Updating NetMon-UI instance UUID to: ${serverConfigUuid} (was: ${dataFileUuid})`
-      );
+      logToServer(`Updating NetMon-UI instance UUID to: ${serverConfigUuid} (was: ${dataFileUuid})`);
       return writeUuid(serverConfigUuid);
     }
   }

@@ -37,44 +37,35 @@ import { getViewBreadcrumbs } from './breadcrumbs';
 
 const location = 'SavedObject view';
 
-uiRoutes.when('/management/kibana/objects/:service/:id', {
-  template: objectViewHTML,
-  k7Breadcrumbs: getViewBreadcrumbs,
-  requireUICapability: 'management.kibana.objects',
-});
+uiRoutes
+  .when('/management/kibana/objects/:service/:id', {
+    template: objectViewHTML,
+    k7Breadcrumbs: getViewBreadcrumbs,
+    requireUICapability: 'management.kibana.objects',
+  });
 
-uiModules
-  .get('apps/management', ['monospaced.elastic'])
+uiModules.get('apps/management', ['monospaced.elastic'])
   .directive('kbnManagementObjectsView', function (kbnIndex, confirmModal) {
     return {
       restrict: 'E',
-      controller: function (
-        $scope,
-        $injector,
-        $routeParams,
-        $location,
-        $window,
-        $rootScope,
-        Private,
-        uiCapabilities
-      ) {
+      controller: function ($scope, $injector, $routeParams, $location, $window, $rootScope, Private, uiCapabilities) {
         const serviceObj = savedObjectManagementRegistry.get($routeParams.service);
         const service = $injector.get(serviceObj.service);
         const savedObjectsClient = Private(SavedObjectsClientProvider);
 
         /**
-         * Creates a field definition and pushes it to the memo stack. This function
-         * is designed to be used in conjunction with _.reduce(). If the
-         * values is plain object it will recurse through all the keys till it hits
-         * a string, number or an array.
-         *
-         * @param {array} memo The stack of fields
-         * @param {mixed} value The value of the field
-         * @param {string} key The key of the field
-         * @param {object} collection This is a reference the collection being reduced
-         * @param {array} parents The parent keys to the field
-         * @returns {array}
-         */
+       * Creates a field definition and pushes it to the memo stack. This function
+       * is designed to be used in conjunction with _.reduce(). If the
+       * values is plain object it will recurse through all the keys till it hits
+       * a string, number or an array.
+       *
+       * @param {array} memo The stack of fields
+       * @param {mixed} value The value of the field
+       * @param {string} key The key of the field
+       * @param {object} collection This is a reference the collection being reduced
+       * @param {array} parents The parent keys to the field
+       * @returns {array}
+       */
         const createField = function (memo, val, key, collection, parents) {
           if (Array.isArray(parents)) {
             parents.push(key);
@@ -122,16 +113,12 @@ uiModules
               name: name,
               type: (function () {
                 switch (castEsToKbnFieldTypeName(esType)) {
-                  case 'string':
-                    return 'text';
-                  case 'number':
-                    return 'number';
-                  case 'boolean':
-                    return 'boolean';
-                  default:
-                    return 'json';
+                  case 'string': return 'text';
+                  case 'number': return 'number';
+                  case 'boolean': return 'boolean';
+                  default: return 'json';
                 }
-              }()),
+              }())
             });
           });
 
@@ -139,7 +126,7 @@ uiModules
             fields.push({
               name: 'kibanaSavedObjectMeta.searchSourceJSON',
               type: 'json',
-              value: '{}',
+              value: '{}'
             });
           }
 
@@ -152,9 +139,7 @@ uiModules
           }
         };
 
-        const { edit: canEdit, delete: canDelete } = uiCapabilities.savedObjectsManagement[
-          service.type
-        ];
+        const { edit: canEdit, delete: canDelete } = uiCapabilities.savedObjectsManagement[service.type];
         $scope.canEdit = canEdit;
         $scope.canDelete = canDelete;
         $scope.canViewInApp = canViewInApp(uiCapabilities, service.type);
@@ -163,8 +148,7 @@ uiModules
 
         $scope.title = service.type;
 
-        savedObjectsClient
-          .get(service.type, $routeParams.id)
+        savedObjectsClient.get(service.type, $routeParams.id)
           .then(function (obj) {
             $scope.obj = obj;
             $scope.link = service.urlFor(obj.id);
@@ -178,11 +162,9 @@ uiModules
             // sorts twice since we want numerical sort to prioritize over name,
             // and sortBy will do string comparison if trying to match against strings
             const nameSortedFields = _.sortBy(fields, 'name');
-            $scope.fields = _.sortBy(nameSortedFields, field => {
-              const orderIndex = service.Class.fieldOrder
-                ? service.Class.fieldOrder.indexOf(field.name)
-                : -1;
-              return orderIndex > -1 ? orderIndex : Infinity;
+            $scope.fields = _.sortBy(nameSortedFields, (field) => {
+              const orderIndex = service.Class.fieldOrder ? service.Class.fieldOrder.indexOf(field.name) : -1;
+              return (orderIndex > -1) ? orderIndex : Infinity;
             });
           })
           .catch(error => fatalError(error, location));
@@ -226,14 +208,13 @@ uiModules
         };
 
         /**
-         * Deletes an object and sets the notification
-         * @param {type} name description
-         * @returns {type} description
-         */
+       * Deletes an object and sets the notification
+       * @param {type} name description
+       * @returns {type} description
+       */
         $scope.delete = function () {
           function doDelete() {
-            savedObjectsClient
-              .delete(service.type, $routeParams.id)
+            savedObjectsClient.delete(service.type, $routeParams.id)
               .then(function () {
                 return redirectHandler('deleted');
               })
@@ -241,14 +222,11 @@ uiModules
           }
           const confirmModalOptions = {
             onConfirm: doDelete,
-            confirmButtonText: i18n.translate(
-              'kbn.management.objects.confirmModalOptions.deleteButtonLabel',
-              {
-                defaultMessage: 'Delete',
-              }
-            ),
+            confirmButtonText: i18n.translate('kbn.management.objects.confirmModalOptions.deleteButtonLabel', {
+              defaultMessage: 'Delete',
+            }),
             title: i18n.translate('kbn.management.objects.confirmModalOptions.modalTitle', {
-              defaultMessage: 'Delete saved NetMon-UI object?',
+              defaultMessage: 'Delete saved NetMon-UI object?'
             }),
           };
           confirmModal(
@@ -278,8 +256,7 @@ uiModules
 
           const { references, ...attributes } = source;
 
-          savedObjectsClient
-            .update(service.type, $routeParams.id, attributes, { references })
+          savedObjectsClient.update(service.type, $routeParams.id, attributes, { references })
             .then(function () {
               return redirectHandler('updated');
             })
@@ -289,16 +266,12 @@ uiModules
         function redirectHandler(action) {
           $location.path('/management/kibana/objects').search({
             _a: rison.encode({
-              tab: serviceObj.title,
-            }),
+              tab: serviceObj.title
+            })
           });
 
-          toastNotifications.addSuccess(
-            `${_.capitalize(action)} '${
-              $scope.obj.attributes.title
-            }' ${$scope.title.toLowerCase()} object`
-          );
+          toastNotifications.addSuccess(`${_.capitalize(action)} '${$scope.obj.attributes.title}' ${$scope.title.toLowerCase()} object`);
         }
-      },
+      }
     };
   });

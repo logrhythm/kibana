@@ -76,27 +76,25 @@ export default function (kibana) {
         {
           id: 'kibana:discover',
           title: i18n.translate('kbn.discoverTitle', {
-            defaultMessage: 'Discover',
+            defaultMessage: 'Discover'
           }),
           order: -1003,
           url: `${kbnBaseUrl}#/discover`,
           icon: 'plugins/kibana/assets/discover.svg',
           euiIconType: 'discoverApp',
-        },
-        {
+        }, {
           id: 'kibana:visualize',
           title: i18n.translate('kbn.visualizeTitle', {
-            defaultMessage: 'Visualize',
+            defaultMessage: 'Visualize'
           }),
           order: -1002,
           url: `${kbnBaseUrl}#/visualize`,
           icon: 'plugins/kibana/assets/visualize.svg',
           euiIconType: 'visualizeApp',
-        },
-        {
+        }, {
           id: 'kibana:dashboard',
           title: i18n.translate('kbn.dashboardTitle', {
-            defaultMessage: 'Dashboard',
+            defaultMessage: 'Dashboard'
           }),
           order: -1001,
           url: `${kbnBaseUrl}#/dashboards`,
@@ -108,27 +106,25 @@ export default function (kibana) {
           subUrlBase: `${kbnBaseUrl}#/dashboard`,
           icon: 'plugins/kibana/assets/dashboard.svg',
           euiIconType: 'dashboardApp',
-        },
-        {
+        }, {
           id: 'kibana:dev_tools',
           title: i18n.translate('kbn.devToolsTitle', {
-            defaultMessage: 'Dev Tools',
+            defaultMessage: 'Dev Tools'
           }),
           order: 9001,
           url: '/app/kibana#/dev_tools',
           icon: 'plugins/kibana/assets/wrench.svg',
           euiIconType: 'devToolsApp',
-        },
-        {
+        }, {
           id: 'kibana:management',
           title: i18n.translate('kbn.managementTitle', {
-            defaultMessage: 'Management',
+            defaultMessage: 'Management'
           }),
           order: 9003,
           url: `${kbnBaseUrl}#/management`,
           icon: 'plugins/kibana/assets/settings.svg',
           euiIconType: 'managementApp',
-          linkToLastSubUrl: false,
+          linkToLastSubUrl: false
         },
       ],
 
@@ -274,22 +270,19 @@ export default function (kibana) {
         },
         advancedSettings: {
           show: true,
-          save: true,
+          save: true
         },
         indexPatterns: {
           save: true,
         },
-        savedObjectsManagement: savedObjects.types.reduce(
-          (acc, type) => ({
-            ...acc,
-            [type]: {
-              delete: true,
-              edit: true,
-              read: true,
-            },
-          }),
-          {}
-        ),
+        savedObjectsManagement: savedObjects.types.reduce((acc, type) => ({
+          ...acc,
+          [type]: {
+            delete: true,
+            edit: true,
+            read: true,
+          }
+        }), {}),
         management: {
           /*
            * Management settings correspond to management section/link ids, and should not be changed
@@ -300,7 +293,7 @@ export default function (kibana) {
             index_patterns: true,
             objects: true,
           },
-        },
+        }
       };
     },
 
@@ -335,6 +328,6 @@ export default function (kibana) {
       server.expose('systemApi', systemApi);
       server.expose('handleEsError', handleEsError);
       server.injectUiAppVars('kibana', () => injectVars(server));
-    },
+    }
   });
 }

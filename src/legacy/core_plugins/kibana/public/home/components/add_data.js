@@ -42,57 +42,50 @@ import {
 const basePath = chrome.getBasePath();
 
 const AddDataUi = ({ apmUiEnabled, isNewKibanaInstance, intl, mlEnabled }) => {
+
   const renderCards = () => {
     const ampData = {
       title: intl.formatMessage({
-        id: 'kbn.home.addData.apm.nameTitle',
-        defaultMessage: 'APM',
+        id: 'kbn.home.addData.apm.nameTitle', defaultMessage: 'APM'
       }),
       description: intl.formatMessage({
         id: 'kbn.home.addData.apm.nameDescription',
-        defaultMessage:
-          'APM automatically collects in-depth performance metrics and errors from inside your applications.',
+        defaultMessage: 'APM automatically collects in-depth performance metrics and errors from inside your applications.'
       }),
-      ariaDescribedby: 'aria-describedby.addAmpButtonLabel',
+      ariaDescribedby: 'aria-describedby.addAmpButtonLabel'
     };
     const loggingData = {
       title: intl.formatMessage({
-        id: 'kbn.home.addData.logging.nameTitle',
-        defaultMessage: 'Logging',
+        id: 'kbn.home.addData.logging.nameTitle', defaultMessage: 'Logging'
       }),
       description: intl.formatMessage({
         id: 'kbn.home.addData.logging.nameDescription',
-        defaultMessage:
-          'Ingest logs from popular data sources and easily visualize in preconfigured dashboards.',
+        defaultMessage: 'Ingest logs from popular data sources and easily visualize in preconfigured dashboards.'
       }),
-      ariaDescribedby: 'aria-describedby.addLogDataButtonLabel',
+      ariaDescribedby: 'aria-describedby.addLogDataButtonLabel'
     };
     const metricsData = {
       title: intl.formatMessage({
-        id: 'kbn.home.addData.metrics.nameTitle',
-        defaultMessage: 'Metrics',
+        id: 'kbn.home.addData.metrics.nameTitle', defaultMessage: 'Metrics'
       }),
       description: intl.formatMessage({
         id: 'kbn.home.addData.metrics.nameDescription',
-        defaultMessage:
-          'Collect metrics from the operating system and services running on your servers.',
+        defaultMessage: 'Collect metrics from the operating system and services running on your servers.'
       }),
-      ariaDescribedby: 'aria-describedby.addMetricsButtonLabel',
+      ariaDescribedby: 'aria-describedby.addMetricsButtonLabel'
     };
     const securityData = {
       title: intl.formatMessage({
-        id: 'kbn.home.addData.security.nameTitle',
-        defaultMessage: 'Security analytics',
+        id: 'kbn.home.addData.security.nameTitle', defaultMessage: 'Security analytics'
       }),
       description: intl.formatMessage({
         id: 'kbn.home.addData.security.nameDescription',
-        defaultMessage:
-          'Centralize security events for interactive investigation in ready-to-go visualizations.',
+        defaultMessage: 'Centralize security events for interactive investigation in ready-to-go visualizations.'
       }),
-      ariaDescribedby: 'aria-describedby.addSecurityButtonLabel',
+      ariaDescribedby: 'aria-describedby.addSecurityButtonLabel'
     };
 
-    const getApmCard = () => (
+    const getApmCard = () =>  (
       <EuiFlexItem grow={false}>
         <EuiCard
           className="homAddData__card"
@@ -116,19 +109,14 @@ const AddDataUi = ({ apmUiEnabled, isNewKibanaInstance, intl, mlEnabled }) => {
     );
 
     return (
-      <EuiFlexGroup
-        className="homeAddData__flexGroup"
-        wrap={apmUiEnabled}
-        gutterSize="l"
-        justifyContent="spaceAround"
-        responsive={false}
-      >
+      <EuiFlexGroup className="homeAddData__flexGroup" wrap={apmUiEnabled} gutterSize="l" justifyContent="spaceAround" responsive={false}>
+
         {apmUiEnabled !== false && getApmCard()}
 
         <EuiFlexItem grow={false}>
           <EuiCard
             className="homAddData__card"
-            icon={<EuiIcon className="homAddData__icon" type="loggingApp" />}
+            icon={<EuiIcon  className="homAddData__icon" type="loggingApp" />}
             title={loggingData.title}
             description={<span id={loggingData.ariaDescribedby}>{loggingData.description}</span>}
             footer={
@@ -191,9 +179,7 @@ const AddDataUi = ({ apmUiEnabled, isNewKibanaInstance, intl, mlEnabled }) => {
     );
   };
 
-  const footerItemClasses = classNames('homAddData__footerItem', {
-    'homAddData__footerItem--highlight': isNewKibanaInstance,
-  });
+  const footerItemClasses = classNames('homAddData__footerItem', { 'homAddData__footerItem--highlight': isNewKibanaInstance });
 
   return (
     <EuiPanel paddingSize="l">
@@ -244,7 +230,7 @@ const AddDataUi = ({ apmUiEnabled, isNewKibanaInstance, intl, mlEnabled }) => {
             </EuiLink>
           </EuiText>
         </EuiFlexItem>
-        {mlEnabled !== false ? (
+        {mlEnabled !== false ?
           <EuiFlexItem className={footerItemClasses}>
             <EuiText size="s">
               <strong style={{ height: 38 }}>
@@ -264,7 +250,8 @@ const AddDataUi = ({ apmUiEnabled, isNewKibanaInstance, intl, mlEnabled }) => {
               </EuiLink>
             </EuiText>
           </EuiFlexItem>
-        ) : null}
+          : null
+        }
         <EuiFlexItem className={footerItemClasses}>
           <EuiText size="s">
             <strong style={{ height: 38 }}>

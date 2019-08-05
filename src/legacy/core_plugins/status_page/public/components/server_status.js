@@ -20,11 +20,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { State as StatePropType } from '../lib/prop_types';
-import { EuiText, EuiFlexGroup, EuiFlexItem, EuiTitle, EuiBadge } from '@elastic/eui';
+import {
+  EuiText,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiTitle,
+  EuiBadge,
+} from '@elastic/eui';
 import { FormattedMessage } from '@kbn/i18n/react';
 
-const ServerState = ({ name, serverState }) => (
-  <EuiFlexGroup alignItems="center" justifyContent="spaceBetween" style={{ flexGrow: 0 }}>
+const ServerState = ({
+  name,
+  serverState
+}) => (
+  <EuiFlexGroup
+    alignItems="center"
+    justifyContent="spaceBetween"
+    style={{ flexGrow: 0 }}
+  >
     <EuiFlexItem grow={false}>
       <EuiTitle>
         <h2>
@@ -32,7 +45,11 @@ const ServerState = ({ name, serverState }) => (
             id="statusPage.serverStatus.statusTitle"
             defaultMessage="NetMon-UI status is {kibanaStatus}"
             values={{
-              kibanaStatus: <EuiBadge color={serverState.uiColor}>{serverState.title}</EuiBadge>,
+              kibanaStatus: (
+                <EuiBadge color={serverState.uiColor}>
+                  {serverState.title}
+                </EuiBadge>
+              ),
             }}
           />
         </h2>
@@ -40,7 +57,9 @@ const ServerState = ({ name, serverState }) => (
     </EuiFlexItem>
     <EuiFlexItem grow={false}>
       <EuiText>
-        <p>{name}</p>
+        <p>
+          {name}
+        </p>
       </EuiText>
     </EuiFlexItem>
   </EuiFlexGroup>
@@ -48,7 +67,7 @@ const ServerState = ({ name, serverState }) => (
 
 ServerState.propTypes = {
   name: PropTypes.string.isRequired,
-  serverState: StatePropType.isRequired,
+  serverState: StatePropType.isRequired
 };
 
 export default ServerState;
