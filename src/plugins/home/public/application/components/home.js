@@ -20,7 +20,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from '@kbn/i18n/react';
-import { EuiFlexGroup, EuiFlexItem, EuiHorizontalRule } from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiHorizontalRule, EuiText, EuiSpacer, EuiButton, EuiPage, EuiPageBody } from '@elastic/eui';
 import { i18n } from '@kbn/i18n';
 import {
   OverviewPageFooter,
@@ -171,9 +171,27 @@ export class Home extends Component {
 
           <EuiHorizontalRule margin="xl" aria-hidden="true" />
 
-          <OverviewPageFooter addBasePath={addBasePath} path={HOME_APP_BASE_PATH} />
-        </div>
-      </main>
+          <EuiFlexGroup justifyContent="center">
+            <EuiFlexItem grow={false} className="eui-textCenter">
+              <EuiText size="s" color="subdued">
+                <p>
+                  <FormattedMessage
+                    id="kbn.home.directories.notFound.description"
+                    defaultMessage="Didn't find what you were looking for?"
+                  />
+                </p>
+              </EuiText>
+              <EuiSpacer size="s" />
+              <EuiButton href="#/home/feature_directory">
+                <FormattedMessage
+                  id="kbn.home.directories.notFound.viewFullButtonLabel"
+                  defaultMessage="View full directory of NetMon-UI plugins"
+                />
+              </EuiButton>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiPageBody>
+      </EuiPage>
     );
   }
 

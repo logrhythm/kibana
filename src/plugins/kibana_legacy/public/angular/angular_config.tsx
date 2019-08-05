@@ -22,84 +22,59 @@ import {
   IHttpProvider,
   IHttpService,
   ILocationProvider,
+  ILocationService,
   IModule,
   IRootScopeService,
 } from 'angular';
 import $ from 'jquery';
-import { set } from '@elastic/safer-lodash-set';
-import { get } from 'lodash';
+import { cloneDeep, forOwn, set } from 'lodash';
+import React, { Fragment } from 'react';
 import * as Rx from 'rxjs';
-import { ChromeBreadcrumb, EnvironmentMode, PackageInfo } from 'kibana/public';
-import { History } from 'history';
 
-import { CoreStart } from 'kibana/public';
-import { isSystemApiRequest } from '../utils';
-import { formatAngularHttpError, isAngularHttpError } from '../notify/lib';
+import { i18n } from '@kbn/i18n';
+import { FormattedMessage } from '@kbn/i18n/react';
+import { CoreStart, LegacyCoreStart } from 'kibana/public';
 
-export interface RouteConfiguration {
-  controller?: string | ((...args: any[]) => void);
-  redirectTo?: string;
-  resolveRedirectTo?: (...args: any[]) => void;
-  reloadOnSearch?: boolean;
-  reloadOnUrl?: boolean;
-  outerAngularWrapperRoute?: boolean;
-  resolve?: object;
-  template?: string;
-  k7Breadcrumbs?: (...args: any[]) => ChromeBreadcrumb[];
-  requireUICapability?: string;
-}
+import { fatalError } from 'ui/notify';
+import { capabilities } from 'ui/capabilities';
+// @ts-ignore
+import { modifyUrl } from 'ui/url';
+// @ts-ignore
+import { UrlOverflowService } from '../error_url_overflow';
+import { npStart } from '../new_platform';
+import { toastNotifications } from '../notify';
+// @ts-ignore
+import { isSystemApiRequest } from '../system_api';
 
-/**
- * Detects whether a given angular route is a dummy route that doesn't
- * require any action. There are two ways this can happen:
- * If `outerAngularWrapperRoute` is set on the route config object,
- * it means the local application service set up this route on the outer angular
- * and the internal routes will handle the hooks.
- *
- * If angular did not detect a route and it is the local angular, we are currently
- * navigating away from a URL controlled by a local angular router and the
- * application will get unmounted. In this case the outer router will handle
- * the hooks.
- * @param $route Injected $route dependency
- * @param isLocalAngular Flag whether this is the local angular router
- */
-function isDummyRoute($route: any, isLocalAngular: boolean) {
-  return (
-    ($route.current && $route.current.$$route && $route.current.$$route.outerAngularWrapperRoute) ||
-    (!$route.current && isLocalAngular)
-  );
-}
+const URL_LIMIT_WARN_WITHIN = 1000;
 
-export const configureAppAngularModule = (
-  angularModule: IModule,
-  newPlatform: {
-    core: CoreStart;
-    readonly env: {
-      mode: Readonly<EnvironmentMode>;
-      packageInfo: Readonly<PackageInfo>;
-    };
-  },
-  isLocalAngular: boolean,
-  getHistory?: () => History
-) => {
-  const core = 'core' in newPlatform ? newPlatform.core : newPlatform;
-  const packageInfo = newPlatform.env.packageInfo;
+export const configureAppAngularModule = (angularModule: IModule) => {
+  const newPlatform = npStart.core;
+  const legacyMetadata = newPlatform.injectedMetadata.getLegacyMetadata();
+
+  forOwn(newPlatform.injectedMetadata.getInjectedVars(), (val, name) => {
+    if (name !== undefined) {
+      // The legacy platform modifies some of these values, clone to an unfrozen object.
+      angularModule.value(name, cloneDeep(val));
+    }
+  });
 
   angularModule
-    .value('kbnVersion', packageInfo.version)
-    .value('buildNum', packageInfo.buildNum)
-    .value('buildSha', packageInfo.buildSha)
-    .value('esUrl', getEsUrl(core))
-    .value('uiCapabilities', core.application.capabilities)
-    .config(setupCompileProvider(newPlatform.env.mode.dev))
-    .config(setupLocationProvider())
-    .config($setupXsrfRequestInterceptor(packageInfo.version))
-    .run(capture$httpLoadingCount(core))
-    .run(digestOnHashChange(getHistory))
-    .run($setupBreadcrumbsAutoClear(core, isLocalAngular))
-    .run($setupBadgeAutoClear(core, isLocalAngular))
-    .run($setupHelpExtensionAutoClear(core, isLocalAngular))
-    .run($setupUICapabilityRedirect(core));
+    .value('kbnVersion', newPlatform.injectedMetadata.getKibanaVersion())
+    .value('buildNum', legacyMetadata.buildNum)
+    .value('buildSha', legacyMetadata.buildSha)
+    .value('serverName', legacyMetadata.serverName)
+    .value('sessionId', Date.now())
+    .value('esUrl', getEsUrl(newPlatform))
+    .value('uiCapabilities', capabilities.get())
+    .config(setupCompileProvider(newPlatform))
+    .config(setupLocationProvider(newPlatform))
+    .config($setupXsrfRequestInterceptor(newPlatform))
+    .run(capture$httpLoadingCount(newPlatform))
+    .run($setupBreadcrumbsAutoClear(newPlatform))
+    .run($setupBadgeAutoClear(newPlatform))
+    .run($setupHelpExtensionAutoClear(newPlatform))
+    .run($setupUrlOverflowHandling(newPlatform));
 };
 
 const getEsUrl = (newPlatform: CoreStart) => {
@@ -115,26 +90,17 @@ const getEsUrl = (newPlatform: CoreStart) => {
   };
 };
 
-const digestOnHashChange = (getHistory?: () => History) => ($rootScope: IRootScopeService) => {
-  if (!getHistory) return;
-  const unlisten = getHistory().listen(() => {
-    // dispatch synthetic hash change event to update hash history objects and angular routing
-    // this is necessary because hash updates triggered by using popState won't trigger this event naturally.
-    // this has to happen in the next tick to not change the existing timing of angular digest cycles.
-    setTimeout(() => {
-      window.dispatchEvent(new HashChangeEvent('hashchange'));
-    }, 0);
-  });
-  $rootScope.$on('$destroy', unlisten);
-};
-
-const setupCompileProvider = (devMode: boolean) => ($compileProvider: ICompileProvider) => {
-  if (!devMode) {
+const setupCompileProvider = (newPlatform: LegacyCoreStart) => (
+  $compileProvider: ICompileProvider
+) => {
+  if (!newPlatform.injectedMetadata.getLegacyMetadata().devMode) {
     $compileProvider.debugInfoEnabled(false);
   }
 };
 
-const setupLocationProvider = () => ($locationProvider: ILocationProvider) => {
+const setupLocationProvider = (newPlatform: CoreStart) => (
+  $locationProvider: ILocationProvider
+) => {
   $locationProvider.html5Mode({
     enabled: false,
     requireBase: false,
@@ -144,7 +110,9 @@ const setupLocationProvider = () => ($locationProvider: ILocationProvider) => {
   $locationProvider.hashPrefix('');
 };
 
-export const $setupXsrfRequestInterceptor = (version: string) => {
+export const $setupXsrfRequestInterceptor = (newPlatform: LegacyCoreStart) => {
+  const version = newPlatform.injectedMetadata.getLegacyMetadata().version;
+
   // Configure jQuery prefilter
   $.ajaxPrefilter(({ kbnXsrfToken = true }: any, originalOptions, jqXHR) => {
     if (kbnXsrfToken) {
@@ -173,16 +141,19 @@ export const $setupXsrfRequestInterceptor = (version: string) => {
  * and adds a root-level watcher that will capture the count of
  * active $http requests on each digest loop and expose the count to
  * the core.loadingCount api
+ * @param  {Angular.Scope} $rootScope
+ * @param  {HttpService} $http
+ * @return {undefined}
  */
 const capture$httpLoadingCount = (newPlatform: CoreStart) => (
   $rootScope: IRootScopeService,
   $http: IHttpService
 ) => {
-  newPlatform.http.addLoadingCountSource(
-    new Rx.Observable((observer) => {
+  newPlatform.http.addLoadingCount(
+    new Rx.Observable(observer => {
       const unwatch = $rootScope.$watch(() => {
         const reqs = $http.pendingRequests || [];
-        observer.next(reqs.filter((req) => !isSystemApiRequest(req)).length);
+        observer.next(reqs.filter(req => !isSystemApiRequest(req)).length);
       });
 
       return unwatch;
@@ -191,41 +162,11 @@ const capture$httpLoadingCount = (newPlatform: CoreStart) => (
 };
 
 /**
- * integrates with angular to automatically redirect to home if required
- * capability is not met
- */
-const $setupUICapabilityRedirect = (newPlatform: CoreStart) => (
-  $rootScope: IRootScopeService,
-  $injector: any
-) => {
-  const isKibanaAppRoute = window.location.pathname.endsWith('/app/kibana');
-  // this feature only works within kibana app for now after everything is
-  // switched to the application service, this can be changed to handle all
-  // apps.
-  if (!isKibanaAppRoute) {
-    return;
-  }
-  $rootScope.$on(
-    '$routeChangeStart',
-    (event, { $$route: route }: { $$route?: RouteConfiguration } = {}) => {
-      if (!route || !route.requireUICapability) {
-        return;
-      }
-
-      if (!get(newPlatform.application.capabilities, route.requireUICapability)) {
-        $injector.get('$location').url('/home');
-        event.preventDefault();
-      }
-    }
-  );
-};
-
-/**
  * internal angular run function that will be called when angular bootstraps and
  * lets us integrate with the angular router so that we can automatically clear
  * the breadcrumbs if we switch to a Kibana app that does not use breadcrumbs correctly
  */
-const $setupBreadcrumbsAutoClear = (newPlatform: CoreStart, isLocalAngular: boolean) => (
+const $setupBreadcrumbsAutoClear = (newPlatform: CoreStart) => (
   $rootScope: IRootScopeService,
   $injector: any
 ) => {
@@ -247,9 +188,6 @@ const $setupBreadcrumbsAutoClear = (newPlatform: CoreStart, isLocalAngular: bool
   });
 
   $rootScope.$on('$routeChangeSuccess', () => {
-    if (isDummyRoute($route, isLocalAngular)) {
-      return;
-    }
     const current = $route.current || {};
 
     if (breadcrumbSetSinceRouteChange || (current.$$route && current.$$route.redirectTo)) {
@@ -265,10 +203,7 @@ const $setupBreadcrumbsAutoClear = (newPlatform: CoreStart, isLocalAngular: bool
     try {
       newPlatform.chrome.setBreadcrumbs($injector.invoke(k7BreadcrumbsProvider));
     } catch (error) {
-      if (isAngularHttpError(error)) {
-        error = formatAngularHttpError(error);
-      }
-      newPlatform.fatalErrors.add(error, 'location');
+      fatalError(error);
     }
   });
 };
@@ -278,7 +213,7 @@ const $setupBreadcrumbsAutoClear = (newPlatform: CoreStart, isLocalAngular: bool
  * lets us integrate with the angular router so that we can automatically clear
  * the badge if we switch to a Kibana app that does not use the badge correctly
  */
-const $setupBadgeAutoClear = (newPlatform: CoreStart, isLocalAngular: boolean) => (
+const $setupBadgeAutoClear = (newPlatform: CoreStart) => (
   $rootScope: IRootScopeService,
   $injector: any
 ) => {
@@ -292,9 +227,6 @@ const $setupBadgeAutoClear = (newPlatform: CoreStart, isLocalAngular: boolean) =
   });
 
   $rootScope.$on('$routeChangeSuccess', () => {
-    if (isDummyRoute($route, isLocalAngular)) {
-      return;
-    }
     const current = $route.current || {};
 
     if (badgeSetSinceRouteChange || (current.$$route && current.$$route.redirectTo)) {
@@ -310,10 +242,7 @@ const $setupBadgeAutoClear = (newPlatform: CoreStart, isLocalAngular: boolean) =
     try {
       newPlatform.chrome.setBadge($injector.invoke(badgeProvider));
     } catch (error) {
-      if (isAngularHttpError(error)) {
-        error = formatAngularHttpError(error);
-      }
-      newPlatform.fatalErrors.add(error, 'location');
+      fatalError(error);
     }
   });
 };
@@ -324,7 +253,7 @@ const $setupBadgeAutoClear = (newPlatform: CoreStart, isLocalAngular: boolean) =
  * the helpExtension if we switch to a Kibana app that does not set its own
  * helpExtension
  */
-const $setupHelpExtensionAutoClear = (newPlatform: CoreStart, isLocalAngular: boolean) => (
+const $setupHelpExtensionAutoClear = (newPlatform: CoreStart) => (
   $rootScope: IRootScopeService,
   $injector: any
 ) => {
@@ -342,16 +271,10 @@ const $setupHelpExtensionAutoClear = (newPlatform: CoreStart, isLocalAngular: bo
   const $route = $injector.has('$route') ? $injector.get('$route') : {};
 
   $rootScope.$on('$routeChangeStart', () => {
-    if (isDummyRoute($route, isLocalAngular)) {
-      return;
-    }
     helpExtensionSetSinceRouteChange = false;
   });
 
   $rootScope.$on('$routeChangeSuccess', () => {
-    if (isDummyRoute($route, isLocalAngular)) {
-      return;
-    }
     const current = $route.current || {};
 
     if (helpExtensionSetSinceRouteChange || (current.$$route && current.$$route.redirectTo)) {
@@ -360,4 +283,62 @@ const $setupHelpExtensionAutoClear = (newPlatform: CoreStart, isLocalAngular: bo
 
     newPlatform.chrome.setHelpExtension(current.helpExtension);
   });
+};
+
+const $setupUrlOverflowHandling = (newPlatform: CoreStart) => (
+  $location: ILocationService,
+  $rootScope: IRootScopeService,
+  Private: any,
+  config: any
+) => {
+  const urlOverflow = new UrlOverflowService();
+  const check = () => {
+    // disable long url checks when storing state in session storage
+    if (config.get('state:storeInSessionStorage')) {
+      return;
+    }
+
+    if ($location.path() === '/error/url-overflow') {
+      return;
+    }
+
+    try {
+      if (urlOverflow.check($location.absUrl()) <= URL_LIMIT_WARN_WITHIN) {
+        toastNotifications.addWarning({
+          title: i18n.translate('common.ui.chrome.bigUrlWarningNotificationTitle', {
+            defaultMessage: 'The URL is big and NetMon-UI might stop working',
+          }),
+          text: (
+            <Fragment>
+              <FormattedMessage
+                id="common.ui.chrome.bigUrlWarningNotificationMessage"
+                defaultMessage="Either enable the {storeInSessionStorageParam} option
+                  in {advancedSettingsLink} or simplify the onscreen visuals."
+                values={{
+                  storeInSessionStorageParam: <code>state:storeInSessionStorage</code>,
+                  advancedSettingsLink: (
+                    <a href="#/management/kibana/settings">
+                      <FormattedMessage
+                        id="common.ui.chrome.bigUrlWarningNotificationMessage.advancedSettingsLinkText"
+                        defaultMessage="advanced settings"
+                      />
+                    </a>
+                  ),
+                }}
+              />
+            </Fragment>
+          ),
+        });
+      }
+    } catch (e) {
+      window.location.href = modifyUrl(window.location.href, (parts: any) => {
+        parts.hash = '#/error/url-overflow';
+      });
+      // force the browser to reload to that Kibana's potentially unstable state is unloaded
+      window.location.reload();
+    }
+  };
+
+  $rootScope.$on('$routeUpdate', check);
+  $rootScope.$on('$routeChangeStart', check);
 };

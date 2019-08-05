@@ -17,35 +17,36 @@
  * under the License.
  */
 
-import { ExpressionTypeDefinition, ExpressionValueBoxed } from '../types';
+import { ManagementSection } from './section';
+import { i18n } from '@kbn/i18n';
 
-const name = 'render';
+export const management = new ManagementSection('management', {
+  display: i18n.translate('common.ui.management.displayName', {
+    defaultMessage: 'Management',
+  }),
+});
 
-/**
- * Represents an object that is intended to be rendered.
- */
-export type ExpressionValueRender<T> = ExpressionValueBoxed<
-  typeof name,
-  {
-    as: string;
-    value: T;
-  }
->;
+management.register('data', {
+  display: i18n.translate('common.ui.management.connectDataDisplayName', {
+    defaultMessage: 'Connect Data',
+  }),
+  order: 0,
+});
 
-/**
- * @deprecated
- *
- * Use `ExpressionValueRender` instead.
- */
-export type Render<T> = ExpressionValueRender<T>;
+management.register('elasticsearch', {
+  display: 'Elasticsearch',
+  order: 20,
+  icon: 'logoElasticsearch',
+});
 
-export const render: ExpressionTypeDefinition<typeof name, ExpressionValueRender<unknown>> = {
-  name,
-  from: {
-    '*': <T>(v: T): ExpressionValueRender<T> => ({
-      type: name,
-      as: 'debug',
-      value: v,
-    }),
-  },
-};
+management.register('kibana', {
+  display: 'NetMon-UI',
+  order: 30,
+  icon: 'logoKibana',
+});
+
+management.register('logstash', {
+  display: 'Logstash',
+  order: 30,
+  icon: 'logoLogstash',
+});

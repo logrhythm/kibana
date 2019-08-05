@@ -33,8 +33,8 @@ export const ServerStatus: FunctionComponent<ServerStateProps> = ({ name, server
       <EuiTitle>
         <h2 data-test-subj="serverStatusTitle">
           <FormattedMessage
-            id="core.statusPage.serverStatus.statusTitle"
-            defaultMessage="Kibana status is {kibanaStatus}"
+            id="statusPage.serverStatus.statusTitle"
+            defaultMessage="NetMon-UI status is {kibanaStatus}"
             values={{
               kibanaStatus: (
                 <EuiBadge

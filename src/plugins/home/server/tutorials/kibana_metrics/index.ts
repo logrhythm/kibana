@@ -18,33 +18,27 @@
  */
 
 import { i18n } from '@kbn/i18n';
-import { TutorialsCategory } from '../../services/tutorials';
+import { TUTORIAL_CATEGORY } from '../../../common/tutorials/tutorial_category';
 import {
   onPremInstructions,
   cloudInstructions,
   onPremCloudInstructions,
-} from '../instructions/metricbeat_instructions';
-import {
-  TutorialContext,
-  TutorialSchema,
-} from '../../services/tutorials/lib/tutorials_registry_types';
+} from '../../../common/tutorials/metricbeat_instructions';
 
-export function kibanaMetricsSpecProvider(context: TutorialContext): TutorialSchema {
+export function kibanaMetricsSpecProvider(server, context) {
   const moduleName = 'kibana';
   return {
     id: 'kibanaMetrics',
-    name: i18n.translate('home.tutorials.kibanaMetrics.nameTitle', {
-      defaultMessage: 'Kibana metrics',
+    name: i18n.translate('kbn.server.tutorials.kibanaMetrics.nameTitle', {
+      defaultMessage: 'NetMon-UI metrics',
     }),
-    moduleName,
     isBeta: false,
-    category: TutorialsCategory.METRICS,
-    shortDescription: i18n.translate('home.tutorials.kibanaMetrics.shortDescription', {
-      defaultMessage: 'Fetch internal metrics from Kibana.',
+    category: TUTORIAL_CATEGORY.METRICS,
+    shortDescription: i18n.translate('kbn.server.tutorials.kibanaMetrics.shortDescription', {
+      defaultMessage: 'Fetch internal metrics from NetMon-UI.',
     }),
-    longDescription: i18n.translate('home.tutorials.kibanaMetrics.longDescription', {
-      defaultMessage:
-        'The `kibana` Metricbeat module fetches internal metrics from Kibana. \
+    longDescription: i18n.translate('kbn.server.tutorials.kibanaMetrics.longDescription', {
+      defaultMessage: 'The `kibana` Metricbeat module fetches internal metrics from NetMon-UI. \
 [Learn more]({learnMoreLink}).',
       values: {
         learnMoreLink: '{config.docs.beats.metricbeat}/metricbeat-module-kibana.html',
@@ -53,10 +47,10 @@ export function kibanaMetricsSpecProvider(context: TutorialContext): TutorialSch
     euiIconType: 'logoKibana',
     artifacts: {
       application: {
-        label: i18n.translate('home.tutorials.kibanaMetrics.artifacts.application.label', {
+        label: i18n.translate('kbn.server.tutorials.kibanaMetrics.artifacts.application.label', {
           defaultMessage: 'Discover',
         }),
-        path: '/app/discover#/',
+        path: '/app/kibana#/discover',
       },
       dashboards: [],
       exportedFields: {
@@ -64,7 +58,7 @@ export function kibanaMetricsSpecProvider(context: TutorialContext): TutorialSch
       },
     },
     completionTimeMinutes: 10,
-    onPrem: onPremInstructions(moduleName, context),
+    onPrem: onPremInstructions(moduleName, null, null, null, context),
     elasticCloud: cloudInstructions(moduleName),
     onPremElasticCloud: onPremCloudInstructions(moduleName),
   };

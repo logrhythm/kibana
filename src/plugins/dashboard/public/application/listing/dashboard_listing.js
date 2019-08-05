@@ -19,12 +19,12 @@
 
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-
-import { FormattedMessage, I18nProvider } from '@kbn/i18n/react';
+import { FormattedMessage } from '@kbn/i18n/react';
 import { i18n } from '@kbn/i18n';
+
 import { EuiLink, EuiButton, EuiEmptyPrompt } from '@elastic/eui';
 
-import { TableListView } from '../../../../kibana_react/public';
+import { TableListView } from './../../table_list_view';
 
 export const EMPTY_FILTER = '';
 
@@ -40,31 +40,25 @@ export class DashboardListing extends React.Component {
 
   render() {
     return (
-      <I18nProvider>
-        <TableListView
-          headingId="dashboardListingHeading"
-          createItem={this.props.hideWriteControls ? null : this.props.createItem}
-          findItems={this.props.findItems}
-          deleteItems={this.props.hideWriteControls ? null : this.props.deleteItems}
-          editItem={this.props.hideWriteControls ? null : this.props.editItem}
-          tableColumns={this.getTableColumns()}
-          listingLimit={this.props.listingLimit}
-          initialFilter={this.props.initialFilter}
-          initialPageSize={this.props.initialPageSize}
-          noItemsFragment={this.getNoItemsMessage()}
-          entityName={i18n.translate('dashboard.listing.table.entityName', {
-            defaultMessage: 'dashboard',
-          })}
-          entityNamePlural={i18n.translate('dashboard.listing.table.entityNamePlural', {
-            defaultMessage: 'dashboards',
-          })}
-          tableListTitle={i18n.translate('dashboard.listing.dashboardsTitle', {
-            defaultMessage: 'Dashboards',
-          })}
-          toastNotifications={this.props.core.notifications.toasts}
-          uiSettings={this.props.core.uiSettings}
-        />
-      </I18nProvider>
+      <TableListView
+        createItem={this.props.hideWriteControls ? null : this.props.createItem}
+        findItems={this.props.findItems}
+        deleteItems={this.props.hideWriteControls ? null : this.props.deleteItems}
+        editItem={this.props.hideWriteControls ? null : this.props.editItem}
+        tableColumns={this.getTableColumns()}
+        listingLimit={this.props.listingLimit}
+        initialFilter={this.props.initialFilter}
+        noItemsFragment={this.getNoItemsMessage()}
+        entityName={i18n.translate('kbn.dashboard.listing.table.entityName', {
+          defaultMessage: 'dashboard',
+        })}
+        entityNamePlural={i18n.translate('kbn.dashboard.listing.table.entityNamePlural', {
+          defaultMessage: 'dashboards',
+        })}
+        tableListTitle={i18n.translate('kbn.dashboard.listing.dashboardsTitle', {
+          defaultMessage: 'Dashboards',
+        })}
+      />
     );
   }
 
@@ -75,12 +69,12 @@ export class DashboardListing extends React.Component {
           <EuiEmptyPrompt
             iconType="visualizeApp"
             title={
-              <h1 id="dashboardListingHeading">
+              <h2>
                 <FormattedMessage
-                  id="dashboard.listing.noItemsMessage"
+                  id="kbn.dashboard.listing.noItemsMessage"
                   defaultMessage="Looks like you don't have any dashboards."
                 />
-              </h1>
+              </h2>
             }
           />
         </div>
@@ -92,36 +86,30 @@ export class DashboardListing extends React.Component {
         <EuiEmptyPrompt
           iconType="dashboardApp"
           title={
-            <h1 id="dashboardListingHeading">
+            <h2>
               <FormattedMessage
-                id="dashboard.listing.createNewDashboard.title"
+                id="kbn.dashboard.listing.createNewDashboard.title"
                 defaultMessage="Create your first dashboard"
               />
-            </h1>
+            </h2>
           }
           body={
             <Fragment>
               <p>
                 <FormattedMessage
-                  id="dashboard.listing.createNewDashboard.combineDataViewFromKibanaAppDescription"
-                  defaultMessage="You can combine data views from any Kibana app into one dashboard and see everything in one place."
+                  id="kbn.dashboard.listing.createNewDashboard.combineDataViewFromKibanaAppDescription"
+                  defaultMessage="You can combine data views from any NetMon-UI app into one dashboard and see everything in one place."
                 />
               </p>
               <p>
                 <FormattedMessage
-                  id="dashboard.listing.createNewDashboard.newToKibanaDescription"
-                  defaultMessage="New to Kibana? {sampleDataInstallLink} to take a test drive."
+                  id="kbn.dashboard.listing.createNewDashboard.newToKibanaDescription"
+                  defaultMessage="New to NetMon-UI? {sampleDataInstallLink} to take a test drive."
                   values={{
                     sampleDataInstallLink: (
-                      <EuiLink
-                        onClick={() =>
-                          this.props.core.application.navigateToApp('home', {
-                            path: '#/tutorial_directory/sampleData',
-                          })
-                        }
-                      >
+                      <EuiLink href="#/home/tutorial_directory/sampleData">
                         <FormattedMessage
-                          id="dashboard.listing.createNewDashboard.sampleDataInstallLinkText"
+                          id="kbn.dashboard.listing.createNewDashboard.sampleDataInstallLinkText"
                           defaultMessage="Install some sample data"
                         />
                       </EuiLink>
@@ -139,7 +127,7 @@ export class DashboardListing extends React.Component {
               data-test-subj="createDashboardPromptButton"
             >
               <FormattedMessage
-                id="dashboard.listing.createNewDashboard.createButtonLabel"
+                id="kbn.dashboard.listing.createNewDashboard.createButtonLabel"
                 defaultMessage="Create new dashboard"
               />
             </EuiButton>
@@ -153,7 +141,7 @@ export class DashboardListing extends React.Component {
     const tableColumns = [
       {
         field: 'title',
-        name: i18n.translate('dashboard.listing.table.titleColumnName', {
+        name: i18n.translate('kbn.dashboard.listing.table.titleColumnName', {
           defaultMessage: 'Title',
         }),
         sortable: true,
@@ -168,7 +156,7 @@ export class DashboardListing extends React.Component {
       },
       {
         field: 'description',
-        name: i18n.translate('dashboard.listing.table.descriptionColumnName', {
+        name: i18n.translate('kbn.dashboard.listing.table.descriptionColumnName', {
           defaultMessage: 'Description',
         }),
         dataType: 'string',
@@ -188,7 +176,6 @@ DashboardListing.propTypes = {
   listingLimit: PropTypes.number.isRequired,
   hideWriteControls: PropTypes.bool.isRequired,
   initialFilter: PropTypes.string,
-  initialPageSize: PropTypes.number.isRequired,
 };
 
 DashboardListing.defaultProps = {

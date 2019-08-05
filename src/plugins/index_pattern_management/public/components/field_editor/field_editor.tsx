@@ -533,7 +533,7 @@ export class FieldEditor extends PureComponent<FieldEdiorProps, FieldEditorState
         label={i18n.translate('indexPatternManagement.popularityLabel', {
           defaultMessage: 'Popularity',
           description:
-            '"Popularity" refers to Kibana\'s measurement how popular a field is (i.e. how commonly it is used).',
+            '"Popularity" refers to NetMon-UI\'s measurement how popular a field is (i.e. how commonly it is used).',
         })}
       >
         <EuiFieldNumber
