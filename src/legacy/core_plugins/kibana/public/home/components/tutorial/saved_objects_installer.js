@@ -104,8 +104,8 @@ class SavedObjectsInstallerUi extends React.Component {
           {
             id: 'kbn.home.tutorial.savedObject.installStatusLabel',
             defaultMessage:
-              "{overwriteErrorsLength} of {savedObjectsLength} objects already exist. \
-Click 'Confirm overwrite' to import and overwrite existing objects. Any changes to the objects will be lost.",
+              '{overwriteErrorsLength} of {savedObjectsLength} objects already exist. \
+Click \'Confirm overwrite\' to import and overwrite existing objects. Any changes to the objects will be lost.',
           },
           {
             overwriteErrorsLength: overwriteErrors.length,
@@ -125,24 +125,24 @@ Click 'Confirm overwrite' to import and overwrite existing objects. Any changes 
     const hasErrors = errors.length > 0;
     const statusMsg = hasErrors
       ? this.props.intl.formatMessage(
-          {
-            id: 'kbn.home.tutorial.savedObject.unableToAddErrorMessage',
-            defaultMessage:
+        {
+          id: 'kbn.home.tutorial.savedObject.unableToAddErrorMessage',
+          defaultMessage:
               'Unable to add {errorsLength} of {savedObjectsLength} kibana objects, Error: {errorMessage}',
-          },
-          {
-            errorsLength: errors.length,
-            savedObjectsLength: this.props.savedObjects.length,
-            errorMessage: errors[0].error.message,
-          }
-        )
+        },
+        {
+          errorsLength: errors.length,
+          savedObjectsLength: this.props.savedObjects.length,
+          errorMessage: errors[0].error.message,
+        }
+      )
       : this.props.intl.formatMessage(
-          {
-            id: 'kbn.home.tutorial.savedObject.addedLabel',
-            defaultMessage: '{savedObjectsLength} saved objects successfully added',
-          },
-          { savedObjectsLength: this.props.savedObjects.length }
-        );
+        {
+          id: 'kbn.home.tutorial.savedObject.addedLabel',
+          defaultMessage: '{savedObjectsLength} saved objects successfully added',
+        },
+        { savedObjectsLength: this.props.savedObjects.length }
+      );
     this.setState({
       isInstalling: false,
       installStatusMsg: statusMsg,
@@ -172,9 +172,9 @@ Click 'Confirm overwrite' to import and overwrite existing objects. Any changes 
     const installMsg = this.props.installMsg
       ? this.props.installMsg
       : this.props.intl.formatMessage({
-          id: 'kbn.home.tutorial.savedObject.installLabel',
-          defaultMessage: 'Imports index pattern, visualizations and pre-defined dashboards.',
-        });
+        id: 'kbn.home.tutorial.savedObject.installLabel',
+        defaultMessage: 'Imports index pattern, visualizations and pre-defined dashboards.',
+      });
     const installStep = (
       <Fragment>
         <EuiFlexGroup justifyContent="spaceBetween" alignItems="center">

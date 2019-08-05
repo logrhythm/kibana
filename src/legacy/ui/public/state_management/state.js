@@ -82,7 +82,7 @@ export function StateProvider(
     this.fetch();
   }
 
-  State.prototype._readFromURL = function() {
+  State.prototype._readFromURL = function () {
     const search = $location.search();
     const urlVal = search[this._urlParam];
 
@@ -131,7 +131,7 @@ export function StateProvider(
    * Fetches the state from the url
    * @returns {void}
    */
-  State.prototype.fetch = function() {
+  State.prototype.fetch = function () {
     if (!stateManagementConfig.enabled) {
       return;
     }
@@ -160,7 +160,7 @@ export function StateProvider(
    * Saves the state to the url
    * @returns {void}
    */
-  State.prototype.save = function(replace) {
+  State.prototype.save = function (replace) {
     if (!stateManagementConfig.enabled) {
       return;
     }
@@ -195,7 +195,7 @@ export function StateProvider(
    * Calls save with a forced replace
    * @returns {void}
    */
-  State.prototype.replace = function() {
+  State.prototype.replace = function () {
     if (!stateManagementConfig.enabled) {
       return;
     }
@@ -208,7 +208,7 @@ export function StateProvider(
    *
    * @returns {void}
    */
-  State.prototype.reset = function() {
+  State.prototype.reset = function () {
     if (!stateManagementConfig.enabled) {
       return;
     }
@@ -227,12 +227,12 @@ export function StateProvider(
    * Cleans up the state object
    * @returns {void}
    */
-  State.prototype.destroy = function() {
+  State.prototype.destroy = function () {
     this.off(); // removes all listeners
     this._cleanUpListeners(); // Removes the $routeUpdate listener
   };
 
-  State.prototype.setDefaults = function(defaults) {
+  State.prototype.setDefaults = function (defaults) {
     this._defaults = defaults || {};
   };
 
@@ -243,7 +243,7 @@ export function StateProvider(
    *  @param  {string} stateHash - state hash value from the query string.
    *  @return {any} - the stored value, or null if hash does not resolve.
    */
-  State.prototype._parseStateHash = function(stateHash) {
+  State.prototype._parseStateHash = function (stateHash) {
     const json = this._hashedItemStore.getItem(stateHash);
     if (json === null) {
       toastNotifications.addDanger(
@@ -264,7 +264,7 @@ export function StateProvider(
    *  @param  {string} stateHashOrRison - either state hash value or rison string.
    *  @return {string} rison
    */
-  State.prototype.translateHashToRison = function(stateHashOrRison) {
+  State.prototype.translateHashToRison = function (stateHashOrRison) {
     if (isStateHash(stateHashOrRison)) {
       return rison.encode(this._parseStateHash(stateHashOrRison));
     }
@@ -272,7 +272,7 @@ export function StateProvider(
     return stateHashOrRison;
   };
 
-  State.prototype.isHashingEnabled = function() {
+  State.prototype.isHashingEnabled = function () {
     return !!config.get('state:storeInSessionStorage');
   };
 
@@ -281,7 +281,7 @@ export function StateProvider(
    *
    *  @return {string}
    */
-  State.prototype.toQueryParam = function(state = this.toObject()) {
+  State.prototype.toQueryParam = function (state = this.toObject()) {
     if (!this.isHashingEnabled()) {
       return rison.encode(state);
     }
@@ -318,7 +318,7 @@ export function StateProvider(
    *  Get the query string parameter name where this state writes and reads
    *  @return {string}
    */
-  State.prototype.getQueryParamName = function() {
+  State.prototype.getQueryParamName = function () {
     return this._urlParam;
   };
 

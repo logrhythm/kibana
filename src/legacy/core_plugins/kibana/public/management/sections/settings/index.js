@@ -82,10 +82,10 @@ uiRoutes.when('/management/kibana/settings/:setting?', {
   },
 });
 
-uiModules.get('apps/management').directive('kbnManagementAdvanced', function(config, $route) {
+uiModules.get('apps/management').directive('kbnManagementAdvanced', function (config, $route) {
   return {
     restrict: 'E',
-    link: function($scope) {
+    link: function ($scope) {
       config.watchAll(() => {
         updateAdvancedSettings($scope, config, $route.current.params.setting || '');
       }, $scope);

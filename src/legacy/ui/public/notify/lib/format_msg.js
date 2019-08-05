@@ -68,7 +68,7 @@ export function formatMsg(err, source) {
   return message;
 }
 
-formatMsg.describeError = function(err) {
+formatMsg.describeError = function (err) {
   if (!err) return undefined;
   if (err.shortMessage) return err.shortMessage;
   if (err.body && err.body.message) return err.body.message;

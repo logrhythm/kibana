@@ -219,14 +219,14 @@ class FieldUI extends PureComponent {
         isInvalid,
         error: isInvalid
           ? this.props.intl.formattedMessage(
-              {
-                id: 'kbn.management.settings.field.imageTooLargeErrorMessage',
-                defaultMessage: 'Image is too large, maximum size is {maxSizeDescription}',
-              },
-              {
-                maxSizeDescription: maxSize.description,
-              }
-            )
+            {
+              id: 'kbn.management.settings.field.imageTooLargeErrorMessage',
+              defaultMessage: 'Image is too large, maximum size is {maxSizeDescription}',
+            },
+            {
+              maxSizeDescription: maxSize.description,
+            }
+          )
           : null,
         changeImage: true,
         unsavedValue: base64Image,

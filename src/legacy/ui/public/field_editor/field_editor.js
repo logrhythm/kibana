@@ -258,9 +258,9 @@ export class FieldEditorComponent extends PureComponent {
         error={
           isInvalid
             ? intl.formatMessage({
-                id: 'common.ui.fieldEditor.nameErrorMessage',
-                defaultMessage: 'Name is required',
-              })
+              id: 'common.ui.fieldEditor.nameErrorMessage',
+              defaultMessage: 'Name is required',
+            })
             : null
         }
       >
@@ -587,7 +587,7 @@ export class FieldEditorComponent extends PureComponent {
           title={intl.formatMessage(
             {
               id: 'common.ui.fieldEditor.deleteFieldHeader',
-              defaultMessage: "Delete field '{fieldName}'",
+              defaultMessage: 'Delete field \'{fieldName}\'',
             },
             { fieldName: field.name }
           )}
@@ -728,7 +728,7 @@ export class FieldEditorComponent extends PureComponent {
         const message = intl.formatMessage(
           {
             id: 'common.ui.fieldEditor.deleteField.deletedHeader',
-            defaultMessage: "Deleted '{fieldName}'",
+            defaultMessage: 'Deleted \'{fieldName}\'',
           },
           { fieldName: field.name }
         );
@@ -781,11 +781,11 @@ export class FieldEditorComponent extends PureComponent {
       indexPattern.fieldFormatMap[field.name] = field.format;
     }
 
-    return indexPattern.save().then(function() {
+    return indexPattern.save().then(function () {
       const message = intl.formatMessage(
         {
           id: 'common.ui.fieldEditor.deleteField.savedHeader',
-          defaultMessage: "Saved '{fieldName}'",
+          defaultMessage: 'Saved \'{fieldName}\'',
         },
         { fieldName: field.name }
       );

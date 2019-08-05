@@ -51,13 +51,13 @@ export function send(method, path, data) {
   };
 
   $.ajax(options).then(
-    function(data, textStatus, jqXHR) {
+    function (data, textStatus, jqXHR) {
       wrappedDfd.resolveWith(this, [data, textStatus, jqXHR]);
     },
-    function(jqXHR, textStatus, errorThrown) {
+    function (jqXHR, textStatus, errorThrown) {
       if (jqXHR.status === 0) {
         jqXHR.responseText =
-          "\n\nFailed to connect to Console's backend.\nPlease check the NetMon server is up and running";
+          '\n\nFailed to connect to Console\'s backend.\nPlease check the NetMon server is up and running';
       }
       wrappedDfd.rejectWith(this, [jqXHR, textStatus, errorThrown]);
     }

@@ -173,8 +173,8 @@ export default class ChoroplethLayer extends KibanaMapLayer {
             'regionMap.choroplethLayer.downloadingVectorData404ErrorMessage',
             {
               defaultMessage:
-                "Server responding with '404' when attempting to fetch {name}. \
-Make sure the file exists at that location.",
+                'Server responding with \'404\' when attempting to fetch {name}. \
+Make sure the file exists at that location.',
               values: { name: name },
             }
           );
@@ -461,7 +461,7 @@ CORS configuration of the server permits requests from the NetMon-UI application
         });
         return mismatches.map(b => b.term);
       },
-      getLeafletBounds: function() {
+      getLeafletBounds: function () {
         return boundsOfAllFeatures.isValid() ? boundsOfAllFeatures : null;
       },
     };

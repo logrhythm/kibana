@@ -45,10 +45,10 @@ uiRoutes.when('/management/kibana/objects/:service/:id', {
 
 uiModules
   .get('apps/management', ['monospaced.elastic'])
-  .directive('kbnManagementObjectsView', function(kbnIndex, confirmModal) {
+  .directive('kbnManagementObjectsView', function (kbnIndex, confirmModal) {
     return {
       restrict: 'E',
-      controller: function(
+      controller: function (
         $scope,
         $injector,
         $routeParams,
@@ -75,7 +75,7 @@ uiModules
          * @param {array} parents The parent keys to the field
          * @returns {array}
          */
-        const createField = function(memo, val, key, collection, parents) {
+        const createField = function (memo, val, key, collection, parents) {
           if (Array.isArray(parents)) {
             parents.push(key);
           } else {
@@ -112,15 +112,15 @@ uiModules
           return memo;
         };
 
-        const readObjectClass = function(fields, Class) {
+        const readObjectClass = function (fields, Class) {
           const fieldMap = _.indexBy(fields, 'name');
 
-          _.forOwn(Class.mapping, function(esType, name) {
+          _.forOwn(Class.mapping, function (esType, name) {
             if (fieldMap[name]) return;
 
             fields.push({
               name: name,
-              type: (function() {
+              type: (function () {
                 switch (castEsToKbnFieldTypeName(esType)) {
                   case 'string':
                     return 'text';
@@ -131,7 +131,7 @@ uiModules
                   default:
                     return 'json';
                 }
-              })(),
+              }()),
             });
           });
 
@@ -165,7 +165,7 @@ uiModules
 
         savedObjectsClient
           .get(service.type, $routeParams.id)
-          .then(function(obj) {
+          .then(function (obj) {
             $scope.obj = obj;
             $scope.link = service.urlFor(obj.id);
 
@@ -195,7 +195,7 @@ uiModules
         const loadedEditors = [];
         $scope.aceInvalidEditors = [];
 
-        $scope.aceLoaded = function(editor) {
+        $scope.aceLoaded = function (editor) {
           if (_.contains(loadedEditors, editor)) return;
           loadedEditors.push(editor);
 
@@ -206,7 +206,7 @@ uiModules
 
           session.setTabSize(2);
           session.setUseSoftTabs(true);
-          session.on('changeAnnotation', function() {
+          session.on('changeAnnotation', function () {
             const annotations = session.getAnnotations();
             if (_.some(annotations, { type: 'error' })) {
               if (!_.contains($scope.aceInvalidEditors, fieldName)) {
@@ -220,7 +220,7 @@ uiModules
           });
         };
 
-        $scope.cancel = function() {
+        $scope.cancel = function () {
           $window.history.back();
           return false;
         };
@@ -230,11 +230,11 @@ uiModules
          * @param {type} name description
          * @returns {type} description
          */
-        $scope.delete = function() {
+        $scope.delete = function () {
           function doDelete() {
             savedObjectsClient
               .delete(service.type, $routeParams.id)
-              .then(function() {
+              .then(function () {
                 return redirectHandler('deleted');
               })
               .catch(error => fatalError(error, location));
@@ -253,16 +253,16 @@ uiModules
           };
           confirmModal(
             i18n.translate('kbn.management.objects.confirmModalOptions.modalDescription', {
-              defaultMessage: "You can't recover deleted objects",
+              defaultMessage: 'You can\'t recover deleted objects',
             }),
             confirmModalOptions
           );
         };
 
-        $scope.submit = function() {
+        $scope.submit = function () {
           const source = _.cloneDeep($scope.obj.attributes);
 
-          _.each($scope.fields, function(field) {
+          _.each($scope.fields, function (field) {
             let value = field.value;
 
             if (field.type === 'number') {
@@ -280,7 +280,7 @@ uiModules
 
           savedObjectsClient
             .update(service.type, $routeParams.id, attributes, { references })
-            .then(function() {
+            .then(function () {
               return redirectHandler('updated');
             })
             .catch(error => fatalError(error, location));

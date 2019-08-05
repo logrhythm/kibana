@@ -28,7 +28,7 @@ export function getUiSettingDefaults() {
   // default fallback in case the locale is not found.
   const numeralLanguageIds = [
     'en',
-    ...numeralLanguages.map(function(numeralLanguage) {
+    ...numeralLanguages.map(function (numeralLanguage) {
       return numeralLanguage.id;
     }),
   ];
@@ -303,12 +303,12 @@ export function getUiSettingDefaults() {
     },
     'doc_table:hideTimeColumn': {
       name: i18n.translate('kbn.advancedSettings.docTableHideTimeColumnTitle', {
-        defaultMessage: "Hide 'Time' column",
+        defaultMessage: 'Hide \'Time\' column',
       }),
       value: false,
       description: i18n.translate('kbn.advancedSettings.docTableHideTimeColumnText', {
         defaultMessage:
-          "Hide the 'Time' column in Discover and in all Saved Searches on Dashboards.",
+          'Hide the \'Time\' column in Discover and in all Saved Searches on Dashboards.',
       }),
       category: ['discover'],
     },

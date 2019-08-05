@@ -22,7 +22,7 @@ import React from 'react';
 import { FormattedMessage } from '@kbn/i18n/react';
 import { EuiSpacer, EuiButtonEmpty } from '@elastic/eui';
 
-export const createZoomWarningMsg = (function() {
+export const createZoomWarningMsg = (function () {
   let disableZoomMsg = false;
   const setZoomMsg = boolDisableMsg => (disableZoomMsg = boolDisableMsg);
 
@@ -113,4 +113,4 @@ export const createZoomWarningMsg = (function() {
       }
     };
   };
-})();
+}());

@@ -46,7 +46,8 @@ function displayBanner() {
           //eslint-disable-next-line max-len
           {
             defaultMessage:
-              "In order to visualize and explore data in NetMon-UI, you'll need to create an index pattern to retrieve data from Elasticsearch.",
+              'In order to visualize and explore data in NetMon-UI,' +
+              'you\'ll need to create an index pattern to retrieve data from Elasticsearch.',
           }
         )}
       />
@@ -61,7 +62,7 @@ function displayBanner() {
 }
 
 // eslint-disable-next-line import/no-default-export
-export default function(opts) {
+export default function (opts) {
   opts = opts || {};
   const whenMissingRedirectTo = opts.whenMissingRedirectTo || null;
 
@@ -74,7 +75,7 @@ export default function(opts) {
         return;
       }
 
-      return getIds().then(function(patterns) {
+      return getIds().then(function (patterns) {
         let defaultId = config.get('defaultIndex');
         let defined = !!defaultId;
         const exists = _.contains(patterns, defaultId);
@@ -100,7 +101,7 @@ export default function(opts) {
       null,
 
       // failure
-      function(err, kbnUrl) {
+      function (err, kbnUrl) {
         const hasDefault = !(err instanceof NoDefaultIndexPattern);
         if (hasDefault || !whenMissingRedirectTo) throw err; // rethrow
 
