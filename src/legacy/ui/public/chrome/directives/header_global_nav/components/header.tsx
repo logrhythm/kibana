@@ -269,7 +269,7 @@ class HeaderUI extends Component<Props, State> {
 
     return (
       <Fragment>
-        <Navbar />
+        <Navbar currentPage="analyze" />
 
         <EuiNavDrawer ref={this.navDrawerRef} data-test-subj="navDrawer">
           <EuiNavDrawerGroup listItems={recentLinksArray} />
