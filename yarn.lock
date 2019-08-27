@@ -6365,6 +6365,11 @@ bail@^1.0.0:
   resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/bail/-/bail-1.0.2.tgz#f7d6c1731630a9f9f0d4d35ed1f962e2074a1764"
   integrity sha1-99bBcxYwqfnw1NNe0fli4gdKF2Q=
 
+balanced-match@^0.4.2:
+  version "0.4.2"
+  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/balanced-match/-/balanced-match-0.4.2.tgz#cb3f3e3c732dc0f01ee70b403f302e61d7709838"
+  integrity sha1-yz8+PHMtwPAe5wtAPzAuYddwmDg=
+
 balanced-match@^1.0.0:
   version "1.0.0"
   resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/balanced-match/-/balanced-match-1.0.0.tgz#89b4d199ab2bee49de164ea02b89ce462d71b767"
@@ -9324,7 +9329,7 @@ d3-hierarchy@^1.1.8:
   resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/d3-hierarchy/-/d3-hierarchy-1.1.8.tgz#7a6317bd3ed24e324641b6f1e76e978836b008cc"
   integrity sha512-L+GHMSZNwTpiq4rt9GEsNcpLa4M96lXMR8M/nMG9p5hBE0jy6C+3hWtyZMenPQdwla249iJy7Nx0uKt3n+u9+w==
 
-d3-interpolate@1, d3-interpolate@^1.3.2:
+d3-interpolate@1, d3-interpolate@^1.3.0, d3-interpolate@^1.3.2:
   version "1.3.2"
   resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/d3-interpolate/-/d3-interpolate-1.3.2.tgz#417d3ebdeb4bc4efcc8fd4361c55e4040211fd68"
   integrity sha512-NlNKGopqaz9qM1PXh9gBF1KSCVh+jSFErrSlD/4hybwoNX/gt1d8CDbDW+3i+5UOHhjC6s6nMvRxcuoMVNgL2w==
@@ -9391,7 +9396,7 @@ d3-scale@^1.0.5, d3-scale@^1.0.7:
     d3-time "1"
     d3-time-format "2"
 
-d3-scale@^2.1.2:
+d3-scale@^2.1.0, d3-scale@^2.1.2:
   version "2.2.2"
   resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/d3-scale/-/d3-scale-2.2.2.tgz#4e880e0b2745acaaddd3ede26a9e908a9e17b81f"
   integrity sha512-LbeEvGgIb8UMcAa0EATLNX0lelKWGYDQiPdHj+gLblGVhGLyNbaCn3EvrJf0A3Y/uOOU5aD6MTh5ZFCdEwGiCw==
@@ -9606,6 +9611,11 @@ decamelize@^2.0.0:
   integrity sha512-Ikpp5scV3MSYxY39ymh45ZLEecsTdv/Xj2CaQfI8RLMuwi7XvjX9H/fhraiSuU+C5w5NTDu4ZU72xNiZnurBPg==
   dependencies:
     xregexp "4.0.0"
+
+decimal.js-light@^2.4.1:
+  version "2.5.0"
+  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/decimal.js-light/-/decimal.js-light-2.5.0.tgz#ca7faf504c799326df94b0ab920424fdfc125348"
+  integrity sha1-yn+vUEx5kybflLCrkgQk/fwSU0g=
 
 decode-uri-component@^0.2.0:
   version "0.2.0"
@@ -10082,7 +10092,7 @@ dom-converter@~0.2:
   resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/dom-helpers/-/dom-helpers-3.3.1.tgz#fc1a4e15ffdf60ddde03a480a9c0fece821dd4a6"
   integrity sha512-2Sm+JaYn74OiTM2wHvxJOo3roiq/h25Yi69Fqk269cNUwIXsCvATB6CRSFC9Am/20G2b28hGv/+7NiWydIrPvg==
 
-dom-helpers@^3.2.1, dom-helpers@^3.3.1:
+dom-helpers@^3.2.1, dom-helpers@^3.3.1, dom-helpers@^3.4.0:
   version "3.4.0"
   resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/dom-helpers/-/dom-helpers-3.4.0.tgz#e9b369700f959f62ecde5a6babde4bccd9169af8"
   integrity sha512-LnuPJ+dwqKDIyotW1VzmOZ5TONUN7CwkCR5hrgawTUbkBGYdeoNLZo6nNfGkCrjtE1nXXaj7iMMpDa8/d9WoIA==
@@ -17854,7 +17864,7 @@ lodash@^3.10.0, lodash@^3.10.1, lodash@^3.3.1, lodash@^3.8.0, lodash@~3.10.1:
   resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/lodash/-/lodash-3.10.1.tgz#5bf45e8e49ba4189e17d482789dfd15bd140b7b6"
   integrity sha1-W/Rejkm6QYnhfUgnid/RW9FAt7Y=
 
-lodash@^4.17.15:
+lodash@^4.17.15, lodash@~4.17.4:
   version "4.17.15"
   resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
   integrity sha1-tEf2ZwoEVbv+7dETku/zMOoJdUg=
@@ -18247,6 +18257,11 @@ material-colors@^1.2.1:
   version "1.2.5"
   resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/material-colors/-/material-colors-1.2.5.tgz#5292593e6754cb1bcc2b98030e4e0d6a3afc9ea1"
   integrity sha1-UpJZPmdUyxvMK5gDDk4Najr8nqE=
+
+math-expression-evaluator@^1.2.14:
+  version "1.2.17"
+  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/math-expression-evaluator/-/math-expression-evaluator-1.2.17.tgz#de819fdbcd84dccd8fae59c6aeb79615b9d266ac"
+  integrity sha1-3oGf282E3M2PrlnGrreWFbnSZqw=
 
 md5.js@^1.3.4:
   version "1.3.4"
@@ -22343,6 +22358,16 @@ react-resizable@1.x:
     prop-types "15.x"
     react-draggable "^2.2.6 || ^3.0.3"
 
+react-resize-detector@^2.3.0:
+  version "2.3.0"
+  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/react-resize-detector/-/react-resize-detector-2.3.0.tgz#57bad1ae26a28a62a2ddb678ba6ffdf8fa2b599c"
+  integrity sha1-V7rRriaiimKi3bZ4um/9+PorWZw=
+  dependencies:
+    lodash.debounce "^4.0.8"
+    lodash.throttle "^4.1.1"
+    prop-types "^15.6.0"
+    resize-observer-polyfill "^1.5.0"
+
 react-resize-detector@^3.2.1:
   version "3.4.0"
   resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/react-resize-detector/-/react-resize-detector-3.4.0.tgz#2ccd399958a0efe9b7c52c5db5a13d87e47cd585"
@@ -22464,6 +22489,16 @@ react-sizeme@^2.3.6:
     invariant "^2.2.2"
     lodash "^4.17.4"
 
+react-smooth@^1.0.0:
+  version "1.0.2"
+  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/react-smooth/-/react-smooth-1.0.2.tgz#f7a2d932ece8db898646078c3c97f3e9533e0486"
+  integrity sha1-96LZMuzo24mGRgeMPJfz6VM+BIY=
+  dependencies:
+    lodash "~4.17.4"
+    prop-types "^15.6.0"
+    raf "^3.4.0"
+    react-transition-group "^2.5.0"
+
 react-spring@^8.0.8:
   version "8.0.20"
   resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/react-spring/-/react-spring-8.0.20.tgz#e25967f6059364b09cf0339168d73014e87c9d17"
@@ -22539,6 +22574,16 @@ react-transition-group@^2.2.1:
   integrity sha512-b0VJTzNRnXxRpCuxng6QJbAzmmrhBn1BZJfPPnHbH2PIo8msdkajqwtfdyGm/OypPXZNfAHKEqeN15wjMXrRJQ==
   dependencies:
     dom-helpers "^3.3.1"
+    loose-envify "^1.4.0"
+    prop-types "^15.6.2"
+    react-lifecycles-compat "^3.0.4"
+
+react-transition-group@^2.5.0:
+  version "2.9.0"
+  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/react-transition-group/-/react-transition-group-2.9.0.tgz#df9cdb025796211151a436c69a8f3b97b5b07c8d"
+  integrity sha1-35zbAleWIRFRpDbGmo87l7WwfI0=
+  dependencies:
+    dom-helpers "^3.4.0"
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
     react-lifecycles-compat "^3.0.4"
@@ -22866,6 +22911,30 @@ recast@~0.11.12:
     private "~0.1.5"
     source-map "~0.5.0"
 
+recharts-scale@^0.4.2:
+  version "0.4.2"
+  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/recharts-scale/-/recharts-scale-0.4.2.tgz#b66315d985cd9b80d5f7d977a5aab9a305abc354"
+  integrity sha1-tmMV2YXNm4DV99l3paq5owWrw1Q=
+  dependencies:
+    decimal.js-light "^2.4.1"
+
+recharts@1.6.2:
+  version "1.6.2"
+  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/recharts/-/recharts-1.6.2.tgz#4ced884f04b680e8dac5d3e109f99b0e7cfb9b0f"
+  integrity sha1-TO2ITwS2gOjaxdPhCfmbDnz7mw8=
+  dependencies:
+    classnames "^2.2.5"
+    core-js "^2.5.1"
+    d3-interpolate "^1.3.0"
+    d3-scale "^2.1.0"
+    d3-shape "^1.2.0"
+    lodash "^4.17.5"
+    prop-types "^15.6.0"
+    react-resize-detector "^2.3.0"
+    react-smooth "^1.0.0"
+    recharts-scale "^0.4.2"
+    reduce-css-calc "^1.3.0"
+
 rechoir@^0.6.2:
   version "0.6.2"
   resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/rechoir/-/rechoir-0.6.2.tgz#85204b54dba82d5742e28c96756ef43af50e3384"
@@ -22931,6 +23000,22 @@ redeyed@~2.1.0:
   integrity sha1-iYS1gV2ZyyIEacme7v/jiRPmzAs=
   dependencies:
     esprima "~4.0.0"
+
+reduce-css-calc@^1.3.0:
+  version "1.3.0"
+  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/reduce-css-calc/-/reduce-css-calc-1.3.0.tgz#747c914e049614a4c9cfbba629871ad1d2927716"
+  integrity sha1-dHyRTgSWFKTJz7umKYca0dKSdxY=
+  dependencies:
+    balanced-match "^0.4.2"
+    math-expression-evaluator "^1.2.14"
+    reduce-function-call "^1.0.1"
+
+reduce-function-call@^1.0.1:
+  version "1.0.2"
+  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/reduce-function-call/-/reduce-function-call-1.0.2.tgz#5a200bf92e0e37751752fe45b0ab330fd4b6be99"
+  integrity sha1-WiAL+S4ON3UXUv5FsKszD9S2vpk=
+  dependencies:
+    balanced-match "^0.4.2"
 
 reduce-reducers@^0.1.0:
   version "0.1.2"
