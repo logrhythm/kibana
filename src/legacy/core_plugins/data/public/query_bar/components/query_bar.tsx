@@ -33,6 +33,9 @@ import { EuiButton, EuiFlexGroup, EuiFlexItem, EuiLink, EuiSuperDatePicker } fro
 import { EuiSuperUpdateButton } from '@elastic/eui';
 
 import { FormattedMessage, InjectedIntl, injectI18n } from '@kbn/i18n/react';
+
+import { convertQuery } from '@logrhythm/nm-web-shared/services/query_mapping';
+
 import { documentationLinks } from 'ui/documentation_links';
 import { Toast, toastNotifications } from 'ui/notify';
 import chrome from 'ui/chrome';
@@ -202,7 +205,7 @@ export class QueryBarUI extends Component<Props, State> {
     );
   };
 
-  public onSubmit = (preventDefault?: () => void) => {
+  public onSubmit = async (preventDefault?: () => void) => {
     if (preventDefault) {
       preventDefault();
     }
@@ -214,16 +217,35 @@ export class QueryBarUI extends Component<Props, State> {
       to: this.state.dateRangeTo,
     });
 
-    this.props.onSubmit({
-      query: {
-        query: this.state.query.query,
-        language: this.state.query.language,
+    let convertedQuery: string = this.state.query.query;
+    try {
+      convertedQuery = await convertQuery(this.state.query.query);
+    } catch (err) {
+      console.warn( // eslint-disable-line
+        'An error occurred trying to correct the provided query for capitalization.',
+        err
+      );
+    }
+
+    this.setState(
+      s => {
+        const newState = { ...s };
+        newState.query.query = convertedQuery;
+        return newState;
       },
-      dateRange: {
-        from: this.state.dateRangeFrom,
-        to: this.state.dateRangeTo,
-      },
-    });
+      () => {
+        this.props.onSubmit({
+          query: {
+            query: this.state.query.query,
+            language: this.state.query.language,
+          },
+          dateRange: {
+            from: this.state.dateRangeFrom,
+            to: this.state.dateRangeTo,
+          },
+        });
+      }
+    );
   };
 
   private onInputSubmit = (query: Query) => {
@@ -232,8 +254,40 @@ export class QueryBarUI extends Component<Props, State> {
     });
   };
 
-  public componentDidMount() {
+  public async componentDidMount() {
     this.persistedLog = getQueryLog(this.props.appName, this.props.query.language);
+
+    const oldQuery = this.state.query.query;
+    try {
+      const convertedQuery = await convertQuery(this.state.query.query);
+      if (oldQuery === convertedQuery) {
+        return;
+      }
+      this.setState(
+        s => {
+          const newState = { ...s };
+          newState.query.query = convertedQuery;
+          return newState;
+        },
+        () => {
+          this.props.onSubmit({
+            query: {
+              query: this.state.query.query,
+              language: this.state.query.language,
+            },
+            dateRange: {
+              from: this.state.dateRangeFrom,
+              to: this.state.dateRangeTo,
+            },
+          });
+        }
+      );
+    } catch (err) {
+      console.warn( // eslint-disable-line
+        'An error occurred trying to correct the provided query for capitalization.',
+        err
+      );
+    }
   }
 
   public componentDidUpdate(prevProps: Props) {
