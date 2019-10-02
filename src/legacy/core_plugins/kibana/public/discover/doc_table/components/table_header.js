@@ -35,6 +35,8 @@ module.directive('kbnTableHeader', function () {
       onChangeSortOrder: '=?',
       onRemoveColumn: '=?',
       onMoveColumn: '=?',
+      onSelectAll: '=?',
+      onSelectCurrentPage: '=?'
     },
     template: headerHtml,
     controller: function ($scope, config) {

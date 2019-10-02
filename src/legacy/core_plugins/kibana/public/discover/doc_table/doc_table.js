@@ -31,6 +31,7 @@ import 'ui/pager';
 import { getRequestInspectorStats, getResponseInspectorStats } from 'ui/courier/utils/courier_inspector_utils';
 
 import { getLimitedSearchResultsMessage } from './doc_table_strings';
+import SelectedCaptureSessions from '@logrhythm/nm-web-shared/services/selected_capture_sessions';
 
 uiModules.get('app/discover')
   .directive('docTable', function (config, Notifier, getAppState, pagerFactory, $filter, courier) {
@@ -183,6 +184,20 @@ uiModules.get('app/discover')
         $scope.shouldShowLimitedResultsWarning = () => (
           !$scope.pager.hasNextPage && $scope.pager.totalItems < $scope.totalHitCount
         );
+
+        $scope.onSelectAll = () => {
+          const allSessions = $scope.hits
+            .map(h => !!h && !!h._source && h._source.Session)
+            .filter(h => !!h);
+          SelectedCaptureSessions.set(allSessions);
+        };
+
+        $scope.onSelectCurrentPage = () => {
+          const allSessions = $scope.pageOfItems
+            .map(h => !!h && !!h._source && h._source.Session)
+            .filter(h => !!h);
+          SelectedCaptureSessions.set(allSessions);
+        };
       }
     };
   });

@@ -17,33 +17,75 @@
  * under the License.
  */
 
+import _ from 'lodash';
 import { asPrettyString } from '../../utils/as_pretty_string';
+import { getHighlightHtml } from '../../../../../core_plugins/kibana/common/highlight/highlight_html';
+import { formatNetmonBoolean } from '../../../../../../netmon/field_formats/boolean_formats';
 
 export function createBoolFormat(FieldFormat) {
-  return class BoolFormat extends FieldFormat {
-    _convert(value) {
-      if (typeof value === 'string') {
-        value = value.trim().toLowerCase();
-      }
-
-      switch (value) {
-        case false:
-        case 0:
-        case 'false':
-        case 'no':
-          return 'false';
-        case true:
-        case 1:
-        case 'true':
-        case 'yes':
-          return 'true';
-        default:
-          return asPrettyString(value);
-      }
-    }
-
+  class BoolFormat extends FieldFormat {
     static id = 'boolean';
     static title = 'Boolean';
     static fieldType = ['boolean', 'number', 'string'];
+  }
+
+  const getTruthy = (value) => {
+    switch (value) {
+      case false:
+      case 0:
+      case 'false':
+      case 'no':
+        return false;
+      case true:
+      case 1:
+      case 'true':
+      case 'yes':
+        return true;
+      default:
+        return null;
+    }
   };
+
+  const formatText = (value) => {
+    if (typeof value === 'string') {
+      value = value.trim().toLowerCase();
+    }
+
+    const truthy = getTruthy(value);
+
+    if(truthy) {
+      return 'true';
+    } else if (truthy === false) {
+      return 'false';
+    }
+
+    return asPrettyString(value);
+  };
+
+  const defaultHtml = (value, field, hit) => {
+    const formatted = _.escape(formatText(value));
+
+    if(!hit || !hit.highlight || !hit.highlight[field.name]) {
+      return formatted;
+    } else {
+      return getHighlightHtml(formatted, hit.highlight[field.name]);
+    }
+  };
+
+  BoolFormat.prototype._convert = {
+    text: function (value) {
+      return formatText(value);
+    },
+    html: function (value, field, hit) {
+      const truthy = getTruthy(value);
+
+      if(!field || truthy === null) {
+        return defaultHtml(value, field, hit);
+      }
+
+      return formatNetmonBoolean(value, field, hit) || defaultHtml(value, field, hit);
+    }
+  };
+
+  return BoolFormat;
 }

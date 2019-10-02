@@ -44,7 +44,7 @@ import { QueryBarInput } from './query_bar_input';
 
 import { getQueryLog } from '../lib/get_query_log';
 
-import { SaveRule } from '../../../../../../netmon/components/save_rule';
+import { SaveRule } from '../../../../../../netmon/components/save_rule/save_rule';
 
 const config = chrome.getUiSettingsClient();
 

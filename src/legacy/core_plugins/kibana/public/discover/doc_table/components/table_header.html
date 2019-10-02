@@ -30,6 +30,11 @@
       data-test-subj="docTableHeader-{{name}}"
     >
       {{getShortDotsName(name)}}
+      <capture-header
+        ng-if="name === 'Captured'"
+        on-select-all="onSelectAll"
+        on-select-current-page="onSelectCurrentPage"
+      ></capture-header>
       <button
         data-test-subj="docTableHeaderFieldSort_{{name}}"
         id="docTableHeaderFieldSort{{name}}"

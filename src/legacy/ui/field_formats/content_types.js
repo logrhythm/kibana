@@ -20,6 +20,7 @@
 import _ from 'lodash';
 import { asPrettyString } from '../../core_plugins/kibana/common/utils/as_pretty_string';
 import { getHighlightHtml } from '../../core_plugins/kibana/common/highlight/highlight_html';
+import { shouldBindFormat } from '../../../netmon/field_formats/should_bind_format';
 
 const types = {
   html: function (format, convert) {
@@ -43,6 +44,9 @@ const types = {
     }
 
     return function (...args) {
+      if(!!args[1] && shouldBindFormat(args[1].name)) {
+        return `<span>${recurse(...args)}</span>`;
+      }
       return `<span ng-non-bindable>${recurse(...args)}</span>`;
     };
   },
