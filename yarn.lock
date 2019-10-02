@@ -1774,10 +1774,10 @@
   resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/@logrhythm/lucene-parser/-/@logrhythm/lucene-parser-3.4.0.tgz#19274929b73c83713c3597febe71a0c62ff2a5e9"
   integrity sha1-GSdJKbc8g3E8NZf+vnGgxi/ypek=
 
-"@logrhythm/nm-web-shared@1.0.0-dev.526a0ea510":
-  version "1.0.0-dev.526a0ea510"
-  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/@logrhythm/nm-web-shared/-/@logrhythm/nm-web-shared-1.0.0-dev.526a0ea510.tgz#0355c956014891286de465497d4e8e0eecdace6b"
-  integrity sha1-A1XJVgFIkSht5GVJfU6ODuzazms=
+"@logrhythm/nm-web-shared@1.0.0-dev.91a7437c3c":
+  version "1.0.0-dev.91a7437c3c"
+  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/@logrhythm/nm-web-shared/-/@logrhythm/nm-web-shared-1.0.0-dev.91a7437c3c.tgz#51ee045e6b142c887a1a41edc3f2a7654e2c86e0"
+  integrity sha1-Ue4EXmsULIh6GkHtw/KnZU4shuA=
 
 "@logrhythm/webui@^5.9.15":
   version "5.9.15"
@@ -3382,7 +3382,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/jss@*", "@types/jss@^9.5.6":
+"@types/jss@^9.5.6":
   version "9.5.8"
   resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/@types/jss/-/jss-9.5.8.tgz#258391f42211c042fc965508d505cbdc579baa5b"
   integrity sha1-JYOR9CIRwEL8llUI1QXL3Febqls=
@@ -3689,16 +3689,6 @@
   resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/@types/react-intl/-/react-intl-2.3.17.tgz#e1fc6e46e8af58bdef9531259d509380a8a99e8e"
   integrity sha512-FGd6J1GQ7zvl1GZ3BBev83B7nfak8dqoR2PZ+l5MoisKMpd4xOLhZJC1ugpmk3Rz5F85t6HbOg9mYqXW97BsNA==
 
-"@types/react-jss@^8.6.4":
-  version "8.6.4"
-  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/@types/react-jss/-/react-jss-8.6.4.tgz#4f1e170f14c59f583c901a1479e96f2db3d52ea6"
-  integrity sha1-Tx4XDxTFn1g8kBoUeelvLbPVLqY=
-  dependencies:
-    "@types/jss" "*"
-    "@types/react" "*"
-    "@types/theming" "*"
-    csstype "^2.0.0"
-
 "@types/react-redux@^6.0.6":
   version "6.0.6"
   resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/@types/react-redux/-/react-redux-6.0.6.tgz#87f1d0a6ea901b93fcaf95fa57641ff64079d277"
@@ -3937,13 +3927,6 @@
   version "1.4.4"
   resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/@types/tether/-/tether-1.4.4.tgz#0fde1ccbd2f1fad74f8f465fe6227ff3b7bff634"
   integrity sha1-D94cy9Lx+tdPj0Zf5iJ/87e/9jQ=
-
-"@types/theming@*":
-  version "1.3.3"
-  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/@types/theming/-/theming-1.3.3.tgz#e770833b38b43f138acd4d0794b52892caf34c6c"
-  integrity sha512-xcCIvBHFFxNDxDUn0Po6FXQPpGA6Y5dzt6/fbzVhBba7Qx4cxkxStmLVEkFqEF4jy01SH9DjbRUqdj7RziC/XA==
-  dependencies:
-    "@types/react" "*"
 
 "@types/tinycolor2@^1.4.1":
   version "1.4.1"
