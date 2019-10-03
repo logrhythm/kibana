@@ -35,13 +35,8 @@ import {
 } from '@elastic/eui';
 // @ts-ignore
 import { saveAs } from '@elastic/filesaver';
-import {
-  FileDownloadStatus,
-  FileType,
-} from '@logrhythm/nm-web-shared/services/session_files';
-import {
-  SessionFileDownloader
-} from '@logrhythm/nm-web-shared/services/session_file_downloader';
+import { FileDownloadStatus, FileType } from '@logrhythm/nm-web-shared/services/session_files';
+import { SessionFileDownloader } from '@logrhythm/nm-web-shared/services/session_file_downloader';
 import { toastNotifications } from 'ui/notify';
 import FileDownloadRow from './file_download_row';
 
@@ -143,7 +138,7 @@ const FileDownloadModal = (props: FileDownloadModalProps) => {
           {downloadStatus.overall !== 'aborted' && fileNames.length > 0 && (
             <>
               <EuiHorizontalRule />
-              {fileNames.map(f => (
+              {fileNames.sort().map(f => (
                 <FileDownloadRow
                   key={`file_${f}`}
                   overallStatus={downloadStatus.overall}
