@@ -27190,6 +27190,11 @@ typescript-fsa@^2.0.0, typescript-fsa@^2.5.0:
   resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/typescript-fsa/-/typescript-fsa-2.5.0.tgz#1baec01b5e8f5f34c322679d1327016e9e294faf"
   integrity sha1-G67AG16PXzTDImedEycBbp4pT68=
 
+typescript@3.6.3:
+  version "3.6.3"
+  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/typescript/-/typescript-3.6.3.tgz#fea942fabb20f7e1ca7164ff626f1a9f3f70b4da"
+  integrity sha1-/qlC+rsg9+HKcWT/Ym8anz9wtNo=
+
 typescript@^3.3.3333, typescript@~3.0.3, typescript@~3.3.3333, typescript@~3.4.3:
   version "3.3.3333"
   resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/typescript/-/typescript-3.3.3333.tgz#171b2c5af66c59e9431199117a3bcadc66fdcfd6"

@@ -38,8 +38,10 @@ import { saveAs } from '@elastic/filesaver';
 import {
   FileDownloadStatus,
   FileType,
-  SessionFileDownloader,
 } from '@logrhythm/nm-web-shared/services/session_files';
+import {
+  SessionFileDownloader
+} from '@logrhythm/nm-web-shared/services/session_file_downloader';
 import { toastNotifications } from 'ui/notify';
 import FileDownloadRow from './file_download_row';
 
