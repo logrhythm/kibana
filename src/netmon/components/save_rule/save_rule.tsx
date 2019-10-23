@@ -33,7 +33,7 @@ import {
 import { convertQuery } from '@logrhythm/nm-web-shared/services/query_mapping';
 import {
   getTriggerCount,
-  save as saveQueryRule,
+  saveQueryRule,
   QueryRule,
 } from '@logrhythm/nm-web-shared/services/query_rules';
 import { SaveRuleForm, SaveRuleFormDataValidation } from './save_rule_form';
