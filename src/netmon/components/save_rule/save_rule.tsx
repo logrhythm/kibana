@@ -43,6 +43,7 @@ const validateForm = (value: QueryRule | null): SaveRuleFormDataValidation | nul
     id: !!value && !!value.id,
     severity: !!value && _.contains(['low', 'medium', 'high'], value.severity),
     query: !!value && !!value.query,
+    enabled: true,
   };
 
   return _.every(Object.values(validation), v => v) ? null : validation;
@@ -88,6 +89,7 @@ const reducer = (state: SaveRuleState, action: SaveRuleAction): SaveRuleState =>
           id: '',
           severity: '',
           query: action.query,
+          enabled: true,
         },
         saveSuccess: null,
         triggerCount: null,
