@@ -58,7 +58,7 @@ import { RecentlyAccessedHistoryItem } from 'ui/persisted_log';
 import { ChromeHeaderNavControlsRegistry } from 'ui/registry/chrome_header_nav_controls';
 import { relativeToAbsolute } from 'ui/url/relative_to_absolute';
 
-import { Navbar } from '@logrhythm/nm-web-shared';
+import LogRhythmNavbar from '../../../../../../../netmon/components/navbar';
 
 import { ChromeBadge, ChromeBreadcrumb, ChromeNavLink } from '../../../../../../../core/public';
 
@@ -269,7 +269,7 @@ class HeaderUI extends Component<Props, State> {
 
     return (
       <Fragment>
-        <Navbar currentPage="analyze" />
+        <LogRhythmNavbar />
 
         <EuiNavDrawer ref={this.navDrawerRef} data-test-subj="navDrawer">
           <EuiNavDrawerGroup listItems={recentLinksArray} />
