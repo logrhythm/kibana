@@ -97,7 +97,8 @@ export class ChromeService {
     if (!this.browserSupportsCsp && injectedMetadata.getCspConfig().warnLegacyBrowsers) {
       notifications.toasts.addWarning(
         i18n.translate('core.chrome.legacyBrowserWarning', {
-          defaultMessage: 'Your browser does not meet the security requirements for Kibana.',
+          defaultMessage:
+            'Your browser does not support Content Security Policy (CSP) headers. This is a security vulnerability. We recommend using a browser that supports CSP.',
         })
       );
     }
