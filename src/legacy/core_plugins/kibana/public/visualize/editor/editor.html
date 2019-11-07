@@ -3,6 +3,15 @@
   <kbn-top-nav name="visualize" config="topNavMenu">
     <!-- Transcluded elements. -->
     <div data-transclude-slots>
+        <div data-transclude-slot="topLeftCorner" class="kuiLocalBreadcrumbs">
+            <h1
+              ng-if="savedVis.title"
+              class="kuiLocalBreadcrumb"
+              style="font-size: 18px"
+            >
+              {{savedVis.title}}
+            </h1>
+          </div>
       <!-- Search. -->
       <div
         data-transclude-slot="bottomRow"

@@ -6,6 +6,15 @@
   <kbn-top-nav name="dashboard" config="topNavMenu">
     <!-- Transcluded elements. -->
     <div data-transclude-slots>
+      <div data-transclude-slot="topLeftCorner" class="kuiLocalBreadcrumbs">
+        <h1
+          ng-if="model.title"
+          class="kuiLocalBreadcrumb"
+          style="font-size: 18px"
+        >
+          {{model.title}}
+        </h1>
+      </div>
       <!-- Search. -->
       <div ng-show="chrome.getVisible()" class="fullWidth" data-transclude-slot="bottomRow">
         <search-bar
