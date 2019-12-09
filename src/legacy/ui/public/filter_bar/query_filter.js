@@ -242,10 +242,12 @@ export function FilterBarQueryFilterProvider(Promise, indexPatterns, $rootScope,
   queryFilter.addFiltersAndChangeTimeFilter = async filters => {
     const timeFilter = await extractTimeFilter(indexPatterns, filters);
     queryFilter.addFilters(filters.filter(filter => filter !== timeFilter));
-    const timeoutId = setTimeout(() => {
-      clearTimeout(timeoutId);
-      if (timeFilter) changeTimeFilter(timeFilter);
-    }, 1000);
+    if (timeFilter) {
+      const timeoutId = setTimeout(() => {
+        clearTimeout(timeoutId);
+        changeTimeFilter(timeFilter);
+      }, 1000);
+    }
   };
 
   initWatchers();
