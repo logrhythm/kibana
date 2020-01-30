@@ -6,7 +6,8 @@
     "outDir": "./target/types",
     "stripInternal": false,
     "emitDeclarationOnly": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "skipLibCheck": true
   },
   "include": [
     "src/core/server/index.ts",

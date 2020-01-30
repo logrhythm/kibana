@@ -1,4 +1,10 @@
 /*
+ * Copyright 2019 LogRhythm, Inc
+ * Licensed under the LogRhythm Global End User License Agreement,
+ * which can be found through this page: https://logrhythm.com/about/logrhythm-terms-and-conditions/
+ */
+
+/*
  * Licensed to Elasticsearch B.V. under one or more contributor
  * license agreements. See the NOTICE file distributed with
  * this work for additional information regarding copyright
@@ -17,30 +23,33 @@
  * under the License.
  */
 
-import { EuiBreadcrumb, IconType } from '@elastic/eui';
 import React from 'react';
-import { FormattedMessage } from '@kbn/i18n/react';
-import { BehaviorSubject, combineLatest, merge, Observable, of, ReplaySubject } from 'rxjs';
-import { flatMap, map, takeUntil } from 'rxjs/operators';
-import { parse } from 'url';
-import { EuiLink } from '@elastic/eui';
-import { mountReactNode } from '../utils/mount';
-import { InternalApplicationStart } from '../application';
-import { DocLinksStart } from '../doc_links';
-import { HttpStart } from '../http';
+import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
+import { map, takeUntil } from 'rxjs/operators';
+import * as Url from 'url';
+
+import { i18n } from '@kbn/i18n';
+import { IconType, Breadcrumb as EuiBreadcrumb } from '@elastic/eui';
+
 import { InjectedMetadataStart } from '../injected_metadata';
 import { NotificationsStart } from '../notifications';
-import { IUiSettingsClient } from '../ui_settings';
-import { KIBANA_ASK_ELASTIC_LINK } from './constants';
-import { ChromeDocTitle, DocTitleService } from './doc_title';
-import { ChromeNavControls, NavControlsService } from './nav_controls';
-import { ChromeNavLinks, NavLinksService, ChromeNavLink } from './nav_links';
-import { ChromeRecentlyAccessed, RecentlyAccessedService } from './recently_accessed';
-import { Header } from './ui';
-import { ChromeHelpExtensionMenuLink } from './ui/header/header_help_menu';
-export { ChromeNavControls, ChromeRecentlyAccessed, ChromeDocTitle };
+import { InternalApplicationStart } from '../application';
+import { HttpStart } from '../http';
 
-const IS_LOCKED_KEY = 'core.chrome.isLocked';
+import { ChromeNavLinks, NavLinksService } from './nav_links';
+import { ChromeRecentlyAccessed, RecentlyAccessedService } from './recently_accessed';
+import { NavControlsService, ChromeNavControls } from './nav_controls';
+import { LoadingIndicator, HeaderWrapper as Header } from './ui';
+import { DocLinksStart } from '../doc_links';
+
+export { ChromeNavControls, ChromeRecentlyAccessed };
+
+const IS_COLLAPSED_KEY = 'core.chrome.isCollapsed';
+
+function isEmbedParamInHash() {
+  const { query } = Url.parse(String(window.location.hash).slice(1), true);
+  return Boolean(query.embed);
+}
 
 /** @public */
 export interface ChromeBadge {
@@ -59,20 +68,7 @@ export interface ChromeBrand {
 export type ChromeBreadcrumb = EuiBreadcrumb;
 
 /** @public */
-export interface ChromeHelpExtension {
-  /**
-   * Provide your plugin's name to create a header for separation
-   */
-  appName: string;
-  /**
-   * Creates unified links for sending users to documentation, GitHub, Discuss, or a custom link/button
-   */
-  links?: ChromeHelpExtensionMenuLink[];
-  /**
-   * Custom content to occur below the list of links
-   */
-  content?: (element: HTMLDivElement) => () => void;
-}
+export type ChromeHelpExtension = (element: HTMLDivElement) => () => void;
 
 interface ConstructorParams {
   browserSupportsCsp: boolean;
@@ -84,52 +80,16 @@ interface StartDeps {
   http: HttpStart;
   injectedMetadata: InjectedMetadataStart;
   notifications: NotificationsStart;
-  uiSettings: IUiSettingsClient;
 }
 
 /** @internal */
 export class ChromeService {
-  private isVisible$!: Observable<boolean>;
-  private isForceHidden$!: BehaviorSubject<boolean>;
   private readonly stop$ = new ReplaySubject(1);
   private readonly navControls = new NavControlsService();
   private readonly navLinks = new NavLinksService();
   private readonly recentlyAccessed = new RecentlyAccessedService();
-  private readonly docTitle = new DocTitleService();
 
   constructor(private readonly params: ConstructorParams) {}
-
-  /**
-   * These observables allow consumers to toggle the chrome visibility via either:
-   *   1. Using setIsVisible() to trigger the next chromeHidden$
-   *   2. Setting `chromeless` when registering an application, which will
-   *      reset the visibility whenever the next application is mounted
-   *   3. Having "embed" in the query string
-   */
-  private initVisibility(application: StartDeps['application']) {
-    // Start off the chrome service hidden if "embed" is in the hash query string.
-    const isEmbedded = 'embed' in parse(location.hash.slice(1), true).query;
-    this.isForceHidden$ = new BehaviorSubject(isEmbedded);
-
-    const appHidden$ = merge(
-      // For the isVisible$ logic, having no mounted app is equivalent to having a hidden app
-      // in the sense that the chrome UI should not be displayed until a non-chromeless app is mounting or mounted
-      of(true),
-      application.currentAppId$.pipe(
-        flatMap((appId) =>
-          application.applications$.pipe(
-            map((applications) => {
-              return !!appId && applications.has(appId) && !!applications.get(appId)!.chromeless;
-            })
-          )
-        )
-      )
-    );
-    this.isVisible$ = combineLatest([appHidden$, this.isForceHidden$]).pipe(
-      map(([appHidden, forceHidden]) => !appHidden && !forceHidden),
-      takeUntil(this.stop$)
-    );
-  }
 
   public async start({
     application,
@@ -137,110 +97,63 @@ export class ChromeService {
     http,
     injectedMetadata,
     notifications,
-    uiSettings,
   }: StartDeps): Promise<InternalChromeStart> {
-    this.initVisibility(application);
+    const FORCE_HIDDEN = isEmbedParamInHash();
 
     const appTitle$ = new BehaviorSubject<string>('Kibana');
     const brand$ = new BehaviorSubject<ChromeBrand>({});
+    const isVisible$ = new BehaviorSubject(true);
+    const isCollapsed$ = new BehaviorSubject(!!localStorage.getItem(IS_COLLAPSED_KEY));
     const applicationClasses$ = new BehaviorSubject<Set<string>>(new Set());
     const helpExtension$ = new BehaviorSubject<ChromeHelpExtension | undefined>(undefined);
     const breadcrumbs$ = new BehaviorSubject<ChromeBreadcrumb[]>([]);
     const badge$ = new BehaviorSubject<ChromeBadge | undefined>(undefined);
-    const customNavLink$ = new BehaviorSubject<ChromeNavLink | undefined>(undefined);
-    const helpSupportUrl$ = new BehaviorSubject<string>(KIBANA_ASK_ELASTIC_LINK);
-    const isNavDrawerLocked$ = new BehaviorSubject(localStorage.getItem(IS_LOCKED_KEY) === 'true');
 
     const navControls = this.navControls.start();
     const navLinks = this.navLinks.start({ application, http });
     const recentlyAccessed = await this.recentlyAccessed.start({ http });
-    const docTitle = this.docTitle.start({ document: window.document });
-
-    // erase chrome fields from a previous app while switching to a next app
-    application.currentAppId$.subscribe(() => {
-      helpExtension$.next(undefined);
-      breadcrumbs$.next([]);
-      badge$.next(undefined);
-      docTitle.reset();
-    });
-
-    const setIsNavDrawerLocked = (isLocked: boolean) => {
-      isNavDrawerLocked$.next(isLocked);
-      localStorage.setItem(IS_LOCKED_KEY, `${isLocked}`);
-    };
-
-    const getIsNavDrawerLocked$ = isNavDrawerLocked$.pipe(takeUntil(this.stop$));
-
-    const isIE = () => {
-      const ua = window.navigator.userAgent;
-      const msie = ua.indexOf('MSIE '); // IE 10 or older
-      const trident = ua.indexOf('Trident/'); // IE 11
-
-      return msie > 0 || trident > 0;
-    };
 
     if (!this.params.browserSupportsCsp && injectedMetadata.getCspConfig().warnLegacyBrowsers) {
-      notifications.toasts.addWarning({
-        title: mountReactNode(
-          <FormattedMessage
-            id="core.chrome.legacyBrowserWarning"
-            defaultMessage="Your browser does not meet the security requirements for Kibana."
-          />
-        ),
-      });
-    }
-
-    if (isIE()) {
-      notifications.toasts.addWarning({
-        title: mountReactNode(
-          <FormattedMessage
-            id="core.chrome.browserDeprecationWarning"
-            defaultMessage="Support for Internet Explorer will be dropped in future versions of this software, please check {link}."
-            values={{
-              link: (
-                <EuiLink target="_blank" href="https://www.elastic.co/support/matrix" external>
-                  <FormattedMessage
-                    id="core.chrome.browserDeprecationLink"
-                    defaultMessage="the support matrix on our website"
-                  />
-                </EuiLink>
-              ),
-            }}
-          />
-        ),
-      });
+      notifications.toasts.addWarning(
+        i18n.translate('core.chrome.legacyBrowserWarning', {
+          defaultMessage: 'Your browser does not meet the security requirements for Kibana.',
+        })
+      );
     }
 
     return {
       navControls,
       navLinks,
       recentlyAccessed,
-      docTitle,
 
       getHeaderComponent: () => (
-        <Header
-          loadingCount$={http.getLoadingCount$()}
-          application={application}
-          appTitle$={appTitle$.pipe(takeUntil(this.stop$))}
-          badge$={badge$.pipe(takeUntil(this.stop$))}
-          basePath={http.basePath}
-          breadcrumbs$={breadcrumbs$.pipe(takeUntil(this.stop$))}
-          customNavLink$={customNavLink$.pipe(takeUntil(this.stop$))}
-          kibanaDocLink={docLinks.links.kibana}
-          forceAppSwitcherNavigation$={navLinks.getForceAppSwitcherNavigation$()}
-          helpExtension$={helpExtension$.pipe(takeUntil(this.stop$))}
-          helpSupportUrl$={helpSupportUrl$.pipe(takeUntil(this.stop$))}
-          homeHref={http.basePath.prepend('/app/home')}
-          isVisible$={this.isVisible$}
-          kibanaVersion={injectedMetadata.getKibanaVersion()}
-          navLinks$={navLinks.getNavLinks$()}
-          recentlyAccessed$={recentlyAccessed.get$()}
-          navControlsLeft$={navControls.getLeft$()}
-          navControlsCenter$={navControls.getCenter$()}
-          navControlsRight$={navControls.getRight$()}
-          onIsLockedUpdate={setIsNavDrawerLocked}
-          isLocked$={getIsNavDrawerLocked$}
-        />
+        <React.Fragment>
+          <LoadingIndicator loadingCount$={http.getLoadingCount$()} />
+
+          <Header
+            isCloudEnabled={injectedMetadata.getInjectedVar('isCloudEnabled') as boolean}
+            application={application}
+            appTitle$={appTitle$.pipe(takeUntil(this.stop$))}
+            badge$={badge$.pipe(takeUntil(this.stop$))}
+            basePath={http.basePath}
+            breadcrumbs$={breadcrumbs$.pipe(takeUntil(this.stop$))}
+            kibanaDocLink={docLinks.links.kibana}
+            forceAppSwitcherNavigation$={navLinks.getForceAppSwitcherNavigation$()}
+            // @ts-ignore
+            helpExtension$={helpExtension$.pipe(takeUntil(this.stop$))}
+            homeHref={http.basePath.prepend('/app/kibana#/home')}
+            isVisible$={isVisible$.pipe(
+              map(visibility => (FORCE_HIDDEN ? false : visibility)),
+              takeUntil(this.stop$)
+            )}
+            kibanaVersion={injectedMetadata.getKibanaVersion()}
+            legacyMode={injectedMetadata.getLegacyMode()}
+            navLinks$={navLinks.getNavLinks$()}
+            recentlyAccessed$={recentlyAccessed.get$()}
+            navControlsLeft$={navControls.getLeft$()}
+            navControlsRight$={navControls.getRight$()}
+          />
+        </React.Fragment>
       ),
 
       setAppTitle: (appTitle: string) => appTitle$.next(appTitle),
@@ -256,13 +169,30 @@ export class ChromeService {
         );
       },
 
-      getIsVisible$: () => this.isVisible$,
+      getIsVisible$: () =>
+        isVisible$.pipe(
+          map(visibility => (FORCE_HIDDEN ? false : visibility)),
+          takeUntil(this.stop$)
+        ),
 
-      setIsVisible: (isVisible: boolean) => this.isForceHidden$.next(!isVisible),
+      setIsVisible: (visibility: boolean) => {
+        isVisible$.next(visibility);
+      },
+
+      getIsCollapsed$: () => isCollapsed$.pipe(takeUntil(this.stop$)),
+
+      setIsCollapsed: (isCollapsed: boolean) => {
+        isCollapsed$.next(isCollapsed);
+        if (isCollapsed) {
+          localStorage.setItem(IS_COLLAPSED_KEY, 'true');
+        } else {
+          localStorage.removeItem(IS_COLLAPSED_KEY);
+        }
+      },
 
       getApplicationClasses$: () =>
         applicationClasses$.pipe(
-          map((set) => [...set]),
+          map(set => [...set]),
           takeUntil(this.stop$)
         ),
 
@@ -294,16 +224,6 @@ export class ChromeService {
 
       setHelpExtension: (helpExtension?: ChromeHelpExtension) => {
         helpExtension$.next(helpExtension);
-      },
-
-      setHelpSupportUrl: (url: string) => helpSupportUrl$.next(url),
-
-      getIsNavDrawerLocked$: () => getIsNavDrawerLocked$,
-
-      getCustomNavLink$: () => customNavLink$.pipe(takeUntil(this.stop$)),
-
-      setCustomNavLink: (customNavLink?: ChromeNavLink) => {
-        customNavLink$.next(customNavLink);
       },
     };
   }
@@ -347,8 +267,6 @@ export interface ChromeStart {
   navControls: ChromeNavControls;
   /** {@inheritdoc ChromeRecentlyAccessed} */
   recentlyAccessed: ChromeRecentlyAccessed;
-  /** {@inheritdoc ChromeDocTitle} */
-  docTitle: ChromeDocTitle;
 
   /**
    * Sets the current app's title
@@ -397,6 +315,16 @@ export interface ChromeStart {
   setIsVisible(isVisible: boolean): void;
 
   /**
+   * Get an observable of the current collapsed state of the chrome.
+   */
+  getIsCollapsed$(): Observable<boolean>;
+
+  /**
+   * Set the collapsed state of the chrome navigation.
+   */
+  setIsCollapsed(isCollapsed: boolean): void;
+
+  /**
    * Get the current set of classNames that will be set on the application container.
    */
   getApplicationClasses$(): Observable<string[]>;
@@ -432,16 +360,6 @@ export interface ChromeStart {
   setBreadcrumbs(newBreadcrumbs: ChromeBreadcrumb[]): void;
 
   /**
-   * Get an observable of the current custom nav link
-   */
-  getCustomNavLink$(): Observable<Partial<ChromeNavLink> | undefined>;
-
-  /**
-   * Override the current set of custom nav link
-   */
-  setCustomNavLink(newCustomNavLink?: Partial<ChromeNavLink>): void;
-
-  /**
    * Get an observable of the current custom help conttent
    */
   getHelpExtension$(): Observable<ChromeHelpExtension | undefined>;
@@ -450,17 +368,6 @@ export interface ChromeStart {
    * Override the current set of custom help content
    */
   setHelpExtension(helpExtension?: ChromeHelpExtension): void;
-
-  /**
-   * Override the default support URL shown in the help menu
-   * @param url The updated support URL
-   */
-  setHelpSupportUrl(url: string): void;
-
-  /**
-   * Get an observable of the current locked state of the nav drawer.
-   */
-  getIsNavDrawerLocked$(): Observable<boolean>;
 }
 
 /** @internal */

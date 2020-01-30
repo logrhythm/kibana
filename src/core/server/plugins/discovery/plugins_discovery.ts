@@ -1,4 +1,10 @@
 /*
+ * Copyright 2019 LogRhythm, Inc
+ * Licensed under the LogRhythm Global End User License Agreement,
+ * which can be found through this page: https://logrhythm.com/about/logrhythm-terms-and-conditions/
+ */
+
+/*
  * Licensed to Elasticsearch B.V. under one or more contributor
  * license agreements. See the NOTICE file distributed with
  * this work for additional information regarding copyright
@@ -114,12 +120,22 @@ function processPluginSearchPaths$(
     );
   }
 
-  return from(pluginDirs.map((dir) => ({ dir, depth: 0 }))).pipe(
-    mergeMap((entry) => {
-      log.debug(`Scanning "${entry.dir}" for plugin sub-directories...`);
-      return fsReadDir$(entry.dir).pipe(
-        mergeMap(() => recursiveScanFolder(entry)),
-        catchError((err) => [PluginDiscoveryError.invalidSearchPath(entry.dir, err)])
+  return from(pluginDirs).pipe(
+    mergeMap((dir) => {
+      log.debug(`Scanning "${dir}" for plugin sub-directories...`);
+      return fsReadDir$(dir).pipe(
+        // @ts-ignore
+        mergeMap((subDirs: string[]) => subDirs.map(subDir => resolve(dir, subDir))),
+        mergeMap(path =>
+          fsStat$(path).pipe(
+            // Filter out non-directory entries from target directories, it's expected that
+            // these directories may contain files (e.g. `README.md` or `package.json`).
+            // We shouldn't silently ignore the entries we couldn't get stat for though.
+            mergeMap(pathStat => (pathStat.isDirectory() ? [path] : [])),
+            catchError(err => [PluginDiscoveryError.invalidPluginPath(path, err)])
+          )
+        ),
+        catchError(err => [PluginDiscoveryError.invalidSearchPath(dir, err)])
       );
     })
   );
