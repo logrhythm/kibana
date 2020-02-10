@@ -19,6 +19,7 @@
 import { escape, isFunction } from 'lodash';
 import { IFieldFormat, HtmlContextTypeConvert, FieldFormatsContentType } from '../types';
 import { asPrettyString, getHighlightHtml } from '../utils';
+import { shouldBindFormat } from '../../../../../netmon/field_formats/should_bind_format';
 
 export const HTML_CONTEXT_TYPE: FieldFormatsContentType = 'html';
 
@@ -59,8 +60,11 @@ export const setup = (
     return subValues.join(',' + (useMultiLine ? '\n' : ' '));
   };
 
-  const wrap: HtmlContextTypeConvert = (value, options) => {
-    return `<span ng-non-bindable>${recurse(value, options)}</span>`;
+  const wrap: HtmlContextTypeConvert = (value, field, hit, meta) => {
+    if (!!field && shouldBindFormat(field.name)) {
+      return `<span>${recurse(value, field, hit, meta)}</span>`;
+    }
+    return `<span ng-non-bindable>${recurse(value, field, hit, meta)}</span>`;
   };
 
   return wrap;

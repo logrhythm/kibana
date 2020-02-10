@@ -32,6 +32,8 @@ interface Props {
   onChangeSortOrder?: (sortOrder: SortOrder[]) => void;
   onMoveColumn?: (name: string, index: number) => void;
   onRemoveColumn?: (name: string) => void;
+  onSelectAll?: () => void;
+  onSelectCurrentPage?: () => void;
   sortOrder: SortOrder[];
 }
 
@@ -44,6 +46,8 @@ export function TableHeader({
   onChangeSortOrder,
   onMoveColumn,
   onRemoveColumn,
+  onSelectAll,
+  onSelectCurrentPage,
   sortOrder,
 }: Props) {
   const displayedColumns = getDisplayedColumns(columns, indexPattern, hideTimeColumn, isShortDots);
@@ -62,6 +66,8 @@ export function TableHeader({
             onMoveColumn={onMoveColumn}
             onRemoveColumn={onRemoveColumn}
             onChangeSortOrder={onChangeSortOrder}
+            onSelectAll={onSelectAll}
+            onSelectCurrentPage={onSelectCurrentPage}
           />
         );
       })}

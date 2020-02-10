@@ -17,45 +17,40 @@
  * under the License.
  */
 
-import dateMath from '@elastic/datemath';
-import classNames from 'classnames';
-import React, { useState } from 'react';
-import { i18n } from '@kbn/i18n';
+import { doesKueryExpressionHaveLuceneSyntaxError } from '@kbn/es-query';
 
-import {
-  EuiButton,
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiLink,
-  EuiSuperDatePicker,
-  EuiFieldText,
-  prettyDuration,
-} from '@elastic/eui';
+import classNames from 'classnames';
+import React, { useState, useEffect } from 'react';
+
+import { EuiButton, EuiFlexGroup, EuiFlexItem, EuiLink, EuiSuperDatePicker } from '@elastic/eui';
 // @ts-ignore
 import { EuiSuperUpdateButton, OnRefreshProps } from '@elastic/eui';
-import { FormattedMessage } from '@kbn/i18n/react';
+import { FormattedMessage, InjectedIntl, injectI18n } from '@kbn/i18n/react';
 import { Toast } from 'src/core/public';
-import { IDataPluginServices, IIndexPattern, TimeRange, TimeHistoryContract, Query } from '../..';
-import { useKibana, toMountPoint, withKibana } from '../../../../kibana_react/public';
-import QueryStringInputUI from './query_string_input';
-import { doesKueryExpressionHaveLuceneSyntaxError, UI_SETTINGS } from '../../../common';
-import { PersistedLog, getQueryLog } from '../../query';
-import { NoDataPopover } from './no_data_popover';
+import { TimeRange } from 'src/plugins/data/public';
+import { convertQuery } from '@logrhythm/nm-web-shared/services/query_mapping';
+import { useKibana } from '../../../../../../../plugins/kibana_react/public';
 
-const QueryStringInput = withKibana(QueryStringInputUI);
+import { IndexPattern } from '../../../index_patterns';
+import { QueryBarInput } from './query_bar_input';
+import { Query, getQueryLog } from '../index';
+import { TimeHistoryContract } from '../../../timefilter';
+import { IDataPluginServices } from '../../../types';
+import { PersistedLog } from '../../persisted_log';
 
-// @internal
-export interface QueryBarTopRowProps {
+import { SaveRule } from '../../../../../../../netmon/components/save_rule/save_rule';
+
+interface Props {
   query?: Query;
   onSubmit: (payload: { dateRange: TimeRange; query?: Query }) => void;
   onChange: (payload: { dateRange: TimeRange; query?: Query }) => void;
   onRefresh?: (payload: { dateRange: TimeRange }) => void;
-  dataTestSubj?: string;
   disableAutoFocus?: boolean;
   screenTitle?: string;
-  indexPatterns?: Array<IIndexPattern | string>;
+  indexPatterns?: Array<IndexPattern | string>;
+  intl: InjectedIntl;
   isLoading?: boolean;
-  prepend?: React.ComponentProps<typeof EuiFieldText>['prepend'];
+  prepend?: React.ReactNode;
   showQueryInput?: boolean;
   showDatePicker?: boolean;
   dateRangeFrom?: string;
@@ -67,28 +62,58 @@ export interface QueryBarTopRowProps {
   customSubmitButton?: any;
   isDirty: boolean;
   timeHistory?: TimeHistoryContract;
-  indicateNoData?: boolean;
 }
 
-// Needed for React.lazy
-// eslint-disable-next-line import/no-default-export
-export default function QueryBarTopRow(props: QueryBarTopRowProps) {
+function QueryBarTopRowUI(props: Props) {
   const [isDateRangeInvalid, setIsDateRangeInvalid] = useState(false);
-  const [isQueryInputFocused, setIsQueryInputFocused] = useState(false);
 
   const kibana = useKibana<IDataPluginServices>();
-  const { uiSettings, notifications, storage, appName, docLinks } = kibana.services;
+  const { uiSettings, notifications, store, appName, docLinks } = kibana.services;
 
   const kueryQuerySyntaxLink: string = docLinks!.links.query.kueryQuerySyntax;
 
   const queryLanguage = props.query && props.query.language;
-  const persistedLog: PersistedLog | undefined = React.useMemo(
-    () =>
-      queryLanguage && uiSettings && storage && appName
-        ? getQueryLog(uiSettings!, storage, appName, queryLanguage)
-        : undefined,
-    [appName, queryLanguage, uiSettings, storage]
-  );
+  let persistedLog: PersistedLog | undefined;
+
+  const currentQueryText = props.query && props.query.query ? (props.query.query as string) : '';
+
+  useEffect(() => {
+    if (!props.query) return;
+    persistedLog = getQueryLog(uiSettings!, store, appName, props.query.language);
+  }, [queryLanguage]);
+
+  useEffect(() => {
+    if (!props.query || !props.query.query) return;
+
+    let shutdown: boolean = false;
+    convertQuery(props.query.query as string)
+      .then(newQueryText => {
+        if (!props.query || shutdown) return;
+        const newQuery = {
+          ...props.query,
+          query: newQueryText,
+        };
+        const dateRange = getDateRange();
+        props.onChange({
+          query: newQuery,
+          dateRange,
+        });
+        props.onSubmit({
+          query: newQuery,
+          dateRange,
+        });
+      })
+      .catch(err => {
+        console.warn( // eslint-disable-line
+          'An error occurred trying to correct the provided query for capitalization.',
+          err
+        );
+      });
+
+    return () => {
+      shutdown = true;
+    };
+  }, []);
 
   function onClickSubmitButton(event: React.MouseEvent<HTMLButtonElement>) {
     if (persistedLog && props.query) {
@@ -99,7 +124,7 @@ export default function QueryBarTopRow(props: QueryBarTopRowProps) {
   }
 
   function getDateRange() {
-    const defaultTimeSetting = uiSettings!.get(UI_SETTINGS.TIMEPICKER_TIME_DEFAULTS);
+    const defaultTimeSetting = uiSettings!.get('timepicker:timeDefaults');
     return {
       from: props.dateRangeFrom || defaultTimeSetting.from,
       to: props.dateRangeTo || defaultTimeSetting.to,
@@ -111,10 +136,6 @@ export default function QueryBarTopRow(props: QueryBarTopRowProps) {
       query,
       dateRange: getDateRange(),
     });
-  }
-
-  function onChangeQueryInputFocus(isFocused: boolean) {
-    setIsQueryInputFocused(isFocused);
   }
 
   function onTimeChange({
@@ -163,7 +184,33 @@ export default function QueryBarTopRow(props: QueryBarTopRowProps) {
       props.timeHistory.add(dateRange);
     }
 
-    props.onSubmit({ query, dateRange });
+    if (!query || !query.query) {
+      props.onSubmit({ query, dateRange });
+      return;
+    }
+
+    convertQuery(query.query as string)
+      .then(newQueryText => {
+        if (!query) return;
+        const newQuery = {
+          ...query,
+          query: newQueryText,
+        };
+        props.onChange({
+          query: newQuery,
+          dateRange,
+        });
+        props.onSubmit({
+          query: newQuery,
+          dateRange,
+        });
+      })
+      .catch(err => {
+        console.warn( // eslint-disable-line
+          'An error occurred trying to correct the provided query for capitalization.',
+          err
+        );
+      });
   }
 
   function onInputSubmit(query: Query) {
@@ -173,47 +220,21 @@ export default function QueryBarTopRow(props: QueryBarTopRowProps) {
     });
   }
 
-  function toAbsoluteString(value: string, roundUp = false) {
-    const valueAsMoment = dateMath.parse(value, { roundUp });
-    if (!valueAsMoment) {
-      return value;
-    }
-    return valueAsMoment.toISOString();
-  }
-
   function renderQueryInput() {
     if (!shouldRenderQueryInput()) return;
     return (
       <EuiFlexItem>
-        <QueryStringInput
+        <QueryBarInput
           disableAutoFocus={props.disableAutoFocus}
           indexPatterns={props.indexPatterns!}
           prepend={props.prepend}
           query={props.query!}
           screenTitle={props.screenTitle}
           onChange={onQueryChange}
-          onChangeQueryInputFocus={onChangeQueryInputFocus}
           onSubmit={onInputSubmit}
           persistedLog={persistedLog}
-          dataTestSubj={props.dataTestSubj}
         />
       </EuiFlexItem>
-    );
-  }
-
-  function renderSharingMetaFields() {
-    const { from, to } = getDateRange();
-    const dateRangePretty = prettyDuration(
-      toAbsoluteString(from),
-      toAbsoluteString(to),
-      [],
-      uiSettings.get('dateFormat')
-    );
-    return (
-      <div
-        data-shared-timefilter-duration={dateRangePretty}
-        data-test-subj="dataSharedTimefilterDuration"
-      />
     );
   }
 
@@ -222,7 +243,7 @@ export default function QueryBarTopRow(props: QueryBarTopRowProps) {
   }
 
   function shouldRenderQueryInput(): boolean {
-    return Boolean(props.showQueryInput && props.indexPatterns && props.query && storage);
+    return Boolean(props.showQueryInput && props.indexPatterns && props.query && store);
   }
 
   function renderUpdateButton() {
@@ -243,12 +264,10 @@ export default function QueryBarTopRow(props: QueryBarTopRowProps) {
     }
 
     return (
-      <NoDataPopover storage={storage} showNoDataPopover={props.indicateNoData}>
-        <EuiFlexGroup responsive={false} gutterSize="s">
-          {renderDatePicker()}
-          <EuiFlexItem grow={false}>{button}</EuiFlexItem>
-        </EuiFlexGroup>
-      </NoDataPopover>
+      <EuiFlexGroup responsive={false} gutterSize="s">
+        {renderDatePicker()}
+        <EuiFlexItem grow={false}>{button}</EuiFlexItem>
+      </EuiFlexGroup>
     );
   }
 
@@ -270,7 +289,7 @@ export default function QueryBarTopRow(props: QueryBarTopRowProps) {
     }
 
     const commonlyUsedRanges = uiSettings!
-      .get(UI_SETTINGS.TIMEPICKER_QUICK_RANGES)
+      .get('timepicker:quickRanges')
       .map(({ from, to, display }: { from: string; to: string; display: string }) => {
         return {
           start: from,
@@ -279,13 +298,8 @@ export default function QueryBarTopRow(props: QueryBarTopRowProps) {
         };
       });
 
-    const wrapperClasses = classNames('kbnQueryBar__datePickerWrapper', {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      'kbnQueryBar__datePickerWrapper-isHidden': isQueryInputFocused,
-    });
-
     return (
-      <EuiFlexItem className={wrapperClasses}>
+      <EuiFlexItem className="kbnQueryBar__datePickerWrapper">
         <EuiSuperDatePicker
           start={props.dateRangeFrom}
           end={props.dateRangeTo}
@@ -299,7 +313,6 @@ export default function QueryBarTopRow(props: QueryBarTopRowProps) {
           commonlyUsedRanges={commonlyUsedRanges}
           dateFormat={uiSettings!.get('dateFormat')}
           isAutoRefreshOnly={props.showAutoRefreshOnly}
-          className="kbnQueryBar__datePicker"
         />
       </EuiFlexItem>
     );
@@ -307,18 +320,20 @@ export default function QueryBarTopRow(props: QueryBarTopRowProps) {
 
   function handleLuceneSyntaxWarning() {
     if (!props.query) return;
+    const { intl } = props;
     const { query, language } = props.query;
     if (
       language === 'kuery' &&
       typeof query === 'string' &&
-      (!storage || !storage.get('kibana.luceneSyntaxWarningOptOut')) &&
+      (!store || !store.get('kibana.luceneSyntaxWarningOptOut')) &&
       doesKueryExpressionHaveLuceneSyntaxError(query)
     ) {
       const toast = notifications!.toasts.addWarning({
-        title: i18n.translate('data.query.queryBar.luceneSyntaxWarningTitle', {
+        title: intl.formatMessage({
+          id: 'data.query.queryBar.luceneSyntaxWarningTitle',
           defaultMessage: 'Lucene syntax warning',
         }),
-        text: toMountPoint(
+        text: (
           <div>
             <p>
               <FormattedMessage
@@ -354,8 +369,8 @@ export default function QueryBarTopRow(props: QueryBarTopRowProps) {
   }
 
   function onLuceneSyntaxWarningOptOut(toast: Toast) {
-    if (!storage) return;
-    storage.set('kibana.luceneSyntaxWarningOptOut', true);
+    if (!store) return;
+    store.set('kibana.luceneSyntaxWarningOptOut', true);
     notifications!.toasts.remove(toast);
   }
 
@@ -371,14 +386,18 @@ export default function QueryBarTopRow(props: QueryBarTopRowProps) {
       justifyContent="flexEnd"
     >
       {renderQueryInput()}
-      {renderSharingMetaFields()}
       <EuiFlexItem grow={false}>{renderUpdateButton()}</EuiFlexItem>
+      <EuiFlexItem grow={false}>
+        <SaveRule query={currentQueryText} disabledForLanguage={queryLanguage !== 'lucene'} />
+      </EuiFlexItem>
     </EuiFlexGroup>
   );
 }
 
-QueryBarTopRow.defaultProps = {
+QueryBarTopRowUI.defaultProps = {
   showQueryInput: true,
   showDatePicker: true,
   showAutoRefreshOnly: false,
 };
+
+export const QueryBarTopRow = injectI18n(QueryBarTopRowUI);
