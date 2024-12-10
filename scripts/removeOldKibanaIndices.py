@@ -3,7 +3,7 @@ import requests
 logFile = open('/var/log/probe/KibanaStartup.log', 'a')
 
 res = requests.get('http://localhost:9200/_cat/indices/.kibana_*')
-content = res.content
+content = res.content.decode()
 kibanaIndices = []
 
 for indexData in content.split(" "):
@@ -12,12 +12,12 @@ for indexData in content.split(" "):
 
 kibanaIndices = sorted(kibanaIndices, key=lambda index: int(index.split("_")[1]))
 kibanaIndices = kibanaIndices[:-1]
-print >>logFile, "Deleting indices: {}".format(kibanaIndices)
+print("Deleting indices: {}".format(kibanaIndices),file=logFile)
 
 for index in kibanaIndices:
    url = "http://localhost:9200/{}".format(index)
    res = requests.delete(url)
    if res.status_code != 200:
-      print >>logFile, "Could not delete {}".format(url)
+      print("Could not delete {}".format(url),file=logFile)
 
 logFile.close()
