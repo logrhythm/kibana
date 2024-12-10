@@ -3,7 +3,7 @@ import requests
 logFile = open('/var/log/probe/KibanaStartup.log', 'a')
 
 res = requests.get('http://localhost:9200/_cat/indices/.kibana_*')
-content = res.content
+content = res.content.decode()
 kibanaIndices = []
 
 for indexData in content.split(" "):
