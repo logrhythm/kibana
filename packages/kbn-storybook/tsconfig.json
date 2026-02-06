@@ -3,7 +3,14 @@
   "compilerOptions": {
     "declaration": true,
     "outDir": "target",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "noErrorTruncation": false
   },
-  "include": ["*.ts", "lib/*.ts"]
+  "include": ["*.ts", "lib/*.ts", "types.d.ts"],
+  "exclude": [
+    "node_modules/**/*",
+    "**/node_modules/**/*",
+    "node_modules/@types/webpack-merge/**/*"
+  ]
 }

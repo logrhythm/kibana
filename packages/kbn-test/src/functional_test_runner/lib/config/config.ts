@@ -18,7 +18,47 @@
  */
 
 import { Schema } from 'joi';
-import { cloneDeepWith, get, has, toPath } from 'lodash';
+import { get, has } from 'lodash';
+
+// Helper function to convert path to array (equivalent to lodash toPath)
+function toPath(path: string | string[]): string[] {
+  if (Array.isArray(path)) {
+    return path;
+  }
+  return path.replace(/\[(\d+)\]/g, '.$1').split('.').filter(Boolean);
+}
+
+// Helper function for deep cloning with customizer (equivalent to lodash cloneDeepWith)
+function cloneDeepWith<T>(obj: T, customizer: (value: any) => any): T {
+  function cloneWithCustomizer(val: any): any {
+    const result = customizer(val);
+    if (result !== undefined) {
+      return result;
+    }
+
+    if (val === null || typeof val !== 'object') {
+      return val;
+    }
+
+    if (Array.isArray(val)) {
+      return val.map(cloneWithCustomizer);
+    }
+
+    if (val.constructor !== Object) {
+      return val;
+    }
+
+    const cloned: any = {};
+    for (const key in val) {
+      if (val.hasOwnProperty(key)) {
+        cloned[key] = cloneWithCustomizer(val[key]);
+      }
+    }
+    return cloned;
+  }
+
+  return cloneWithCustomizer(obj);
+}
 
 import { schema } from './schema';
 
@@ -111,7 +151,7 @@ export class Config {
       throw new Error(`Unknown config key "${key}"`);
     }
 
-    return cloneDeepWith(get(this[$values], key, defaultValue), (v) => {
+    return cloneDeepWith(get(this[$values], key, defaultValue), (v: any) => {
       if (typeof v === 'function') {
         return v;
       }
@@ -119,7 +159,7 @@ export class Config {
   }
 
   public getAll() {
-    return cloneDeepWith(this[$values], (v) => {
+    return cloneDeepWith(this[$values], (v: any) => {
       if (typeof v === 'function') {
         return v;
       }

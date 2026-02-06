@@ -40,7 +40,7 @@ export function readLimits(): Limits {
     }
   }
 
-  return yaml ? Yaml.safeLoad(yaml) : {};
+  return yaml ? (Yaml.safeLoad(yaml) as Limits) : ({} as Limits);
 }
 
 export function validateLimitsForAllBundles(log: ToolingLog, config: OptimizerConfig) {

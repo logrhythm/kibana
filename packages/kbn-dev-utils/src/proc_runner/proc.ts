@@ -86,7 +86,7 @@ export function startProc(name: string, options: ProcOptions, log: ToolingLog) {
     if (!statSync(cwd).isDirectory()) {
       throw new Error(`cwd "${cwd}" exists but is not a directory`);
     }
-  } catch (err) {
+  } catch (err: any) {
     if (err.code === 'ENOENT') {
       throw new Error(`cwd "${cwd}" does not exist`);
     }
@@ -109,10 +109,9 @@ export function startProc(name: string, options: ProcOptions, log: ToolingLog) {
 
   const outcome$: Rx.Observable<number | null> = Rx.race(
     // observe first exit event
-    Rx.fromEvent(childProcess, 'exit').pipe(
-      // @ts-ignore
+    (Rx.fromEvent(childProcess, 'exit') as Rx.Observable<number>).pipe(
       take(1),
-      map(([code]) => {
+      map((code: number) => {
         if (stopCalled) {
           return null;
         }
@@ -126,7 +125,7 @@ export function startProc(name: string, options: ProcOptions, log: ToolingLog) {
     ),
 
     // observe first error event
-    Rx.fromEvent(childProcess, 'error').pipe(
+    (Rx.fromEvent(childProcess, 'error') as Rx.Observable<Error>).pipe(
       take(1),
       mergeMap((err) => Rx.throwError(err))
     )

@@ -34,10 +34,29 @@ const PLUGIN_BUILD_DIR = Path.resolve(PLUGIN_DIR, 'build');
 const PLUGIN_ARCHIVE = Path.resolve(PLUGIN_BUILD_DIR, `fooTestPlugin-${KIBANA_VERSION}.zip`);
 const TMP_DIR = Path.resolve(__dirname, '__tmp__');
 
-expect.addSnapshotSerializer(createReplaceSerializer(/[\d\.]+ sec/g, '<time>'));
-expect.addSnapshotSerializer(createReplaceSerializer(/\d+(\.\d+)?[sm]/g, '<time>'));
-expect.addSnapshotSerializer(createReplaceSerializer(/yarn (\w+) v[\d\.]+/g, 'yarn $1 <version>'));
-expect.addSnapshotSerializer(createStripAnsiSerializer());
+// Add print method to serializers for compatibility with newer Jest types
+const replaceSecondsSerializer = createReplaceSerializer(/[\d\.]+ sec/g, '<time>');
+const replaceTimeSerializer = createReplaceSerializer(/\d+(\.\d+)?[sm]/g, '<time>');
+const replaceYarnSerializer = createReplaceSerializer(/yarn (\w+) v[\d\.]+/g, 'yarn $1 <version>');
+const stripAnsiSerializer = createStripAnsiSerializer();
+
+// Add print method for newer Jest compatibility
+expect.addSnapshotSerializer({
+  ...replaceSecondsSerializer,
+  print: (val: any, serialize: (val: any) => string) => serialize(val),
+});
+expect.addSnapshotSerializer({
+  ...replaceTimeSerializer,
+  print: (val: any, serialize: (val: any) => string) => serialize(val),
+});
+expect.addSnapshotSerializer({
+  ...replaceYarnSerializer,
+  print: (val: any, serialize: (val: any) => string) => serialize(val),
+});
+expect.addSnapshotSerializer({
+  ...stripAnsiSerializer,
+  print: (val: any, serialize: (val: any) => string) => serialize(val),
+});
 
 beforeEach(async () => {
   await del([PLUGIN_DIR, TMP_DIR]);
@@ -52,11 +71,10 @@ it('builds a generated plugin into a viable archive', async () => {
     ['scripts/generate_plugin', '-y', '--name', 'fooTestPlugin'],
     {
       cwd: REPO_ROOT,
-      all: true,
     }
   );
 
-  expect(generateProc.all).toMatchInlineSnapshot(`
+  expect(generateProc.stdout).toMatchInlineSnapshot(`
     " succ 🎉
 
           Your plugin has been created in plugins/foo_test_plugin
@@ -68,11 +86,10 @@ it('builds a generated plugin into a viable archive', async () => {
     ['../../scripts/plugin_helpers', 'build', '--kibana-version', KIBANA_VERSION],
     {
       cwd: PLUGIN_DIR,
-      all: true,
     }
   );
 
-  expect(buildProc.all).toMatchInlineSnapshot(`
+  expect(buildProc.stdout).toMatchInlineSnapshot(`
     " warn These tools might work with 7.9 versions, but there are known workarounds required. See https://github.com/elastic/kibana/issues/82466 for more info
      info deleting the build and target directories
      info running @kbn/optimizer

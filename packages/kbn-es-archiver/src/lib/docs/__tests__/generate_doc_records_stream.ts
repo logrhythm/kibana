@@ -19,7 +19,7 @@
 
 import sinon from 'sinon';
 import expect from '@kbn/expect';
-import { delay } from 'bluebird';
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 import { createListStream, createPromiseFromStreams, createConcatStream } from '../../streams';
 

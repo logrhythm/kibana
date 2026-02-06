@@ -4,7 +4,10 @@
     "outDir": "target",
     "target": "ES2019",
     "declaration": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true
   },
   "include": [
     "src/**/*"

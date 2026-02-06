@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { delay } from 'bluebird';
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 import { createPromiseFromStreams } from './promise_from_streams';
 import { createListStream } from './list_stream';

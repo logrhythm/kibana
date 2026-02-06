@@ -17,12 +17,10 @@
  * under the License.
  */
 
-import { readdir } from 'fs';
-import { promisify } from 'util';
-
-const readdirAsync = promisify(readdir);
-
-export async function readDirectory(path: string) {
-  const allNames = await readdirAsync(path);
-  return allNames.filter((name) => !name.startsWith('.'));
+declare module 'normalize-path' {
+  /**
+   * Normalize a file path to use forward slashes and remove extra slashes
+   */
+  function normalizePath(path: string): string;
+  export = normalizePath;
 }
