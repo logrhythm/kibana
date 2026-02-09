@@ -1,7 +1,19 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "tsBuildInfoFile": "../../build/tsbuildinfo/packages/kbn-optimizer"
+    "tsBuildInfoFile": "../../build/tsbuildinfo/packages/kbn-optimizer",
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "strictFunctionTypes": false,
+    "skipLibCheck": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "baseUrl": ".",
+    "paths": {
+      "@kbn/std": ["../../packages/kbn-std/src"],
+      "@kbn/dev-utils": ["../../packages/kbn-dev-utils/src"],
+      "@kbn/utils": ["../../packages/kbn-utils/src"]
+    }
   },
   "include": [
     "index.d.ts",

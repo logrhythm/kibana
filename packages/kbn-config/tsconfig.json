@@ -5,6 +5,11 @@
     "outDir": "./target",
     "stripInternal": false,
     "declarationMap": true,
+    "paths": {
+      "@kbn/config": ["src/core/server/config"],
+      "@kbn/std": ["packages/kbn-std/src"],
+      "@kbn/utils": ["packages/kbn-utils/src"]
+    },
     "types": ["jest", "node"]
   },
   "include": ["./src/**/*.ts"],

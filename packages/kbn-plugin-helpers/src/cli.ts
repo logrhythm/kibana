@@ -76,7 +76,7 @@ export function runCli() {
 
         const plugin = loadKibanaPlatformPlugin(pluginDir);
         const config = await loadConfig(log, plugin);
-        const kibanaVersion = await resolveKibanaVersion(versionFlag, plugin);
+	const kibanaVersion = await resolveKibanaVersion(versionFlag as string, plugin);
 
         if (semver.satisfies(kibanaVersion, '<7.9')) {
           log.error(

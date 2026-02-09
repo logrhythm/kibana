@@ -27,7 +27,7 @@ import globby from 'globby';
 
 const GENERATED_DIR = Path.resolve(REPO_ROOT, `plugins`);
 
-expect.addSnapshotSerializer(createAbsolutePathSerializer());
+expect.addSnapshotSerializer(createAbsolutePathSerializer() as any);
 
 beforeEach(async () => {
   await del(GENERATED_DIR, { force: true });

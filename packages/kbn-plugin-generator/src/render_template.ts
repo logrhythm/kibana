@@ -86,7 +86,7 @@ export async function renderTemplates({
       buffer: true,
       nodir: true,
       cwd: Path.resolve(__dirname, '../template'),
-    }),
+    } as any),
 
     // exclude files from the template based on selected options, patterns
     // are matched without the .ejs extension

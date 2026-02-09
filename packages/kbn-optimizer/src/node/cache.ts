@@ -19,7 +19,7 @@
 
 import Path from 'path';
 
-// @ts-expect-error no types available
+// // @ts-ignore no types available
 import * as LmdbStore from 'lmdb-store';
 import { REPO_ROOT, UPSTREAM_BRANCH } from '@kbn/dev-utils';
 

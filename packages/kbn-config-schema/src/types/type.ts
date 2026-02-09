@@ -47,7 +47,7 @@ export abstract class Type<V> {
 
       // If default value is a function, then we must provide description for it.
       if (typeof options.defaultValue === 'function') {
-        schema = schema.default(options.defaultValue, 'Type default value');
+	schema = (schema.default as any)(options.defaultValue, 'Type default value');
       } else {
         schema = schema.default(
           Reference.isReference(options.defaultValue)
@@ -106,7 +106,7 @@ export abstract class Type<V> {
 
     const { context = {}, type, path, message } = error;
 
-    const errorHandleResult = this.handleError(type, context, path);
+    const errorHandleResult = this.handleError(type, context, path as any);
     if (errorHandleResult instanceof SchemaTypeError) {
       return errorHandleResult;
     }
@@ -114,15 +114,16 @@ export abstract class Type<V> {
     // If error handler just defines error message, then wrap it into proper
     // `SchemaTypeError` instance.
     if (typeof errorHandleResult === 'string') {
-      return new SchemaTypeError(errorHandleResult, path);
+      return new SchemaTypeError(errorHandleResult, path as any);
     }
 
     // If error is produced by the custom validator, just extract source message
     // from context and wrap it into `SchemaTypeError` instance.
     if (type === 'any.custom') {
-      return new SchemaTypeError(context.message, path);
+      return new SchemaTypeError(context.message, path as any);
+
     }
 
-    return new SchemaTypeError(message || type, path);
+    return new SchemaTypeError(message || type, path as any);
   }
 }

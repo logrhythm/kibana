@@ -1,7 +1,25 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "tsBuildInfoFile": "./build/tsbuildinfo/kibana"
+    "tsBuildInfoFile": "./build/tsbuildinfo/kibana",
+    "typeRoots": ["node_modules/@types", "node_modules/@testing-library"],
+    "types": ["jest", "testing-library__jest-dom"],
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "strictFunctionTypes": false,
+    "strictBindCallApply": false,
+    "strictPropertyInitialization": false,
+    "alwaysStrict": false,
+    "skipLibCheck": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "noImplicitThis": false,
+    "baseUrl": ".",
+    "paths": {
+      "@kbn/std": ["../../packages/kbn-std/src"],
+      "@kbn/dev-utils": ["../../packages/kbn-dev-utils/src"],
+      "@kbn/utils": ["../../packages/kbn-utils/src"]
+    }
   },
   "include": [
     "kibana.d.ts",

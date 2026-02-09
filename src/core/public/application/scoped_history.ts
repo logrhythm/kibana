@@ -100,7 +100,7 @@ export class ScopedHistory<HistoryLocationState = unknown>
    */
   public get location() {
     this.verifyActive();
-    return this.stripBasePath(this.parentHistory.location);
+    return this.stripBasePath(this.parentHistory.location as any);
   }
 
   /**
@@ -325,7 +325,7 @@ export class ScopedHistory<HistoryLocationState = unknown>
       }
 
       [...this.listeners].forEach((listener) => {
-        listener(this.stripBasePath(location), action);
+        listener(this.stripBasePath(location as any), action);
       });
     });
   }

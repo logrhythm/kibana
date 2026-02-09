@@ -4,7 +4,20 @@
     "outDir": "target",
     "declaration": true,
     "sourceMap": true,
-    "target": "ES2018"
+    "target": "ES2018",
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "strictFunctionTypes": false,
+    "skipLibCheck": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "baseUrl": ".",
+    "paths": {
+      "@kbn/config-schema": ["../../packages/kbn-config-schema/src"],
+      "@kbn/std": ["../../packages/kbn-std/src"],
+      "@kbn/dev-utils": ["../../packages/kbn-dev-utils/src"],
+      "@kbn/utils": ["../../packages/kbn-utils/src"]
+    }
   },
   "include": [
     "src/**/*"

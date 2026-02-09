@@ -6,10 +6,22 @@
     "outDir": "./target/out",
     "stripInternal": true,
     "declarationMap": true,
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "strictFunctionTypes": false,
+    "skipLibCheck": true,
+    "suppressImplicitAnyIndexErrors": true,
     "types": [
       "jest",
       "node"
-    ]
+    ],
+    "paths": {
+    "@kbn/config-schema": ["../../packages/kbn-config-schema/src"],
+    "@kbn/std": ["../../packages/kbn-std/src"],
+    "@kbn/dev-utils": ["../../packages/kbn-dev-utils/src"],
+    "@kbn/utils": ["../../packages/kbn-utils/src"]
+  }
   },
   "include": [
     "./types/joi.d.ts",

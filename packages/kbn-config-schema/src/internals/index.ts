@@ -16,17 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import Joi from 'joi';
+import 'joi';
 import {
-  AnySchema,
-  JoiRoot,
   Reference,
-  Rules,
   SchemaLike,
   State,
   ValidationErrorItem,
   ValidationOptions,
 } from 'joi';
+const Joi = require('joi');
+type JoiRoot = any;
+type Rules = any;
+type AnySchema = any; 
 import { isPlainObject } from 'lodash';
 import { isDuration } from 'moment';
 import { Stream } from 'stream';

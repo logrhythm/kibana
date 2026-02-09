@@ -24,7 +24,7 @@ import { ToolingLog, CiStatsMetrics } from '@kbn/dev-utils';
 import { OptimizerConfig } from './optimizer_config';
 
 const flatten = <T>(arr: Array<T | T[]>): T[] =>
-  arr.reduce((acc: T[], item) => acc.concat(item), []);
+  (arr.reduce((acc: T[], item) => acc.concat(item as any), [] as T[]) as T[]);
 
 interface Entry {
   relPath: string;

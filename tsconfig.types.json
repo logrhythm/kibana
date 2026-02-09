@@ -1,6 +1,13 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@kbn/config": ["src/core/server/config"],
+      "@kbn/std": ["packages/kbn-std/src"],
+      "@kbn/utils": ["packages/kbn-utils/src"],
+      "@kbn/config-schema": ["packages/kbn-config-schema/src"]
+    },
     "incremental": false,
     "declaration": true,
     "outDir": "./target/types",

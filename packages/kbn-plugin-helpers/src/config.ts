@@ -69,7 +69,7 @@ export async function loadConfig(log: ToolingLog, plugin: Plugin): Promise<Confi
     log.info(`Loaded config file from [${path}]`);
     return {
       skipInstallDependencies,
-      serverSourcePatterns: ssp,
+      serverSourcePatterns: ssp as string[],
     };
   } catch (error) {
     if (error.code === 'ENOENT') {

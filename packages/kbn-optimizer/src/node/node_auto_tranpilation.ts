@@ -140,7 +140,7 @@ export function registerNodeAutoTranspilation() {
   sourceMapSupport.install({
     handleUncaughtExceptions: false,
     environment: 'node',
-    // @ts-expect-error bad source-map-support types
+    // // @ts-ignore bad source-map-support types
     retrieveSourceMap(path: string) {
       const map = cache.getSourceMap(path);
 
