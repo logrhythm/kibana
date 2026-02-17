@@ -19,7 +19,7 @@
 
 import { resolve } from 'path';
 // deep import to avoid loading the whole package
-import { getConfigPath } from '@kbn/utils/target/path';
+import { getConfigPath } from '@kbn/utils/target/src/src/path';
 import { getArgValues } from './read_argv';
 
 /**

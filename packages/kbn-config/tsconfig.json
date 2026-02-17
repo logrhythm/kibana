@@ -2,16 +2,16 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "declaration": true,
-    "outDir": "./target",
+    "outDir": "./target/src",
     "stripInternal": false,
     "declarationMap": true,
-    "paths": {
-      "@kbn/config": ["src/core/server/config"],
-      "@kbn/std": ["packages/kbn-std/src"],
-      "@kbn/utils": ["packages/kbn-utils/src"]
-    },
+    "composite": true,
     "types": ["jest", "node"]
   },
   "include": ["./src/**/*.ts"],
-  "exclude": ["target"]
+  "exclude": ["target"],
+  "references": [
+    { "path": "../kbn-std" },
+    { "path": "../kbn-logging" }
+  ]
 }

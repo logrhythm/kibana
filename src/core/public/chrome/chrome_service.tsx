@@ -1,13 +1,4 @@
 /*
- * THIS FILE HAS BEEN MODIFIED FROM THE ORIGINAL SOURCE
- * This comment only applies to modifications applied after the f421eec40b5a9f31383591e30bef86724afcd2b3 commit
- *
- * Copyright 2020 LogRhythm, Inc
- * Licensed under the LogRhythm Global End User License Agreement,
- * which can be found through this page: https://logrhythm.com/about/logrhythm-terms-and-conditions/
- */
-
-/*
  * Licensed to Elasticsearch B.V. under one or more contributor
  * license agreements. See the NOTICE file distributed with
  * this work for additional information regarding copyright
@@ -26,13 +17,22 @@
  * under the License.
  */
 
+/*
+ * THIS FILE HAS BEEN MODIFIED FROM THE ORIGINAL SOURCE
+ * This comment only applies to modifications applied after the f421eec40b5a9f31383591e30bef86724afcd2b3 commit
+ *
+ * Copyright 2020 LogRhythm, Inc
+ * Licensed under the LogRhythm Global End User License Agreement,
+ * which can be found through this page: https://logrhythm.com/about/logrhythm-terms-and-conditions/
+ */
+
 import React from 'react';
 import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 import * as Url from 'url';
 
 import { i18n } from '@kbn/i18n';
-import { IconType, Breadcrumb as EuiBreadcrumb } from '@elastic/eui';
+import { IconType } from '@elastic/eui';
 
 import { InjectedMetadataStart } from '../injected_metadata';
 import { NotificationsStart } from '../notifications';
@@ -42,7 +42,7 @@ import { HttpStart } from '../http';
 import { ChromeNavLinks, NavLinksService } from './nav_links';
 import { ChromeRecentlyAccessed, RecentlyAccessedService } from './recently_accessed';
 import { NavControlsService, ChromeNavControls } from './nav_controls';
-import { LoadingIndicator, HeaderWrapper as Header } from './ui';
+import { LoadingIndicator, Header } from './ui';
 import { DocLinksStart } from '../doc_links';
 
 export { ChromeNavControls, ChromeRecentlyAccessed };
@@ -68,10 +68,19 @@ export interface ChromeBrand {
 }
 
 /** @public */
-export type ChromeBreadcrumb = EuiBreadcrumb;
+export interface ChromeBreadcrumb {
+  text: string;
+  href?: string;
+  onClick?: () => void;
+  'data-test-subj'?: string;
+}
 
 /** @public */
-export type ChromeHelpExtension = (element: HTMLDivElement) => () => void;
+export interface ChromeHelpExtension {
+  appName?: string;
+  links?: any[];
+  content?: any;
+}
 
 interface ConstructorParams {
   browserSupportsCsp: boolean;
@@ -142,15 +151,15 @@ export class ChromeService {
             breadcrumbs$={breadcrumbs$.pipe(takeUntil(this.stop$))}
             kibanaDocLink={docLinks.links.kibana}
             forceAppSwitcherNavigation$={navLinks.getForceAppSwitcherNavigation$()}
-            // @ts-ignore
+            // @ts-expect-error
             helpExtension$={helpExtension$.pipe(takeUntil(this.stop$))}
             homeHref={http.basePath.prepend('/app/kibana#/home')}
             isVisible$={isVisible$.pipe(
-              map(visibility => (FORCE_HIDDEN ? false : visibility)),
+              map((visibility) => (FORCE_HIDDEN ? false : visibility)),
               takeUntil(this.stop$)
             )}
             kibanaVersion={injectedMetadata.getKibanaVersion()}
-            legacyMode={injectedMetadata.getLegacyMode()}
+            legacyMode={false}
             navLinks$={navLinks.getNavLinks$()}
             recentlyAccessed$={recentlyAccessed.get$()}
             navControlsLeft$={navControls.getLeft$()}
@@ -174,7 +183,7 @@ export class ChromeService {
 
       getIsVisible$: () =>
         isVisible$.pipe(
-          map(visibility => (FORCE_HIDDEN ? false : visibility)),
+          map((visibility) => (FORCE_HIDDEN ? false : visibility)),
           takeUntil(this.stop$)
         ),
 
@@ -195,7 +204,7 @@ export class ChromeService {
 
       getApplicationClasses$: () =>
         applicationClasses$.pipe(
-          map(set => [...set]),
+          map((set) => [...set]),
           takeUntil(this.stop$)
         ),
 
@@ -228,6 +237,23 @@ export class ChromeService {
       setHelpExtension: (helpExtension?: ChromeHelpExtension) => {
         helpExtension$.next(helpExtension);
       },
+
+      docTitle: {
+        change: (title: string) => {
+          document.title = title;
+        },
+        reset: () => {
+          document.title = 'Kibana';
+        },
+      },
+
+      getCustomNavLink$: () => new BehaviorSubject(undefined),
+
+      setCustomNavLink: (navLink?: any) => {
+        // Implementation stub for legacy compatibility
+      },
+
+      getIsNavDrawerLocked$: () => new BehaviorSubject(false),
     };
   }
 
@@ -380,4 +406,31 @@ export interface InternalChromeStart extends ChromeStart {
    * @internal
    */
   getHeaderComponent(): JSX.Element;
+
+  /**
+   * Document title service
+   * @internal
+   */
+  docTitle: {
+    change(title: string): void;
+    reset(): void;
+  };
+
+  /**
+   * Get observable for custom nav link
+   * @internal
+   */
+  getCustomNavLink$(): Observable<any>;
+
+  /**
+   * Set custom nav link
+   * @internal
+   */
+  setCustomNavLink(navLink?: any): void;
+
+  /**
+   * Get observable for nav drawer locked state
+   * @internal
+   */
+  getIsNavDrawerLocked$(): Observable<boolean>;
 }

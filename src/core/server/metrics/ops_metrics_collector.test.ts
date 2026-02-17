@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { loggerMock } from '@kbn/logging/target/mocks';
+import { loggerMock } from '@kbn/logging/target/src/mocks';
 import {
   mockOsCollector,
   mockProcessCollector,

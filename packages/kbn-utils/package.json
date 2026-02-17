@@ -1,6 +1,6 @@
 {
   "name": "@kbn/utils",
-  "main": "./target/index.js",
+  "main": "./target/src/src/index.js",
   "version": "1.0.0",
   "license": "Apache-2.0",
   "private": true,

@@ -17,19 +17,5 @@
  * under the License.
  */
 
-import { Readable } from 'stream';
-
-export function createListStream<T>(items: T | T[] = []) {
-  const queue: T[] = Array.isArray(items) ? items : [items];
-  return new Readable({
-    objectMode: true,
-    read(size) {
-      queue.splice(0, size).forEach((item) => {
-        this.push(item);
-      });
-      if (!queue.length) {
-        this.push(null);
-      }
-    },
-  });
-}
+// Placeholder for @logrhythm/icons package
+module.exports = {};

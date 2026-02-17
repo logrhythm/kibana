@@ -63,15 +63,14 @@ function sign({
   features?: PublicFeatures;
   error?: string;
 }) {
-  return createHash('sha256')
-    .update(
-      stringify({
-        license,
-        features,
-        error,
-      })
-    )
-    .digest('hex');
+  const dataToSign =
+    stringify({
+      license: license || null,
+      features: features || null,
+      error: error || null,
+    }) || '';
+
+  return createHash('sha256').update(dataToSign).digest('hex');
 }
 
 /**

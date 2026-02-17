@@ -1,4 +1,23 @@
 /*
+ * Licensed to Elasticsearch B.V. under one or more contributor
+ * license agreements. See the NOTICE file distributed with
+ * this work for additional information regarding copyright
+ * ownership. Elasticsearch B.V. licenses this file to you under
+ * the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+/*
  * Copyright 2020 LogRhythm, Inc
  * Licensed under the LogRhythm Global End User License Agreement,
  * which can be found through this page: https://logrhythm.com/about/logrhythm-terms-and-conditions/
@@ -41,12 +60,12 @@ const useStyles = makeStyles({
 const validateForm = (value: QueryRule | null): SaveRuleFormDataValidation | null => {
   const validation = {
     id: !!value && !!value.id,
-    severity: !!value && _.contains(['low', 'medium', 'high'], value.severity),
+    severity: !!value && _.includes(['low', 'medium', 'high'], value.severity),
     query: !!value && !!value.query,
     enabled: true,
   };
 
-  return _.every(Object.values(validation), v => v) ? null : validation;
+  return _.every(Object.values(validation), (v) => v) ? null : validation;
 };
 
 export type SaveRuleAction =
@@ -223,11 +242,11 @@ export const SaveRule = (props: SaveRuleProps) => {
       return;
     }
 
-    saveQueryRule(saveRuleData.id, saveRuleData)
+    saveQueryRule(saveRuleData.id || '', saveRuleData)
       .then(() => {
         dispatch({ type: 'SAVE_RULE_FINISH', success: true });
       })
-      .catch(err => {
+      .catch((err) => {
         console.error(`An error occurred saving query rule '${saveRuleData.id}'`, err); // eslint-disable-line
         dispatch({ type: 'SAVE_RULE_FINISH', success: false });
       });
@@ -255,7 +274,7 @@ export const SaveRule = (props: SaveRuleProps) => {
           {triggerCount === null && saveSuccess === null && !loading && (
             <SaveRuleForm
               value={saveRuleData}
-              onChange={val => {
+              onChange={(val) => {
                 dispatch({ type: 'UPDATE_RULE_DATA', ruleData: val });
               }}
               validation={validation}

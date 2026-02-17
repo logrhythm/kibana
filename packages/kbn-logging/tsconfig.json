@@ -5,7 +5,11 @@
     "stripInternal": false,
     "declaration": true,
     "declarationMap": true,
-    "types": ["jest", "node"]
+    "types": ["jest", "node"],
+    "composite": true
   },
-  "include": ["./src/**/*.ts"]
+  "include": ["./src/**/*.ts"],
+  "references": [
+    { "path": "../kbn-std" }
+  ]
 }

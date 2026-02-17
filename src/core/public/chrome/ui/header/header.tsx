@@ -1,13 +1,4 @@
 /*
- * THIS FILE HAS BEEN MODIFIED FROM THE ORIGINAL SOURCE
- * This comment only applies to modifications applied after the f421eec40b5a9f31383591e30bef86724afcd2b3 commit
- *
- * Copyright 2020 LogRhythm, Inc
- * Licensed under the LogRhythm Global End User License Agreement,
- * which can be found through this page: https://logrhythm.com/about/logrhythm-terms-and-conditions/
- */
-
-/*
  * Licensed to Elasticsearch B.V. under one or more contributor
  * license agreements. See the NOTICE file distributed with
  * this work for additional information regarding copyright
@@ -26,6 +17,15 @@
  * under the License.
  */
 
+/*
+ * THIS FILE HAS BEEN MODIFIED FROM THE ORIGINAL SOURCE
+ * This comment only applies to modifications applied after the f421eec40b5a9f31383591e30bef86724afcd2b3 commit
+ *
+ * Copyright 2020 LogRhythm, Inc
+ * Licensed under the LogRhythm Global End User License Agreement,
+ * which can be found through this page: https://logrhythm.com/about/logrhythm-terms-and-conditions/
+ */
+
 import Url from 'url';
 
 import React, { Component, createRef } from 'react';
@@ -37,27 +37,27 @@ import 'bootstrap';
 
 import {
   // TODO: add type annotations
-  // @ts-ignore
+  // @ts-expect-error
   EuiHeader,
-  // @ts-ignore
+  // @ts-expect-error
   EuiHeaderLogo,
-  // @ts-ignore
+  // @ts-expect-error
   EuiHeaderSection,
-  // @ts-ignore
+  // @ts-expect-error
   EuiHeaderSectionItem,
-  // @ts-ignore
+  // @ts-expect-error
   EuiHeaderSectionItemButton,
-  // @ts-ignore
+  // @ts-expect-error
   EuiHideFor,
   EuiHorizontalRule,
   EuiIcon,
-  // @ts-ignore
+  // @ts-expect-error
   EuiImage,
-  // @ts-ignore
+  // @ts-expect-error
   EuiNavDrawer,
-  // @ts-ignore
+  // @ts-expect-error
   EuiNavDrawerGroup,
-  // @ts-ignore
+  // @ts-expect-error
   EuiShowFor,
 } from '@elastic/eui';
 
@@ -103,7 +103,7 @@ function extendRecentlyAccessedHistoryItem(
   basePath: HttpStart['basePath']
 ) {
   const href = relativeToAbsolute(basePath.prepend(recentlyAccessed.link));
-  const navLink = navLinks.find(nl => href.startsWith(nl.subUrlBase || nl.baseUrl));
+  const navLink = navLinks.find((nl) => href.startsWith(nl.subUrlBase || nl.baseUrl));
 
   let titleAndAriaLabel = recentlyAccessed.label;
   if (navLink) {
@@ -139,7 +139,7 @@ function extendNavLink(navLink: ChromeNavLink, urlForApp: ApplicationStart['getU
   };
 }
 
-function isModifiedEvent(event: MouseEvent) {
+function isModifiedEvent(event: React.MouseEvent<HTMLButtonElement, MouseEvent> | MouseEvent) {
   return !!(event.metaKey || event.altKey || event.ctrlKey || event.shiftKey);
 }
 
@@ -246,10 +246,10 @@ class HeaderUI extends Component<Props, State> {
           appTitle,
           isVisible,
           forceNavigation,
-          navLinks: navLinks.map(navLink =>
+          navLinks: navLinks.map((navLink) =>
             extendNavLink(navLink, this.props.application.getUrlForApp)
           ),
-          recentlyAccessed: recentlyAccessed.map(ra =>
+          recentlyAccessed: recentlyAccessed.map((ra) =>
             extendRecentlyAccessedHistoryItem(navLinks, ra, this.props.basePath)
           ),
           navControlsLeft,
@@ -286,7 +286,7 @@ class HeaderUI extends Component<Props, State> {
     return (
       <EuiHeaderSectionItemButton
         aria-label="Toggle side navigation"
-        onClick={() => this.navDrawerRef.current.toggleOpen()}
+        onClick={() => this.navDrawerRef.current?.toggleOpen()}
       >
         <EuiIcon type="apps" size="m" />
       </EuiHeaderSectionItemButton>
@@ -302,14 +302,14 @@ class HeaderUI extends Component<Props, State> {
     }
 
     const navLinksArray = navLinks
-      .filter(navLink => !navLink.hidden)
-      .map(navLink => ({
+      .filter((navLink) => !navLink.hidden)
+      .map((navLink) => ({
         key: navLink.id,
         label: navLink.title,
 
         // Use href and onClick to support "open in new tab" and SPA navigation in the same link
         href: navLink.href,
-        onClick: (event: MouseEvent) => {
+        onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
           if (
             !legacyMode && // ignore when in legacy mode
             !navLink.legacy && // ignore links to legacy apps
@@ -335,9 +335,7 @@ class HeaderUI extends Component<Props, State> {
               aria-hidden={true}
               url={basePath.prepend(`/${navLink.icon}`)}
             />
-          ) : (
-            undefined
-          ),
+          ) : undefined,
         'data-test-subj': 'navDrawerAppsMenuLink',
       }));
 
@@ -354,7 +352,7 @@ class HeaderUI extends Component<Props, State> {
             id: 'core.ui.chrome.sideGlobalNav.viewRecentItemsFlyoutTitle',
             defaultMessage: 'Recent items',
           }),
-          listItems: recentlyAccessed.map(item => ({
+          listItems: recentlyAccessed.map((item) => ({
             label: truncateRecentItemLabel(item.label),
             title: item.title,
             'aria-label': item.title,
@@ -415,7 +413,7 @@ class HeaderUI extends Component<Props, State> {
       return;
     }
 
-    const navLink = this.state.navLinks.find(item => item.href === anchor.href);
+    const navLink = this.state.navLinks.find((item) => item.href === anchor.href);
     if (navLink && navLink.disabled) {
       event.preventDefault();
       return;

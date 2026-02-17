@@ -5,7 +5,9 @@
     "outDir": "./target/types",
     "emitDeclarationOnly": true,
     "declaration": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "rootDir": "../",
+    "typeRoots": ["../../node_modules/@types", "../../typings"]
   },
   "include": [
     "public/**/*",
@@ -13,10 +15,17 @@
     "types/**/*",
     "test_helpers/**/*",
     "utils/**/*",
+    "../netmon/**/*",
+    "../../typings/**/*",
     "index.ts",
     "typings.ts"
   ],
   "references": [
-    { "path": "../test_utils/" }
+    { "path": "../test_utils/" },
+    { "path": "../../packages/kbn-config" },
+    { "path": "../../packages/kbn-config-schema" },
+    { "path": "../../packages/kbn-std" },
+    { "path": "../../packages/kbn-logging" },
+    { "path": "../../packages/kbn-utils" }
   ]
 }

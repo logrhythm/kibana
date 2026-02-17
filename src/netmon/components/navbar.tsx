@@ -1,4 +1,23 @@
 /*
+ * Licensed to Elasticsearch B.V. under one or more contributor
+ * license agreements. See the NOTICE file distributed with
+ * this work for additional information regarding copyright
+ * ownership. Elasticsearch B.V. licenses this file to you under
+ * the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+/*
  * Copyright 2020 LogRhythm, Inc
  * Licensed under the LogRhythm Global End User License Agreement,
  * which can be found through this page: https://logrhythm.com/about/logrhythm-terms-and-conditions/
@@ -10,11 +29,11 @@ import { makeStyles } from '@material-ui/styles';
 import { AuthContext, AuthContextValue } from '@logrhythm/nm-web-shared/contexts/auth_context';
 import {
   BlockingProcessContext,
-  BlockingProcessContextState,
+  BlockingProcessContextValue,
 } from '@logrhythm/nm-web-shared/contexts/blocking_process_context';
-import BlockingProcessModal from '@logrhythm/nm-web-shared/components/blocking_process/blocking_process_modal';
+import { BlockingProcessModal } from '@logrhythm/nm-web-shared/components/blocking_process/blocking_process_modal';
 import { Navbar } from '@logrhythm/nm-web-shared/components/navigation/navbar/navbar';
-import Auth from '@logrhythm/nm-web-shared/services/auth';
+import { Auth } from '@logrhythm/nm-web-shared/services/auth';
 import { useSessionSync } from '@logrhythm/nm-web-shared/hooks/session_sync_hooks';
 import NotificationHandler from './notification_handler';
 
@@ -41,32 +60,29 @@ const useStyles = makeStyles(
 const LogRhythmNavbar = () => {
   const classes = useStyles();
 
-  const [authState, setAuthState] = useState<AuthContextValue>(undefined);
+  const [authState, setAuthState] = useState<AuthContextValue | undefined>(undefined);
 
   const checkingToken = useSessionSync('token');
   const checkingNotifications = useSessionSync('notificationsAlreadySeen');
 
   const [blockingProcessMsg, setBlockingProcessMsg] = useState<string>('');
-  const blockingProcessContextState: BlockingProcessContextState = {
+  const blockingProcessContextState: BlockingProcessContextValue = {
     message: blockingProcessMsg,
     block: setBlockingProcessMsg,
     unblock: () => setBlockingProcessMsg(''),
   };
 
-  useEffect(
-    () => {
-      if (checkingToken || checkingNotifications) {
-        return;
-      }
+  useEffect(() => {
+    if (checkingToken || checkingNotifications) {
+      return;
+    }
 
-      const unsub = Auth.subscribe(setAuthState);
+    const unsub = Auth.subscribe(setAuthState);
 
-      Auth.getCurrentUser();
+    Auth.getCurrentUser();
 
-      return unsub;
-    },
-    [checkingToken, checkingNotifications]
-  );
+    return unsub;
+  }, [checkingToken, checkingNotifications]);
 
   if (authState === undefined) {
     return null;
@@ -83,7 +99,7 @@ const LogRhythmNavbar = () => {
         >
           <Navbar />
           <NotificationHandler />
-          <BlockingProcessModal />
+          <BlockingProcessModal isOpen={!!blockingProcessMsg} message={blockingProcessMsg} />
         </SnackbarProvider>
       </BlockingProcessContext.Provider>
     </AuthContext.Provider>

@@ -17,19 +17,21 @@
  * under the License.
  */
 
-import { Readable } from 'stream';
+declare module 'notistack' {
+  import React from 'react';
 
-export function createListStream<T>(items: T | T[] = []) {
-  const queue: T[] = Array.isArray(items) ? items : [items];
-  return new Readable({
-    objectMode: true,
-    read(size) {
-      queue.splice(0, size).forEach((item) => {
-        this.push(item);
-      });
-      if (!queue.length) {
-        this.push(null);
-      }
-    },
-  });
+  export interface SnackbarProviderProps {
+    maxSnack?: number;
+    hideIconVariant?: boolean;
+    children?: React.ReactNode;
+    classes?: Record<string, string>;
+    autoHideDuration?: number;
+  }
+
+  export const SnackbarProvider: React.ComponentType<SnackbarProviderProps>;
+
+  export function useSnackbar(): {
+    enqueueSnackbar: (message: React.ReactNode, options?: any) => void;
+    closeSnackbar: (key?: string | number) => void;
+  };
 }

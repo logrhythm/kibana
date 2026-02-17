@@ -22,4 +22,4 @@ export {
   rawConfigServiceMock,
   configServiceMock,
   configMock,
-} from '@kbn/config/target/mocks';
+} from '@kbn/config/target/src/src/mocks';

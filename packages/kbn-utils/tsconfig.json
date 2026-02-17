@@ -1,11 +1,15 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "target",
+    "outDir": "target/src",
     "declaration": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "composite": true
   },
   "include": [
     "src/**/*"
+  ],
+  "references": [
+    { "path": "../kbn-config-schema" }
   ]
 }

@@ -18,13 +18,16 @@
  */
 
 import { schema, TypeOf } from '@kbn/config-schema';
-import { ConfigDeprecationProvider } from 'src/core/server';
+import { ConfigDeprecationProvider, ConfigDeprecationFactory } from 'src/core/server';
 import { ServiceConfigDescriptor } from '../internal_types';
 
-const deprecations: ConfigDeprecationProvider = ({ unused, renameFromRoot }) => [
-  unused('enabled'),
-  renameFromRoot('server.defaultRoute', 'uiSettings.overrides.defaultRoute'),
-];
+const deprecations: ConfigDeprecationProvider = (factory: ConfigDeprecationFactory) => {
+  const { unused, renameFromRoot } = factory;
+  return [
+    unused('enabled'),
+    renameFromRoot('server.defaultRoute', 'uiSettings.overrides.defaultRoute'),
+  ];
+};
 
 const configSchema = schema.object({
   overrides: schema.object({}, { unknowns: 'allow' }),

@@ -237,35 +237,35 @@ export class CoreUsageDataService implements CoreService<void, CoreUsageDataStar
     this.configService
       .atPath<ElasticsearchConfigType>('elasticsearch')
       .pipe(takeUntil(this.stop$))
-      .subscribe((config) => {
+      .subscribe((config: ElasticsearchConfigType) => {
         this.elasticsearchConfig = config;
       });
 
     this.configService
       .atPath<HttpConfigType>('server')
       .pipe(takeUntil(this.stop$))
-      .subscribe((config) => {
+      .subscribe((config: HttpConfigType) => {
         this.httpConfig = config;
       });
 
     this.configService
       .atPath<LoggingConfigType>('logging')
       .pipe(takeUntil(this.stop$))
-      .subscribe((config) => {
+      .subscribe((config: LoggingConfigType) => {
         this.loggingConfig = config;
       });
 
     this.configService
       .atPath<SavedObjectsConfigType>('savedObjects')
       .pipe(takeUntil(this.stop$))
-      .subscribe((config) => {
+      .subscribe((config: SavedObjectsConfigType) => {
         this.soConfig = config;
       });
 
     this.configService
       .atPath<KibanaConfigType>('kibana')
       .pipe(takeUntil(this.stop$))
-      .subscribe((config) => {
+      .subscribe((config: KibanaConfigType) => {
         this.kibanaConfig = config;
       });
   }

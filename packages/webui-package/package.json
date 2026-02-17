@@ -1,0 +1,7 @@
+{
+  "name": "@logrhythm/webui",
+  "version": "5.9.15",
+  "description": "Placeholder for @logrhythm/webui package",
+  "main": "index.js",
+  "private": true
+}

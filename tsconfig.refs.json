@@ -5,5 +5,8 @@
     { "path": "./src/core/tsconfig.json" },
     { "path": "./src/plugins/kibana_utils/tsconfig.json" },
     { "path": "./src/plugins/kibana_react/tsconfig.json" },
+    { "path": "./packages/kbn-config" },
+    { "path": "./packages/kbn-std" },
+    { "path": "./packages/kbn-logging" }
   ]
 }

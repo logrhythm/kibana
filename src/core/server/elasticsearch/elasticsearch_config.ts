@@ -122,7 +122,7 @@ export const configSchema = schema.object({
 });
 
 const deprecations: ConfigDeprecationProvider = () => [
-  (settings, fromPath, log) => {
+  (settings: Record<string, any>, fromPath: string, log: (message: string) => void) => {
     const es = settings[fromPath];
     if (!es) {
       return settings;

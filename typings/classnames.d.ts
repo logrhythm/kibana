@@ -17,19 +17,18 @@
  * under the License.
  */
 
-import { Readable } from 'stream';
+declare module 'classnames' {
+  type ClassValue =
+    | string
+    | number
+    | boolean
+    | undefined
+    | null
+    | { [key: string]: any }
+    | ClassValue[];
 
-export function createListStream<T>(items: T | T[] = []) {
-  const queue: T[] = Array.isArray(items) ? items : [items];
-  return new Readable({
-    objectMode: true,
-    read(size) {
-      queue.splice(0, size).forEach((item) => {
-        this.push(item);
-      });
-      if (!queue.length) {
-        this.push(null);
-      }
-    },
-  });
+  type ClassNamesExport = (...classes: ClassValue[]) => string;
+
+  const classNames: ClassNamesExport;
+  export = classNames;
 }

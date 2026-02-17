@@ -1,13 +1,4 @@
 /*
- * THIS FILE HAS BEEN MODIFIED FROM THE ORIGINAL SOURCE
- * This comment only applies to modifications applied after the f421eec40b5a9f31383591e30bef86724afcd2b3 commit
- *
- * Copyright 2020 LogRhythm, Inc
- * Licensed under the LogRhythm Global End User License Agreement,
- * which can be found through this page: https://logrhythm.com/about/logrhythm-terms-and-conditions/
- */
-
-/*
  * Licensed to Elasticsearch B.V. under one or more contributor
  * license agreements. See the NOTICE file distributed with
  * this work for additional information regarding copyright
@@ -26,6 +17,15 @@
  * under the License.
  */
 
+/*
+ * THIS FILE HAS BEEN MODIFIED FROM THE ORIGINAL SOURCE
+ * This comment only applies to modifications applied after the f421eec40b5a9f31383591e30bef86724afcd2b3 commit
+ *
+ * Copyright 2020 LogRhythm, Inc
+ * Licensed under the LogRhythm Global End User License Agreement,
+ * which can be found through this page: https://logrhythm.com/about/logrhythm-terms-and-conditions/
+ */
+
 import { readdir, stat } from 'fs';
 import { resolve } from 'path';
 import { bindNodeCallback, from, merge, Observable } from 'rxjs';
@@ -40,13 +40,6 @@ import { parseManifest } from './plugin_manifest_parser';
 
 const fsReadDir$ = bindNodeCallback<string, string[]>(readdir);
 const fsStat$ = bindNodeCallback(stat);
-
-const maxScanDepth = 5;
-
-interface PluginSearchPathEntry {
-  dir: string;
-  depth: number;
-}
 
 /**
  * Tries to discover all possible plugins based on the provided plugin config.
@@ -106,39 +99,22 @@ function processPluginSearchPaths$(
   pluginDirs: readonly string[],
   log: Logger
 ): Observable<string | PluginDiscoveryError> {
-  function recursiveScanFolder(
-    ent: PluginSearchPathEntry
-  ): Observable<string | PluginDiscoveryError> {
-    return from([ent]).pipe(
-      mergeMap((entry) => {
-        return findManifestInFolder(entry.dir, () => {
-          if (entry.depth > maxScanDepth) {
-            return [];
-          }
-          return mapSubdirectories(entry.dir, (subDir) =>
-            recursiveScanFolder({ dir: subDir, depth: entry.depth + 1 })
-          );
-        });
-      })
-    );
-  }
-
   return from(pluginDirs).pipe(
     mergeMap((dir) => {
       log.debug(`Scanning "${dir}" for plugin sub-directories...`);
       return fsReadDir$(dir).pipe(
-        // @ts-ignore
-        mergeMap((subDirs: string[]) => subDirs.map(subDir => resolve(dir, subDir))),
-        mergeMap(path =>
+        // @ts-expect-error
+        mergeMap((subDirs: string[]) => subDirs.map((subDir) => resolve(dir, subDir))),
+        mergeMap((path) =>
           fsStat$(path).pipe(
             // Filter out non-directory entries from target directories, it's expected that
             // these directories may contain files (e.g. `README.md` or `package.json`).
             // We shouldn't silently ignore the entries we couldn't get stat for though.
-            mergeMap(pathStat => (pathStat.isDirectory() ? [path] : [])),
-            catchError(err => [PluginDiscoveryError.invalidPluginPath(path, err)])
+            mergeMap((pathStat) => (pathStat.isDirectory() ? [path] : [])),
+            catchError((err) => [PluginDiscoveryError.invalidPluginPath(path, err)])
           )
         ),
-        catchError(err => [PluginDiscoveryError.invalidSearchPath(dir, err)])
+        catchError((err) => [PluginDiscoveryError.invalidSearchPath(dir, err)])
       );
     })
   );
@@ -150,50 +126,6 @@ function processPluginSearchPaths$(
  * @param dir
  * @param notFound
  */
-function findManifestInFolder(
-  dir: string,
-  notFound: () => never[] | Observable<string | PluginDiscoveryError>
-): string[] | Observable<string | PluginDiscoveryError> {
-  return fsStat$(resolve(dir, 'kibana.json')).pipe(
-    mergeMap((stats) => {
-      // `kibana.json` exists in given directory, we got a plugin
-      if (stats.isFile()) {
-        return [dir];
-      }
-      return [];
-    }),
-    catchError((manifestStatError) => {
-      // did not find manifest. recursively process sub directories until we reach max depth.
-      if (manifestStatError.code !== 'ENOENT') {
-        return [PluginDiscoveryError.invalidPluginPath(dir, manifestStatError)];
-      }
-      return notFound();
-    })
-  );
-}
-
-/**
- * Finds all subdirectories in `dir` and executed `mapFunc` for each one. For any directories that cannot be read,
- * a PluginDiscoveryError is added.
- * @param dir
- * @param mapFunc
- */
-function mapSubdirectories(
-  dir: string,
-  mapFunc: (subDir: string) => Observable<string | PluginDiscoveryError>
-): Observable<string | PluginDiscoveryError> {
-  return fsReadDir$(dir).pipe(
-    mergeMap((subDirs: string[]) => subDirs.map((subDir) => resolve(dir, subDir))),
-    mergeMap((subDir) =>
-      fsStat$(subDir).pipe(
-        mergeMap((pathStat) => (pathStat.isDirectory() ? mapFunc(subDir) : [])),
-        catchError((subDirStatError) => [
-          PluginDiscoveryError.invalidPluginPath(subDir, subDirStatError),
-        ])
-      )
-    )
-  );
-}
 
 /**
  * Tries to load and parse the plugin manifest file located at the provided plugin

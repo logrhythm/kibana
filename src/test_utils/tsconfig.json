@@ -5,10 +5,12 @@
     "composite": true,
     "emitDeclarationOnly": true,
     "declaration": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "typeRoots": ["../../node_modules/@types", "../../typings"]
   },
   "include": [
-    "public/**/*"
+    "public/**/*",
+    "../../typings/**/*"
   ],
   "exclude": [
     "target"

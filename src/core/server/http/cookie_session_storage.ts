@@ -22,6 +22,19 @@ import hapiAuthCookie from 'hapi-auth-cookie';
 // @ts-expect-error no TS definitions
 import Statehood from 'statehood';
 
+// Extend Request interface to include cookieAuth property added by hapi-auth-cookie
+declare module 'hapi' {
+  interface Request {
+    cookieAuth: {
+      set(session: any): void;
+      clear(): void;
+      h: {
+        unstate(name: string, options: any): void;
+      };
+    };
+  }
+}
+
 import { KibanaRequest, ensureRawRequest } from './router';
 import { SessionStorageFactory, SessionStorage } from './session_storage';
 import { Logger } from '..';
@@ -138,12 +151,12 @@ export async function createCookieSessionStorageFactory<T>(
     }
   }
 
-  await server.register({ plugin: hapiAuthCookie });
+  await server.register(hapiAuthCookie as any);
 
   server.auth.strategy('security-cookie', 'cookie', {
     cookie: cookieOptions.name,
     password: cookieOptions.encryptionKey,
-    validateFunc: async (req, session: T | T[]) => {
+    validateFunc: async (req: Request, session: T | T[]) => {
       const result = cookieOptions.validate(session);
       if (!result.isValid) {
         clearInvalidCookie(req, result.path);

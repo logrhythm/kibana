@@ -21,7 +21,7 @@ import { join } from 'path';
 import { merge, get } from 'lodash';
 import { execSync } from 'child_process';
 // deep import to avoid loading the whole package
-import { getDataPath } from '@kbn/utils/target/path';
+import { getDataPath } from '@kbn/utils/target/src/src/path';
 import { readFileSync } from 'fs';
 import { ApmAgentConfig } from './types';
 

@@ -17,19 +17,17 @@
  * under the License.
  */
 
-import { Readable } from 'stream';
+declare module '@material-ui/styles' {
+  export function makeStyles<Theme = {}>(
+    styles: ((theme: Theme) => any) | Record<string, any>,
+    options?: { name?: string }
+  ): () => Record<string, string>;
 
-export function createListStream<T>(items: T | T[] = []) {
-  const queue: T[] = Array.isArray(items) ? items : [items];
-  return new Readable({
-    objectMode: true,
-    read(size) {
-      queue.splice(0, size).forEach((item) => {
-        this.push(item);
-      });
-      if (!queue.length) {
-        this.push(null);
-      }
-    },
-  });
+  export function useTheme<Theme = {}>(): Theme;
+
+  export interface StylesProvider {
+    children?: React.ReactNode;
+  }
+
+  export const StylesProvider: React.ComponentType<StylesProvider>;
 }

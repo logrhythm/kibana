@@ -94,7 +94,7 @@ describe('ApmSystem', () => {
           wrappedObserver({
             type: 'http-request',
             name: 'GET http://mykibanadomain.com:5601/asdf/qwerty',
-          } as Transaction)
+          } as any)
         ).toEqual({ type: 'http-request', name: 'GET /asdf/qwerty' });
 
         // Does not modify URLs that are not on the same origin
@@ -102,7 +102,7 @@ describe('ApmSystem', () => {
           wrappedObserver({
             type: 'http-request',
             name: 'GET https://mykibanadomain.com:5601/asdf/qwerty',
-          } as Transaction)
+          } as any)
         ).toEqual({
           type: 'http-request',
           name: 'GET https://mykibanadomain.com:5601/asdf/qwerty',
@@ -112,7 +112,7 @@ describe('ApmSystem', () => {
           wrappedObserver({
             type: 'http-request',
             name: 'GET http://mykibanadomain.com:9200/asdf/qwerty',
-          } as Transaction)
+          } as any)
         ).toEqual({
           type: 'http-request',
           name: 'GET http://mykibanadomain.com:9200/asdf/qwerty',
@@ -122,7 +122,7 @@ describe('ApmSystem', () => {
           wrappedObserver({
             type: 'http-request',
             name: 'GET http://myotherdomain.com:5601/asdf/qwerty',
-          } as Transaction)
+          } as any)
         ).toEqual({
           type: 'http-request',
           name: 'GET http://myotherdomain.com:5601/asdf/qwerty',
@@ -139,28 +139,28 @@ describe('ApmSystem', () => {
           wrappedObserver({
             type: 'http-request',
             name: 'GET http://mykibanadomain.com:5601/alpha',
-          } as Transaction)
+          } as any)
         ).toEqual({ type: 'http-request', name: 'GET /' });
 
         expect(
           wrappedObserver({
             type: 'http-request',
             name: 'GET http://mykibanadomain.com:5601/alpha/',
-          } as Transaction)
+          } as any)
         ).toEqual({ type: 'http-request', name: 'GET /' });
 
         expect(
           wrappedObserver({
             type: 'http-request',
             name: 'GET http://mykibanadomain.com:5601/alpha/beta',
-          } as Transaction)
+          } as any)
         ).toEqual({ type: 'http-request', name: 'GET /beta' });
 
         expect(
           wrappedObserver({
             type: 'http-request',
             name: 'GET http://mykibanadomain.com:5601/alpha/beta/',
-          } as Transaction)
+          } as any)
         ).toEqual({ type: 'http-request', name: 'GET /beta/' });
 
         // Works with relative URLs as well
@@ -168,7 +168,7 @@ describe('ApmSystem', () => {
           wrappedObserver({
             type: 'http-request',
             name: 'GET /alpha/beta/',
-          } as Transaction)
+          } as any)
         ).toEqual({ type: 'http-request', name: 'GET /beta/' });
       });
     });

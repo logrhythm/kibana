@@ -1,7 +1,7 @@
 {
   "name": "@kbn/std",
-  "main": "./target/index.js",
-  "types": "./target/index.d.ts",
+  "main": "./target/src/index.js",
+  "types": "./target/src/index.d.ts",
   "version": "1.0.0",
   "license": "Apache-2.0",
   "private": true,

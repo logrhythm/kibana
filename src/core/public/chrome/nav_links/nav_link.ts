@@ -90,6 +90,24 @@ export interface ChromeNavLink {
    * Hides a link from the navigation.
    */
   readonly hidden?: boolean;
+
+  /**
+   * Sub URL base for legacy compatibility.
+   * @deprecated Used for legacy app compatibility
+   */
+  readonly subUrlBase?: string;
+
+  /**
+   * Whether this is a legacy app.
+   * @deprecated Used for legacy app compatibility
+   */
+  readonly legacy?: boolean;
+
+  /**
+   * Whether this app is currently active.
+   * @deprecated Used for legacy app compatibility
+   */
+  readonly active?: boolean;
 }
 
 /** @public */

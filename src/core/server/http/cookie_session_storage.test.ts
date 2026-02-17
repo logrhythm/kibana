@@ -145,7 +145,7 @@ describe('Cookie based SessionStorage', () => {
       expect(cookies).toBeDefined();
       expect(cookies).toHaveLength(1);
 
-      const sessionCookie = retrieveSessionCookie(cookies[0]);
+      const sessionCookie = retrieveSessionCookie(cookies![0]);
       expect(sessionCookie).toBeDefined();
       expect(sessionCookie.key).toBe('sid');
       expect(sessionCookie.value).toBeDefined();
@@ -182,7 +182,7 @@ describe('Cookie based SessionStorage', () => {
       expect(cookies).toBeDefined();
       expect(cookies).toHaveLength(1);
 
-      const sessionCookie = retrieveSessionCookie(cookies[0]);
+      const sessionCookie = retrieveSessionCookie(cookies![0]);
 
       await supertest(innerServer.listener)
         .get('/')
@@ -246,7 +246,7 @@ describe('Cookie based SessionStorage', () => {
 
       await delay(sessionDurationMs);
 
-      const sessionCookie = retrieveSessionCookie(cookies[0]);
+      const sessionCookie = retrieveSessionCookie(cookies![0]);
       const response2 = await supertest(innerServer.listener)
         .get('/')
         .set('Cookie', `${sessionCookie.key}=${sessionCookie.value}`)
@@ -289,7 +289,7 @@ describe('Cookie based SessionStorage', () => {
       const cookies = response.get('set-cookie');
       expect(cookies).toBeDefined();
 
-      const sessionCookie = retrieveSessionCookie(cookies[0]);
+      const sessionCookie = retrieveSessionCookie(cookies![0]);
       const response2 = await supertest(innerServer.listener)
         .get('/')
         .set('Cookie', `${sessionCookie.key}=${sessionCookie.value}`)
@@ -415,7 +415,7 @@ describe('Cookie based SessionStorage', () => {
       const response = await supertest(innerServer.listener).get('/').expect(200);
 
       const cookies = response.get('set-cookie');
-      const sessionCookie = retrieveSessionCookie(cookies[0]);
+      const sessionCookie = retrieveSessionCookie(cookies![0]);
 
       const response2 = await supertest(innerServer.listener)
         .get('/')
@@ -473,7 +473,7 @@ describe('Cookie based SessionStorage', () => {
           expect(cookies).toBeDefined();
           expect(cookies).toHaveLength(1);
 
-          const sessionCookie = retrieveSessionCookie(cookies[0]);
+          const sessionCookie = retrieveSessionCookie(cookies![0]);
           expect(sessionCookie.extensions).toContain(`SameSite=${sameSite}`);
 
           await supertest(innerServer.listener)

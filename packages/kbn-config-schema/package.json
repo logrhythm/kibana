@@ -1,7 +1,7 @@
 {
   "name": "@kbn/config-schema",
-  "main": "./target/out/index.js",
-  "types": "./target/types/index.d.ts",
+  "main": "./target/out/src/index.js",
+  "types": "./target/types/src/index.d.ts",
   "version": "1.0.0",
   "license": "Apache-2.0",
   "private": true,

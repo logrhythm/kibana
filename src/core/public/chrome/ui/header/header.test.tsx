@@ -47,7 +47,7 @@ function mockProps() {
     customNavLink$: new BehaviorSubject(undefined),
     recentlyAccessed$: new BehaviorSubject([]),
     forceAppSwitcherNavigation$: new BehaviorSubject(false),
-    helpExtension$: new BehaviorSubject(undefined),
+    helpExtension$: new BehaviorSubject({} as any),
     helpSupportUrl$: new BehaviorSubject(''),
     navControlsLeft$: new BehaviorSubject([]),
     navControlsCenter$: new BehaviorSubject([]),
@@ -73,12 +73,6 @@ describe('Header', () => {
     const navLinks$ = new BehaviorSubject([
       { id: 'kibana', title: 'kibana', baseUrl: '', href: '' },
     ]);
-    const customNavLink$ = new BehaviorSubject({
-      id: 'cloud-deployment-link',
-      title: 'Manage cloud deployment',
-      baseUrl: '',
-      href: '',
-    });
     const recentlyAccessed$ = new BehaviorSubject([
       { link: '', label: 'dashboard', id: 'dashboard' },
     ]);
@@ -89,8 +83,9 @@ describe('Header', () => {
         breadcrumbs$={breadcrumbs$}
         navLinks$={navLinks$}
         recentlyAccessed$={recentlyAccessed$}
-        isLocked$={isLocked$}
-        customNavLink$={customNavLink$}
+        isLocked={false}
+        legacyMode={false}
+        isCloudEnabled={false}
       />
     );
     expect(component.find('EuiHeader').exists()).toBeFalsy();

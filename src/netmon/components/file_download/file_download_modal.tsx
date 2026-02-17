@@ -1,4 +1,23 @@
 /*
+ * Licensed to Elasticsearch B.V. under one or more contributor
+ * license agreements. See the NOTICE file distributed with
+ * this work for additional information regarding copyright
+ * ownership. Elasticsearch B.V. licenses this file to you under
+ * the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+/*
  * Copyright 2020 LogRhythm, Inc
  * Licensed under the LogRhythm Global End User License Agreement,
  * which can be found through this page: https://logrhythm.com/about/logrhythm-terms-and-conditions/
@@ -22,7 +41,11 @@ import {
 } from '@elastic/eui';
 // @ts-ignore
 import { saveAs } from '@elastic/filesaver';
-import { FileDownloadStatus, FileType } from '@logrhythm/nm-web-shared/services/session_files';
+import {
+  FileDownloadStatus,
+  FileType,
+  DownloadStatus,
+} from '@logrhythm/nm-web-shared/services/session_files';
 import { SessionFileDownloader } from '@logrhythm/nm-web-shared/services/session_file_downloader';
 import { toastNotifications } from 'ui/notify';
 import FileDownloadRow from './file_download_row';
@@ -55,31 +78,28 @@ const FileDownloadModal = (props: FileDownloadModalProps) => {
   });
   const downloader = useRef<SessionFileDownloader | null>(null);
 
-  useEffect(
-    () => {
-      if (downloader.current && !downloader.current.terminated) {
-        downloader.current.abort();
-      }
+  useEffect(() => {
+    if (downloader.current && !downloader.current.terminated) {
+      downloader.current.abort();
+    }
 
-      if (!downloadId) {
-        return;
-      }
+    if (!downloadId) {
+      return;
+    }
 
-      downloader.current = new SessionFileDownloader(
-        downloadId,
-        fileType,
-        setDownloadStatus,
-        fileInfo => {
-          saveAs(fileInfo.blob, fileInfo.name);
-        },
-        toastNotifications.addWarning,
-        toastNotifications.addDanger
-      );
+    downloader.current = new SessionFileDownloader(
+      downloadId,
+      fileType,
+      setDownloadStatus,
+      (fileInfo) => {
+        saveAs(fileInfo.blob, fileInfo.name);
+      },
+      toastNotifications.addWarning,
+      toastNotifications.addDanger
+    );
 
-      downloader.current.start();
-    },
-    [downloadId]
-  );
+    downloader.current.start();
+  }, [downloadId, fileType]);
 
   const handleClose = () => {
     if (downloader.current && !downloader.current.terminated) {
@@ -128,10 +148,10 @@ const FileDownloadModal = (props: FileDownloadModalProps) => {
           {downloadStatus.overall !== 'aborted' && fileNames.length > 0 && (
             <>
               <EuiHorizontalRule />
-              {fileNames.sort().map(f => (
+              {fileNames.sort().map((f) => (
                 <FileDownloadRow
                   key={`file_${f}`}
-                  overallStatus={downloadStatus.overall}
+                  overallStatus={downloadStatus.overall as DownloadStatus}
                   fileName={fileType === 'pcap' ? `${f}.pcap` : f}
                   fileStatus={downloadStatus.fileStatuses[f]}
                 />

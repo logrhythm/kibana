@@ -17,7 +17,6 @@
  * under the License.
  */
 
-import { Server } from 'hapi';
 import type { PublicMethodsOf } from '@kbn/utility-types';
 
 import { CspConfig } from '../csp';
@@ -81,14 +80,14 @@ const createAuthMock = () => {
 const createInternalSetupContractMock = () => {
   const mock: InternalHttpServiceSetupMock = {
     // we can mock other hapi server methods when we need it
-    server: ({
+    server: {
       name: 'http-server-test',
       version: 'kibana',
       route: jest.fn(),
       start: jest.fn(),
       stop: jest.fn(),
       config: jest.fn().mockReturnValue(configMock.create()),
-    } as unknown) as jest.MockedClass<Server>,
+    } as any,
     createCookieSessionStorageFactory: jest.fn(),
     registerOnPreRouting: jest.fn(),
     registerOnPreAuth: jest.fn(),

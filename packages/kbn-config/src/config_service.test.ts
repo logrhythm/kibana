@@ -24,7 +24,7 @@ import { mockApplyDeprecations } from './config_service.test.mocks';
 import { rawConfigServiceMock } from './raw/raw_config_service.mock';
 
 import { schema } from '@kbn/config-schema';
-import { MockedLogger, loggerMock } from '@kbn/logging/target/mocks';
+import { MockedLogger, loggerMock } from '@kbn/logging/target/src/mocks';
 
 import { ConfigService, Env, RawPackageInfo } from '.';
 

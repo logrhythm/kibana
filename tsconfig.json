@@ -2,7 +2,7 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "tsBuildInfoFile": "./build/tsbuildinfo/kibana",
-    "typeRoots": ["node_modules/@types", "node_modules/@testing-library"],
+    "typeRoots": ["node_modules/@types", "node_modules/@testing-library", "typings"],
     "types": ["jest", "testing-library__jest-dom"],
     "strict": false,
     "noImplicitAny": false,
@@ -16,9 +16,11 @@
     "noImplicitThis": false,
     "baseUrl": ".",
     "paths": {
-      "@kbn/std": ["../../packages/kbn-std/src"],
-      "@kbn/dev-utils": ["../../packages/kbn-dev-utils/src"],
-      "@kbn/utils": ["../../packages/kbn-utils/src"]
+      "@kbn/std": ["./packages/kbn-std/src"],
+      "@kbn/dev-utils": ["./packages/kbn-dev-utils/src"],
+      "@kbn/utils": ["./packages/kbn-utils/src"],
+      "@kbn/config-schema": ["./packages/kbn-config-schema/src"],
+      "@kbn/config": ["./packages/kbn-config/src"]
     }
   },
   "include": [
