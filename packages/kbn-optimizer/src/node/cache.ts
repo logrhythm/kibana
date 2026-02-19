@@ -52,7 +52,7 @@ interface Lmdb<T> {
 }
 
 export class Cache {
-  private readonly codes: Lmdb<string>;
+  private readonly codes: any;
   private readonly atimes: Lmdb<string>;
   private readonly mtimes: Lmdb<string>;
   private readonly sourceMaps: Lmdb<any>;

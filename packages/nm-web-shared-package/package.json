@@ -1,7 +1,0 @@
-{
-  "name": "@logrhythm/nm-web-shared",
-  "version": "1.43.0",
-  "description": "Placeholder for @logrhythm/nm-web-shared package",
-  "main": "index.js",
-  "private": true
-}

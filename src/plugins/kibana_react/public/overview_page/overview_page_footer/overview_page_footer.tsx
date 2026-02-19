@@ -49,7 +49,7 @@ export const OverviewPageFooter: FC<Props> = ({ addBasePath, path }) => {
       <RedirectAppLinks application={application}>
         <EuiButtonEmpty
           className="kbnOverviewPageFooter__button"
-          flush="both"
+          flush={'both' as any}
           href={addBasePath('/app/management/kibana/settings#defaultRoute')}
           iconType="home"
           size="xs"
@@ -63,7 +63,7 @@ export const OverviewPageFooter: FC<Props> = ({ addBasePath, path }) => {
     ) : (
       <EuiButtonEmpty
         className="kbnOverviewPageFooter__button"
-        flush="both"
+        flush={'both' as any}
         iconType="home"
         onClick={() => {
           setDefaultRoute(path);
@@ -95,7 +95,7 @@ export const OverviewPageFooter: FC<Props> = ({ addBasePath, path }) => {
               <EuiButtonEmpty
                 className="kbnOverviewPageFooter__button"
                 data-test-subj="allPlugins"
-                flush="both"
+                flush={'both' as any}
                 href={addBasePath('/app/home#/feature_directory')}
                 iconType="apps"
                 size="xs"

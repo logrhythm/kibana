@@ -39,23 +39,18 @@ import {
   // TODO: add type annotations
   // @ts-expect-error
   EuiHeader,
-  // @ts-expect-error
   EuiHeaderLogo,
   // @ts-expect-error
   EuiHeaderSection,
   // @ts-expect-error
   EuiHeaderSectionItem,
-  // @ts-expect-error
   EuiHeaderSectionItemButton,
   // @ts-expect-error
   EuiHideFor,
   EuiHorizontalRule,
   EuiIcon,
-  // @ts-expect-error
   EuiImage,
-  // @ts-expect-error
   EuiNavDrawer,
-  // @ts-expect-error
   EuiNavDrawerGroup,
   // @ts-expect-error
   EuiShowFor,

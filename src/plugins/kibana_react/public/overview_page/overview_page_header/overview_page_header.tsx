@@ -56,10 +56,8 @@ export const OverviewPageHeader: FC<Props> = ({
     services: { application },
   } = useKibana<CoreStart>();
 
-  const {
-    management: isManagementEnabled,
-    dev_tools: isDevToolsEnabled,
-  } = application.capabilities.navLinks;
+  const { management: isManagementEnabled, dev_tools: isDevToolsEnabled } =
+    application.capabilities.navLinks;
 
   return (
     <header
@@ -92,7 +90,7 @@ export const OverviewPageHeader: FC<Props> = ({
                   <RedirectAppLinks application={application}>
                     <EuiButtonEmpty
                       className="kbnOverviewPageHeader__actionButton"
-                      flush="both"
+                      flush={'both' as any}
                       href={addBasePath('/app/home#/tutorial_directory')}
                       iconType="indexOpen"
                     >
@@ -108,7 +106,7 @@ export const OverviewPageHeader: FC<Props> = ({
                     <RedirectAppLinks application={application}>
                       <EuiButtonEmpty
                         className="kbnOverviewPageHeader__actionButton"
-                        flush="both"
+                        flush={'both' as any}
                         iconType="gear"
                         href={addBasePath('/app/management')}
                       >
@@ -128,7 +126,7 @@ export const OverviewPageHeader: FC<Props> = ({
                     <RedirectAppLinks application={application}>
                       <EuiButtonEmpty
                         className="kbnOverviewPageHeader__actionButton"
-                        flush="both"
+                        flush={'both' as any}
                         iconType="wrench"
                         href={addBasePath('/app/dev_tools#/console')}
                       >

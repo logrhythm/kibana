@@ -103,7 +103,6 @@ function processPluginSearchPaths$(
     mergeMap((dir) => {
       log.debug(`Scanning "${dir}" for plugin sub-directories...`);
       return fsReadDir$(dir).pipe(
-        // @ts-expect-error
         mergeMap((subDirs: string[]) => subDirs.map((subDir) => resolve(dir, subDir))),
         mergeMap((path) =>
           fsStat$(path).pipe(
