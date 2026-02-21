@@ -26,8 +26,8 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import { EuiButtonIcon } from '@elastic/eui';
-import { toastNotifications } from 'ui/notify';
 import { startAttachmentDownload, FileType } from '@logrhythm/nm-web-shared/services/session_files';
+import { toastNotifications } from '../services/notifications';
 import FileDownloadModal from './file_download/file_download_modal';
 
 const useStyles = makeStyles({

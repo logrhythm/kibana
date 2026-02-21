@@ -1,13 +1,4 @@
 /*
- * THIS FILE HAS BEEN MODIFIED FROM THE ORIGINAL SOURCE
- * This comment only applies to modifications applied after the f421eec40b5a9f31383591e30bef86724afcd2b3 commit
- *
- * Copyright 2020 LogRhythm, Inc
- * Licensed under the LogRhythm Global End User License Agreement,
- * which can be found through this page: https://logrhythm.com/about/logrhythm-terms-and-conditions/
- */
-
-/*
  * Licensed to Elasticsearch B.V. under one or more contributor
  * license agreements. See the NOTICE file distributed with
  * this work for additional information regarding copyright
@@ -26,12 +17,21 @@
  * under the License.
  */
 
+/*
+ * THIS FILE HAS BEEN MODIFIED FROM THE ORIGINAL SOURCE
+ * This comment only applies to modifications applied after the f421eec40b5a9f31383591e30bef86724afcd2b3 commit
+ *
+ * Copyright 2020 LogRhythm, Inc
+ * Licensed under the LogRhythm Global End User License Agreement,
+ * which can be found through this page: https://logrhythm.com/about/logrhythm-terms-and-conditions/
+ */
+
 import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Synopsis } from './synopsis';
 import { SampleDataSetCards } from './sample_data_set_cards';
-import chrome from 'ui/chrome';
+import { getServices } from '../kibana_services';
 
 import {
   EuiPage,
@@ -102,7 +102,7 @@ class TutorialDirectoryUi extends React.Component {
     let openTab = ALL_TAB_ID;
     if (
       props.openTab &&
-      this.tabs.some(tab => {
+      this.tabs.some((tab) => {
         return tab.id === props.openTab;
       })
     ) {
@@ -121,7 +121,7 @@ class TutorialDirectoryUi extends React.Component {
   async componentDidMount() {
     this._isMounted = true;
 
-    chrome.breadcrumbs.set([
+    getServices().chrome.setBreadcrumbs([
       {
         text: homeTitle,
         href: '#/home',
@@ -135,7 +135,7 @@ class TutorialDirectoryUi extends React.Component {
       return;
     }
 
-    let tutorialCards = tutorialConfigs.map(tutorialConfig => {
+    let tutorialCards = tutorialConfigs.map((tutorialConfig) => {
       // add base path to SVG based icons
       let icon = tutorialConfig.euiIconType;
       if (icon && icon.includes('/')) {
@@ -170,7 +170,7 @@ class TutorialDirectoryUi extends React.Component {
     });
 
     if (this.props.isCloudEnabled) {
-      tutorialCards = tutorialCards.filter(tutorial => {
+      tutorialCards = tutorialCards.filter((tutorial) => {
         return _.has(tutorial, 'elasticCloud');
       });
     }
@@ -185,7 +185,7 @@ class TutorialDirectoryUi extends React.Component {
     });
   }
 
-  onSelectedTabChanged = id => {
+  onSelectedTabChanged = (id) => {
     this.setState({
       selectedTabId: id,
     });
@@ -211,13 +211,13 @@ class TutorialDirectoryUi extends React.Component {
     return (
       <EuiFlexGrid columns={4}>
         {this.state.tutorialCards
-          .filter(tutorial => {
+          .filter((tutorial) => {
             return (
               this.state.selectedTabId === ALL_TAB_ID ||
               this.state.selectedTabId === tutorial.category
             );
           })
-          .map(tutorial => {
+          .map((tutorial) => {
             return (
               <EuiFlexItem key={tutorial.name}>
                 <Synopsis

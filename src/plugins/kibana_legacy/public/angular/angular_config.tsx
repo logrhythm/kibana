@@ -1,13 +1,4 @@
 /*
- * THIS FILE HAS BEEN MODIFIED FROM THE ORIGINAL SOURCE
- * This comment only applies to modifications applied after the f421eec40b5a9f31383591e30bef86724afcd2b3 commit
- *
- * Copyright 2020 LogRhythm, Inc
- * Licensed under the LogRhythm Global End User License Agreement,
- * which can be found through this page: https://logrhythm.com/about/logrhythm-terms-and-conditions/
- */
-
-/*
  * Licensed to Elasticsearch B.V. under one or more contributor
  * license agreements. See the NOTICE file distributed with
  * this work for additional information regarding copyright
@@ -24,6 +15,15 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ */
+
+/*
+ * THIS FILE HAS BEEN MODIFIED FROM THE ORIGINAL SOURCE
+ * This comment only applies to modifications applied after the f421eec40b5a9f31383591e30bef86724afcd2b3 commit
+ *
+ * Copyright 2020 LogRhythm, Inc
+ * Licensed under the LogRhythm Global End User License Agreement,
+ * which can be found through this page: https://logrhythm.com/about/logrhythm-terms-and-conditions/
  */
 
 import {
@@ -44,10 +44,8 @@ import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
 import { CoreStart, LegacyCoreStart } from 'kibana/public';
 
-import { fatalError } from 'ui/notify';
-import { capabilities } from 'ui/capabilities';
-// @ts-ignore
-import { modifyUrl } from 'ui/url';
+// Legacy UI imports replaced with new platform equivalents
+import { format as formatUrl, parse as parseUrl } from 'url';
 // @ts-ignore
 import { UrlOverflowService } from '../error_url_overflow';
 import { npStart } from '../new_platform';
@@ -56,6 +54,21 @@ import { toastNotifications } from '../notify';
 import { isSystemApiRequest } from '../system_api';
 
 const URL_LIMIT_WARN_WITHIN = 1000;
+
+// Legacy compatibility helpers
+const capabilities = {
+  get: () => npStart.application.capabilities,
+};
+
+const fatalError = (error: Error) => {
+  npStart.fatalErrors.add(error);
+};
+
+const modifyUrl = (url: string, modifier: (parts: any) => void) => {
+  const parsed = parseUrl(url, true);
+  modifier(parsed);
+  return formatUrl(parsed);
+};
 
 export const configureAppAngularModule = (angularModule: IModule) => {
   const newPlatform = npStart.core;
@@ -99,25 +112,23 @@ const getEsUrl = (newPlatform: CoreStart) => {
   };
 };
 
-const setupCompileProvider = (newPlatform: LegacyCoreStart) => (
-  $compileProvider: ICompileProvider
-) => {
-  if (!newPlatform.injectedMetadata.getLegacyMetadata().devMode) {
-    $compileProvider.debugInfoEnabled(false);
-  }
-};
+const setupCompileProvider =
+  (newPlatform: LegacyCoreStart) => ($compileProvider: ICompileProvider) => {
+    if (!newPlatform.injectedMetadata.getLegacyMetadata().devMode) {
+      $compileProvider.debugInfoEnabled(false);
+    }
+  };
 
-const setupLocationProvider = (newPlatform: CoreStart) => (
-  $locationProvider: ILocationProvider
-) => {
-  $locationProvider.html5Mode({
-    enabled: false,
-    requireBase: false,
-    rewriteLinks: false,
-  });
+const setupLocationProvider =
+  (newPlatform: CoreStart) => ($locationProvider: ILocationProvider) => {
+    $locationProvider.html5Mode({
+      enabled: false,
+      requireBase: false,
+      rewriteLinks: false,
+    });
 
-  $locationProvider.hashPrefix('');
-};
+    $locationProvider.hashPrefix('');
+  };
 
 export const $setupXsrfRequestInterceptor = (newPlatform: LegacyCoreStart) => {
   const version = newPlatform.injectedMetadata.getLegacyMetadata().version;
@@ -154,107 +165,101 @@ export const $setupXsrfRequestInterceptor = (newPlatform: LegacyCoreStart) => {
  * @param  {HttpService} $http
  * @return {undefined}
  */
-const capture$httpLoadingCount = (newPlatform: CoreStart) => (
-  $rootScope: IRootScopeService,
-  $http: IHttpService
-) => {
-  newPlatform.http.addLoadingCount(
-    new Rx.Observable(observer => {
-      const unwatch = $rootScope.$watch(() => {
-        const reqs = $http.pendingRequests || [];
-        observer.next(reqs.filter(req => !isSystemApiRequest(req)).length);
-      });
+const capture$httpLoadingCount =
+  (newPlatform: CoreStart) => ($rootScope: IRootScopeService, $http: IHttpService) => {
+    newPlatform.http.addLoadingCount(
+      new Rx.Observable((observer) => {
+        const unwatch = $rootScope.$watch(() => {
+          const reqs = $http.pendingRequests || [];
+          observer.next(reqs.filter((req) => !isSystemApiRequest(req)).length);
+        });
 
-      return unwatch;
-    })
-  );
-};
+        return unwatch;
+      })
+    );
+  };
 
 /**
  * internal angular run function that will be called when angular bootstraps and
  * lets us integrate with the angular router so that we can automatically clear
  * the breadcrumbs if we switch to a Kibana app that does not use breadcrumbs correctly
  */
-const $setupBreadcrumbsAutoClear = (newPlatform: CoreStart) => (
-  $rootScope: IRootScopeService,
-  $injector: any
-) => {
-  // A flag used to determine if we should automatically
-  // clear the breadcrumbs between angular route changes.
-  let breadcrumbSetSinceRouteChange = false;
-  const $route = $injector.has('$route') ? $injector.get('$route') : {};
+const $setupBreadcrumbsAutoClear =
+  (newPlatform: CoreStart) => ($rootScope: IRootScopeService, $injector: any) => {
+    // A flag used to determine if we should automatically
+    // clear the breadcrumbs between angular route changes.
+    let breadcrumbSetSinceRouteChange = false;
+    const $route = $injector.has('$route') ? $injector.get('$route') : {};
 
-  // reset breadcrumbSetSinceRouteChange any time the breadcrumbs change, even
-  // if it was done directly through the new platform
-  newPlatform.chrome.getBreadcrumbs$().subscribe({
-    next() {
-      breadcrumbSetSinceRouteChange = true;
-    },
-  });
+    // reset breadcrumbSetSinceRouteChange any time the breadcrumbs change, even
+    // if it was done directly through the new platform
+    newPlatform.chrome.getBreadcrumbs$().subscribe({
+      next() {
+        breadcrumbSetSinceRouteChange = true;
+      },
+    });
 
-  $rootScope.$on('$routeChangeStart', () => {
-    breadcrumbSetSinceRouteChange = false;
-  });
+    $rootScope.$on('$routeChangeStart', () => {
+      breadcrumbSetSinceRouteChange = false;
+    });
 
-  $rootScope.$on('$routeChangeSuccess', () => {
-    const current = $route.current || {};
+    $rootScope.$on('$routeChangeSuccess', () => {
+      const current = $route.current || {};
 
-    if (breadcrumbSetSinceRouteChange || (current.$$route && current.$$route.redirectTo)) {
-      return;
-    }
+      if (breadcrumbSetSinceRouteChange || (current.$$route && current.$$route.redirectTo)) {
+        return;
+      }
 
-    const k7BreadcrumbsProvider = current.k7Breadcrumbs;
-    if (!k7BreadcrumbsProvider) {
-      newPlatform.chrome.setBreadcrumbs([]);
-      return;
-    }
+      const k7BreadcrumbsProvider = current.k7Breadcrumbs;
+      if (!k7BreadcrumbsProvider) {
+        newPlatform.chrome.setBreadcrumbs([]);
+        return;
+      }
 
-    try {
-      newPlatform.chrome.setBreadcrumbs($injector.invoke(k7BreadcrumbsProvider));
-    } catch (error) {
-      fatalError(error);
-    }
-  });
-};
+      try {
+        newPlatform.chrome.setBreadcrumbs($injector.invoke(k7BreadcrumbsProvider));
+      } catch (error) {
+        fatalError(error);
+      }
+    });
+  };
 
 /**
  * internal angular run function that will be called when angular bootstraps and
  * lets us integrate with the angular router so that we can automatically clear
  * the badge if we switch to a Kibana app that does not use the badge correctly
  */
-const $setupBadgeAutoClear = (newPlatform: CoreStart) => (
-  $rootScope: IRootScopeService,
-  $injector: any
-) => {
-  // A flag used to determine if we should automatically
-  // clear the badge between angular route changes.
-  let badgeSetSinceRouteChange = false;
-  const $route = $injector.has('$route') ? $injector.get('$route') : {};
+const $setupBadgeAutoClear =
+  (newPlatform: CoreStart) => ($rootScope: IRootScopeService, $injector: any) => {
+    // A flag used to determine if we should automatically
+    // clear the badge between angular route changes.
+    let badgeSetSinceRouteChange = false;
+    const $route = $injector.has('$route') ? $injector.get('$route') : {};
 
-  $rootScope.$on('$routeChangeStart', () => {
-    badgeSetSinceRouteChange = false;
-  });
+    $rootScope.$on('$routeChangeStart', () => {
+      badgeSetSinceRouteChange = false;
+    });
 
-  $rootScope.$on('$routeChangeSuccess', () => {
-    const current = $route.current || {};
+    $rootScope.$on('$routeChangeSuccess', () => {
+      const current = $route.current || {};
 
-    if (badgeSetSinceRouteChange || (current.$$route && current.$$route.redirectTo)) {
-      return;
-    }
+      if (badgeSetSinceRouteChange || (current.$$route && current.$$route.redirectTo)) {
+        return;
+      }
 
-    const badgeProvider = current.badge;
-    if (!badgeProvider) {
-      newPlatform.chrome.setBadge(undefined);
-      return;
-    }
+      const badgeProvider = current.badge;
+      if (!badgeProvider) {
+        newPlatform.chrome.setBadge(undefined);
+        return;
+      }
 
-    try {
-      newPlatform.chrome.setBadge($injector.invoke(badgeProvider));
-    } catch (error) {
-      fatalError(error);
-    }
-  });
-};
+      try {
+        newPlatform.chrome.setBadge($injector.invoke(badgeProvider));
+      } catch (error) {
+        fatalError(error);
+      }
+    });
+  };
 
 /**
  * internal angular run function that will be called when angular bootstraps and
@@ -262,92 +267,87 @@ const $setupBadgeAutoClear = (newPlatform: CoreStart) => (
  * the helpExtension if we switch to a Kibana app that does not set its own
  * helpExtension
  */
-const $setupHelpExtensionAutoClear = (newPlatform: CoreStart) => (
-  $rootScope: IRootScopeService,
-  $injector: any
-) => {
-  /**
-   * reset helpExtensionSetSinceRouteChange any time the helpExtension changes, even
-   * if it was done directly through the new platform
-   */
-  let helpExtensionSetSinceRouteChange = false;
-  newPlatform.chrome.getHelpExtension$().subscribe({
-    next() {
-      helpExtensionSetSinceRouteChange = true;
-    },
-  });
+const $setupHelpExtensionAutoClear =
+  (newPlatform: CoreStart) => ($rootScope: IRootScopeService, $injector: any) => {
+    /**
+     * reset helpExtensionSetSinceRouteChange any time the helpExtension changes, even
+     * if it was done directly through the new platform
+     */
+    let helpExtensionSetSinceRouteChange = false;
+    newPlatform.chrome.getHelpExtension$().subscribe({
+      next() {
+        helpExtensionSetSinceRouteChange = true;
+      },
+    });
 
-  const $route = $injector.has('$route') ? $injector.get('$route') : {};
+    const $route = $injector.has('$route') ? $injector.get('$route') : {};
 
-  $rootScope.$on('$routeChangeStart', () => {
-    helpExtensionSetSinceRouteChange = false;
-  });
+    $rootScope.$on('$routeChangeStart', () => {
+      helpExtensionSetSinceRouteChange = false;
+    });
 
-  $rootScope.$on('$routeChangeSuccess', () => {
-    const current = $route.current || {};
+    $rootScope.$on('$routeChangeSuccess', () => {
+      const current = $route.current || {};
 
-    if (helpExtensionSetSinceRouteChange || (current.$$route && current.$$route.redirectTo)) {
-      return;
-    }
-
-    newPlatform.chrome.setHelpExtension(current.helpExtension);
-  });
-};
-
-const $setupUrlOverflowHandling = (newPlatform: CoreStart) => (
-  $location: ILocationService,
-  $rootScope: IRootScopeService,
-  Private: any,
-  config: any
-) => {
-  const urlOverflow = new UrlOverflowService();
-  const check = () => {
-    // disable long url checks when storing state in session storage
-    if (config.get('state:storeInSessionStorage')) {
-      return;
-    }
-
-    if ($location.path() === '/error/url-overflow') {
-      return;
-    }
-
-    try {
-      if (urlOverflow.check($location.absUrl()) <= URL_LIMIT_WARN_WITHIN) {
-        toastNotifications.addWarning({
-          title: i18n.translate('common.ui.chrome.bigUrlWarningNotificationTitle', {
-            defaultMessage: 'The URL is big and NetMon-UI might stop working',
-          }),
-          text: (
-            <Fragment>
-              <FormattedMessage
-                id="common.ui.chrome.bigUrlWarningNotificationMessage"
-                defaultMessage="Either enable the {storeInSessionStorageParam} option
-                  in {advancedSettingsLink} or simplify the onscreen visuals."
-                values={{
-                  storeInSessionStorageParam: <code>state:storeInSessionStorage</code>,
-                  advancedSettingsLink: (
-                    <a href="#/management/kibana/settings">
-                      <FormattedMessage
-                        id="common.ui.chrome.bigUrlWarningNotificationMessage.advancedSettingsLinkText"
-                        defaultMessage="advanced settings"
-                      />
-                    </a>
-                  ),
-                }}
-              />
-            </Fragment>
-          ),
-        });
+      if (helpExtensionSetSinceRouteChange || (current.$$route && current.$$route.redirectTo)) {
+        return;
       }
-    } catch (e) {
-      window.location.href = modifyUrl(window.location.href, (parts: any) => {
-        parts.hash = '#/error/url-overflow';
-      });
-      // force the browser to reload to that Kibana's potentially unstable state is unloaded
-      window.location.reload();
-    }
+
+      newPlatform.chrome.setHelpExtension(current.helpExtension);
+    });
   };
 
-  $rootScope.$on('$routeUpdate', check);
-  $rootScope.$on('$routeChangeStart', check);
-};
+const $setupUrlOverflowHandling =
+  (newPlatform: CoreStart) =>
+  ($location: ILocationService, $rootScope: IRootScopeService, Private: any, config: any) => {
+    const urlOverflow = new UrlOverflowService();
+    const check = () => {
+      // disable long url checks when storing state in session storage
+      if (config.get('state:storeInSessionStorage')) {
+        return;
+      }
+
+      if ($location.path() === '/error/url-overflow') {
+        return;
+      }
+
+      try {
+        if (urlOverflow.check($location.absUrl()) <= URL_LIMIT_WARN_WITHIN) {
+          toastNotifications.addWarning({
+            title: i18n.translate('common.ui.chrome.bigUrlWarningNotificationTitle', {
+              defaultMessage: 'The URL is big and NetMon-UI might stop working',
+            }),
+            text: (
+              <Fragment>
+                <FormattedMessage
+                  id="common.ui.chrome.bigUrlWarningNotificationMessage"
+                  defaultMessage="Either enable the {storeInSessionStorageParam} option
+                  in {advancedSettingsLink} or simplify the onscreen visuals."
+                  values={{
+                    storeInSessionStorageParam: <code>state:storeInSessionStorage</code>,
+                    advancedSettingsLink: (
+                      <a href="#/management/kibana/settings">
+                        <FormattedMessage
+                          id="common.ui.chrome.bigUrlWarningNotificationMessage.advancedSettingsLinkText"
+                          defaultMessage="advanced settings"
+                        />
+                      </a>
+                    ),
+                  }}
+                />
+              </Fragment>
+            ),
+          });
+        }
+      } catch (e) {
+        window.location.href = modifyUrl(window.location.href, (parts: any) => {
+          parts.hash = '#/error/url-overflow';
+        });
+        // force the browser to reload to that Kibana's potentially unstable state is unloaded
+        window.location.reload();
+      }
+    };
+
+    $rootScope.$on('$routeUpdate', check);
+    $rootScope.$on('$routeChangeStart', check);
+  };

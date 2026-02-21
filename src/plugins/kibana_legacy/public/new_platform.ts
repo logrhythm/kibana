@@ -17,16 +17,11 @@
  * under the License.
  */
 
-import { ExpressionTypeDefinition } from '../types';
+import { CoreStart } from 'kibana/public';
 
-const name = 'render';
+// Legacy new platform compatibility
+export let npStart: CoreStart;
 
-export interface ExpressionValueRender<T = unknown> {
-  type: typeof name;
-  as: string;
-  value: T;
-}
-
-export const render: ExpressionTypeDefinition<typeof name, ExpressionValueRender> = {
-  name,
+export const setNpStart = (coreStart: CoreStart) => {
+  npStart = coreStart;
 };

@@ -17,4 +17,9 @@
  * under the License.
  */
 
+import { ToastNotifications } from './toast_notifications';
+
 export { ToastNotifications } from './toast_notifications';
+
+// Legacy compatibility - will be initialized by the plugin
+export let toastNotifications: ToastNotifications;

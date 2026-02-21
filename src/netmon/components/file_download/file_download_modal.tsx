@@ -47,7 +47,7 @@ import {
   DownloadStatus,
 } from '@logrhythm/nm-web-shared/services/session_files';
 import { SessionFileDownloader } from '@logrhythm/nm-web-shared/services/session_file_downloader';
-import { toastNotifications } from 'ui/notify';
+import { toastNotifications } from '../../services/notifications';
 import FileDownloadRow from './file_download_row';
 
 const useStyles = makeStyles({

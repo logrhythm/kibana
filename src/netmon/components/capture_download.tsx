@@ -28,7 +28,7 @@ import { makeStyles } from '@material-ui/styles';
 import { EuiButtonIcon, EuiCheckbox } from '@elastic/eui';
 import { SelectedCaptureSessions } from '@logrhythm/nm-web-shared/services/selected_capture_sessions';
 import { startPcapDownload, FileType } from '@logrhythm/nm-web-shared/services/session_files';
-import { toastNotifications } from 'ui/notify';
+import { toastNotifications } from '../services/notifications';
 import FileDownloadModal from './file_download/file_download_modal';
 
 const useStyles = makeStyles({

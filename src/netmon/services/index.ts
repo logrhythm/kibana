@@ -17,16 +17,4 @@
  * under the License.
  */
 
-import { ExpressionTypeDefinition } from '../types';
-
-const name = 'render';
-
-export interface ExpressionValueRender<T = unknown> {
-  type: typeof name;
-  as: string;
-  value: T;
-}
-
-export const render: ExpressionTypeDefinition<typeof name, ExpressionValueRender> = {
-  name,
-};
+export * from './notifications';

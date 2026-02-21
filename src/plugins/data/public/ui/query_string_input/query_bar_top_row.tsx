@@ -1,13 +1,4 @@
 /*
- * THIS FILE HAS BEEN MODIFIED FROM THE ORIGINAL SOURCE
- * This comment only applies to modifications applied after the f421eec40b5a9f31383591e30bef86724afcd2b3 commit
- *
- * Copyright 2020 LogRhythm, Inc
- * Licensed under the LogRhythm Global End User License Agreement,
- * which can be found through this page: https://logrhythm.com/about/logrhythm-terms-and-conditions/
- */
-
-/*
  * Licensed to Elasticsearch B.V. under one or more contributor
  * license agreements. See the NOTICE file distributed with
  * this work for additional information regarding copyright
@@ -26,10 +17,17 @@
  * under the License.
  */
 
-import { doesKueryExpressionHaveLuceneSyntaxError } from '@kbn/es-query';
+/*
+ * THIS FILE HAS BEEN MODIFIED FROM THE ORIGINAL SOURCE
+ * This comment only applies to modifications applied after the f421eec40b5a9f31383591e30bef86724afcd2b3 commit
+ *
+ * Copyright 2020 LogRhythm, Inc
+ * Licensed under the LogRhythm Global End User License Agreement,
+ * which can be found through this page: https://logrhythm.com/about/logrhythm-terms-and-conditions/
+ */
 
 import classNames from 'classnames';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 import { EuiButton, EuiFlexGroup, EuiFlexItem, EuiLink, EuiSuperDatePicker } from '@elastic/eui';
 // @ts-ignore
@@ -38,16 +36,17 @@ import { FormattedMessage, InjectedIntl, injectI18n } from '@kbn/i18n/react';
 import { Toast } from 'src/core/public';
 import { TimeRange } from 'src/plugins/data/public';
 import { convertQuery } from '@logrhythm/nm-web-shared/services/query_mapping';
-import { useKibana } from '../../../../../../../plugins/kibana_react/public';
+import { doesKueryExpressionHaveLuceneSyntaxError } from '../../../common/es_query';
+import { useKibana } from '../../../../kibana_react/public';
 
 import { IndexPattern } from '../../../index_patterns';
-import { QueryBarInput } from './query_bar_input';
+import QueryBarInput from './query_string_input';
 import { Query, getQueryLog } from '../index';
 import { TimeHistoryContract } from '../../../timefilter';
 import { IDataPluginServices } from '../../../types';
 import { PersistedLog } from '../../persisted_log';
 
-import { SaveRule } from '../../../../../../../netmon/components/save_rule/save_rule';
+import { SaveRule } from '../../../../../netmon/components/save_rule/save_rule';
 
 interface Props {
   query?: Query;
@@ -81,38 +80,59 @@ function QueryBarTopRowUI(props: Props) {
 
   const kueryQuerySyntaxLink: string = docLinks!.links.query.kueryQuerySyntax;
 
-  const queryLanguage = props.query && props.query.language;
-  let persistedLog: PersistedLog | undefined;
+  // Destructure props for useEffect dependencies
+  const {
+    query,
+    onChange,
+    onSubmit,
+    dateRangeFrom,
+    dateRangeTo,
+    showQueryInput,
+    indexPatterns,
+    prepend,
+    screenTitle,
+    intl,
+  } = props;
+  const queryLanguage = query && query.language;
+  const persistedLogRef = useRef<PersistedLog | undefined>();
 
-  const currentQueryText = props.query && props.query.query ? (props.query.query as string) : '';
+  const currentQueryText = query && query.query ? (query.query as string) : '';
+
+  const getDateRange = useCallback(() => {
+    const defaultTimeSetting = uiSettings!.get('timepicker:timeDefaults');
+    return {
+      from: dateRangeFrom || defaultTimeSetting.from,
+      to: dateRangeTo || defaultTimeSetting.to,
+    };
+  }, [dateRangeFrom, dateRangeTo, uiSettings]);
 
   useEffect(() => {
-    if (!props.query) return;
-    persistedLog = getQueryLog(uiSettings!, store, appName, props.query.language);
-  }, [queryLanguage]);
+    if (!query) return;
+    persistedLogRef.current = getQueryLog(uiSettings!, store, appName, query.language);
+  }, [query, queryLanguage, uiSettings, store, appName]);
 
   useEffect(() => {
-    if (!props.query || !props.query.query) return;
+    if (!query || !query.query) return;
 
     let shutdown: boolean = false;
-    convertQuery(props.query.query as string)
-      .then(newQueryText => {
-        if (!props.query || shutdown) return;
+    convertQuery(query.query as string)
+      .then((newQueryText) => {
+        if (!query || shutdown) return;
         const newQuery = {
-          ...props.query,
+          ...query,
           query: newQueryText,
         };
         const dateRange = getDateRange();
-        props.onChange({
+        onChange({
           query: newQuery,
           dateRange,
         });
-        props.onSubmit({
+        onSubmit({
           query: newQuery,
           dateRange,
         });
       })
-      .catch(err => {
+      .catch((err) => {
         console.warn( // eslint-disable-line
           'An error occurred trying to correct the provided query for capitalization.',
           err
@@ -122,27 +142,19 @@ function QueryBarTopRowUI(props: Props) {
     return () => {
       shutdown = true;
     };
-  }, []);
+  }, [query, onChange, onSubmit, getDateRange]);
 
   function onClickSubmitButton(event: React.MouseEvent<HTMLButtonElement>) {
-    if (persistedLog && props.query) {
-      persistedLog.add(props.query.query);
+    if (persistedLogRef.current && query) {
+      persistedLogRef.current.add(query.query);
     }
     event.preventDefault();
-    onSubmit({ query: props.query, dateRange: getDateRange() });
+    onSubmit({ query, dateRange: getDateRange() });
   }
 
-  function getDateRange() {
-    const defaultTimeSetting = uiSettings!.get('timepicker:timeDefaults');
-    return {
-      from: props.dateRangeFrom || defaultTimeSetting.from,
-      to: props.dateRangeTo || defaultTimeSetting.to,
-    };
-  }
-
-  function onQueryChange(query: Query) {
+  function onQueryChange(newQuery: Query) {
     props.onChange({
-      query,
+      query: newQuery,
       dateRange: getDateRange(),
     });
   }
@@ -160,7 +172,7 @@ function QueryBarTopRowUI(props: Props) {
   }) {
     setIsDateRangeInvalid(isInvalid);
     const retVal = {
-      query: props.query,
+      query,
       dateRange: {
         from: start,
         to: end,
@@ -186,23 +198,23 @@ function QueryBarTopRowUI(props: Props) {
     }
   }
 
-  function onSubmit({ query, dateRange }: { query?: Query; dateRange: TimeRange }) {
+  function onSubmit({ query: submitQuery, dateRange }: { query?: Query; dateRange: TimeRange }) {
     handleLuceneSyntaxWarning();
 
     if (props.timeHistory) {
       props.timeHistory.add(dateRange);
     }
 
-    if (!query || !query.query) {
-      props.onSubmit({ query, dateRange });
+    if (!submitQuery || !submitQuery.query) {
+      props.onSubmit({ query: submitQuery, dateRange });
       return;
     }
 
-    convertQuery(query.query as string)
-      .then(newQueryText => {
-        if (!query) return;
+    convertQuery(submitQuery.query as string)
+      .then((newQueryText) => {
+        if (!submitQuery) return;
         const newQuery = {
-          ...query,
+          ...submitQuery,
           query: newQueryText,
         };
         props.onChange({
@@ -214,7 +226,7 @@ function QueryBarTopRowUI(props: Props) {
           dateRange,
         });
       })
-      .catch(err => {
+      .catch((err) => {
         console.warn( // eslint-disable-line
           'An error occurred trying to correct the provided query for capitalization.',
           err
@@ -222,9 +234,9 @@ function QueryBarTopRowUI(props: Props) {
       });
   }
 
-  function onInputSubmit(query: Query) {
+  function onInputSubmit(newQuery: Query) {
     onSubmit({
-      query,
+      query: newQuery,
       dateRange: getDateRange(),
     });
   }
@@ -235,10 +247,10 @@ function QueryBarTopRowUI(props: Props) {
       <EuiFlexItem>
         <QueryBarInput
           disableAutoFocus={props.disableAutoFocus}
-          indexPatterns={props.indexPatterns!}
-          prepend={props.prepend}
-          query={props.query!}
-          screenTitle={props.screenTitle}
+          indexPatterns={indexPatterns!}
+          prepend={prepend}
+          query={query!}
+          screenTitle={screenTitle}
           onChange={onQueryChange}
           onSubmit={onInputSubmit}
           persistedLog={persistedLog}
@@ -252,7 +264,7 @@ function QueryBarTopRowUI(props: Props) {
   }
 
   function shouldRenderQueryInput(): boolean {
-    return Boolean(props.showQueryInput && props.indexPatterns && props.query && store);
+    return Boolean(showQueryInput && indexPatterns && query && store);
   }
 
   function renderUpdateButton() {
@@ -328,14 +340,13 @@ function QueryBarTopRowUI(props: Props) {
   }
 
   function handleLuceneSyntaxWarning() {
-    if (!props.query) return;
-    const { intl } = props;
-    const { query, language } = props.query;
+    if (!query) return;
+    const { query: queryText, language } = query;
     if (
       language === 'kuery' &&
-      typeof query === 'string' &&
+      typeof queryText === 'string' &&
       (!store || !store.get('kibana.luceneSyntaxWarningOptOut')) &&
-      doesKueryExpressionHaveLuceneSyntaxError(query)
+      doesKueryExpressionHaveLuceneSyntaxError(queryText)
     ) {
       const toast = notifications!.toasts.addWarning({
         title: intl.formatMessage({
