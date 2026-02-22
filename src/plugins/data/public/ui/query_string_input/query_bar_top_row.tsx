@@ -198,7 +198,13 @@ function QueryBarTopRowUI(props: Props) {
     }
   }
 
-  function handleSubmit({ query: submitQuery, dateRange }: { query?: Query; dateRange: TimeRange }) {
+  function handleSubmit({
+    query: submitQuery,
+    dateRange,
+  }: {
+    query?: Query;
+    dateRange: TimeRange;
+  }) {
     handleLuceneSyntaxWarning();
 
     if (props.timeHistory) {
