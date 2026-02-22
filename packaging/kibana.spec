@@ -23,6 +23,10 @@ rm -rf %{name}
 mkdir %{name}
 cd %{name}
 
+%global __requires_exclude_from ^/usr/local/kibana.*/node_modules/.*$
+%global __provides_exclude_from ^/usr/local/kibana.*/node_modules/.*$
+%global __requires_exclude ^(/usr/bin/python2|/usr/bin/python22|/usr/bin/python23)$
+
 #extract sources
 tar xf %_sourcedir/%{name}-%{version}.tar
 if [ $? -ne 0 ]; then
@@ -67,6 +71,10 @@ cp scripts/util.py %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/sc
 cp scripts/kibana-post-start.sh %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/scripts
 cp scripts/removeOldKibanaIndices.py %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/scripts
 cp -a plugins/ %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/
+
+find %{buildroot} -type f -name "*.py" -exec sed -i '1s|#!.*python|#!/usr/bin/python2|' {} +
+find %{buildroot} -type f \( -name "*.md" -o -name "*.json" -o -name "*.js" \) -exec chmod -x {} +
+find %{buildroot} -path "*/node-gyp/gyp/*" -type f -exec sed -i '1s|#!.*python|#!/usr/bin/python2|' {} +
 
 mkdir -p %{buildroot}/usr/local/www/probe/
 ln -sf /usr/local/%{name}-%{kibana_version}-linux-x86_64 %{buildroot}/usr/local/www/probe/%{name}-%{kibana_version}-linux-x86_64

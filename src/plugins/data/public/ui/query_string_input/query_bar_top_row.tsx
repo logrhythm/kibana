@@ -198,7 +198,7 @@ function QueryBarTopRowUI(props: Props) {
     }
   }
 
-  function onSubmit({ query: submitQuery, dateRange }: { query?: Query; dateRange: TimeRange }) {
+  function handleSubmit({ query: submitQuery, dateRange }: { query?: Query; dateRange: TimeRange }) {
     handleLuceneSyntaxWarning();
 
     if (props.timeHistory) {
@@ -235,7 +235,7 @@ function QueryBarTopRowUI(props: Props) {
   }
 
   function onInputSubmit(newQuery: Query) {
-    onSubmit({
+    handleSubmit({
       query: newQuery,
       dateRange: getDateRange(),
     });
