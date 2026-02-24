@@ -17,12 +17,26 @@
  * under the License.
  */
 
-var force = require('./force')(process.argv);
+export function onPremInstructions(
+  moduleName: string,
+  context1?: any,
+  context2?: any,
+  context3?: any,
+  context?: any
+) {
+  return {
+    instructionSets: [],
+  };
+}
 
-var uid = process.getuid && process.getuid();
-var isRoot = require('./is_root')(uid);
+export function cloudInstructions(moduleName: string) {
+  return {
+    instructionSets: [],
+  };
+}
 
-if (isRoot && !force) {
-  //console.error('Kibana should not be run as root.  Use --allow-root to continue.');
-  //process.exit(1);
+export function onPremCloudInstructions(moduleName: string) {
+  return {
+    instructionSets: [],
+  };
 }

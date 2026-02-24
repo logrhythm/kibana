@@ -130,3 +130,9 @@ telemetry.optIn: false
 # Reporting your cluster statistics helps us improve your user experience. Your data is never shared with anyone.
 # Set to false to disable telemetry capabilities entirely. You can alternatively opt out through the Advanced Settings in Kibana.
 telemetry.enabled: false
+
+# Content Security Policy (CSP) configuration to allow inline scripts
+csp.rules:
+  - "script-src 'unsafe-eval' 'unsafe-inline' 'self'"
+  - "worker-src blob: 'self'"
+  - "style-src 'unsafe-inline' 'self'"
