@@ -58,7 +58,7 @@ import {
 
 import { i18n } from '@kbn/i18n';
 import { InjectedIntl, injectI18n } from '@kbn/i18n/react';
-import LogRhythmNavbar from '../../../../../netmon/components/navbar';
+import { LogRhythmNavbar } from '../../../../../netmon/components/navbar';
 
 import {
   ChromeBadge,
@@ -360,6 +360,7 @@ class HeaderUI extends Component<Props, State> {
 
     return (
       <header>
+        {/* LogRhythm Navbar - renders full navbar with Analyze dropdown for Kibana dashboards */}
         <LogRhythmNavbar />
 
         {/* <EuiHeader>

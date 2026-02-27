@@ -44,6 +44,7 @@ import { ChromeRecentlyAccessed, RecentlyAccessedService } from './recently_acce
 import { NavControlsService, ChromeNavControls } from './nav_controls';
 import { LoadingIndicator, Header } from './ui';
 import { DocLinksStart } from '../doc_links';
+import { initializeNotifications } from '../../../netmon/services';
 
 export { ChromeNavControls, ChromeRecentlyAccessed };
 
@@ -124,6 +125,9 @@ export class ChromeService {
     const navControls = this.navControls.start();
     const navLinks = this.navLinks.start({ application, http });
     const recentlyAccessed = await this.recentlyAccessed.start({ http });
+
+    // Initialize NetMon services with 7.10.2 core services
+    initializeNotifications(notifications);
 
     if (!this.params.browserSupportsCsp && injectedMetadata.getCspConfig().warnLegacyBrowsers) {
       notifications.toasts.addWarning(

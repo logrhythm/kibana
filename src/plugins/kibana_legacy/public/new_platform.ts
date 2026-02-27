@@ -17,11 +17,20 @@
  * under the License.
  */
 
-import { CoreStart } from 'kibana/public';
+import { CoreStart } from '../../../core/public';
 
 // Legacy new platform compatibility
 export let npStart: CoreStart;
 
 export const setNpStart = (coreStart: CoreStart) => {
+  if (!coreStart) {
+    return;
+  }
+
   npStart = coreStart;
+};
+
+// Helper to safely access npStart
+export const getNpStart = (): CoreStart | undefined => {
+  return npStart;
 };

@@ -24,10 +24,6 @@ export const Jquery = require('jquery');
 window.$ = window.jQuery = Jquery;
 require('./flot_charts');
 
-// expose Tether globally for Bootstrap
-export const Tether = require('tether');
-window.Tether = Tether;
-
 // stateful deps
 export const KbnI18n = require('@kbn/i18n');
 export const KbnI18nAngular = require('@kbn/i18n/angular');

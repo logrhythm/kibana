@@ -81,18 +81,22 @@ if (window.__kbnStrictCsp__ && window.__kbnCspNotEnforced__) {
       });
     }
 
-    load([
-      {{#each jsDependencyPaths}}
-        '{{this}}',
-      {{/each}}
-    ], function () {
-      __kbnBundles__.get('entry/core/public').__kbnBootstrap__();
-
+    // Load Tether first, before other dependencies
+    loadScript('/analyze/ui/tether.min.js', function() {
+      // Tether should now be available globally
       load([
-        {{#each styleSheetPaths}}
+        {{#each jsDependencyPaths}}
           '{{this}}',
         {{/each}}
-      ]);
+      ], function () {
+        __kbnBundles__.get('entry/core/public').__kbnBootstrap__();
+
+        load([
+          {{#each styleSheetPaths}}
+            '{{this}}',
+          {{/each}}
+        ]);
+      });
     });
   }
 }

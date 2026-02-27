@@ -17,10 +17,11 @@
  * under the License.
  */
 
-import { PluginInitializerContext, CoreStart, CoreSetup } from 'kibana/public';
+import { PluginInitializerContext, CoreStart, CoreSetup } from '../../../core/public';
 import { ConfigSchema } from '../config';
 import { getDashboardConfig } from './dashboard_config';
 import { injectHeaderStyle } from './utils/inject_header_style';
+import { setNpStart } from './new_platform';
 
 export class KibanaLegacyPlugin {
   constructor(private readonly initializerContext: PluginInitializerContext<ConfigSchema>) {}
@@ -29,7 +30,33 @@ export class KibanaLegacyPlugin {
     return {};
   }
 
-  public start({ application, http: { basePath }, uiSettings }: CoreStart) {
+  public start(core: CoreStart) {
+    const { application, uiSettings } = core;
+
+    // Initialize the new platform compatibility layer
+    setNpStart(core);
+
+    // Error handling setup for subscribe calls
+
+    // Add safety wrapper for subscribe calls
+    try {
+      // Patch common observable subscribe methods to add safety
+      if (typeof window !== 'undefined' && (window as any).Rx) {
+        const rxObservable = (window as any).Rx.Observable;
+        if (rxObservable && rxObservable.prototype && rxObservable.prototype.subscribe) {
+          const originalSubscribe = rxObservable.prototype.subscribe;
+          rxObservable.prototype.subscribe = function (...args: any[]) {
+            if (this == null || this === undefined) {
+              return { unsubscribe: () => {} };
+            }
+            return originalSubscribe.apply(this, args);
+          };
+        }
+      }
+    } catch (patchError) {
+      // Silently handle patch errors
+    }
+
     injectHeaderStyle(uiSettings);
     return {
       /**
