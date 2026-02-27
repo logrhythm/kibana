@@ -42,10 +42,10 @@ import * as Rx from 'rxjs';
 
 import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
-import { CoreStart, LegacyCoreStart } from 'kibana/public';
+import { format as formatUrl, parse as parseUrl } from 'url';
+import { CoreStart, LegacyCoreStart } from '../../../core/public';
 
 // Legacy UI imports replaced with new platform equivalents
-import { format as formatUrl, parse as parseUrl } from 'url';
 // @ts-ignore
 import { UrlOverflowService } from '../error_url_overflow';
 import { npStart } from '../new_platform';
@@ -70,33 +70,83 @@ const modifyUrl = (url: string, modifier: (parts: any) => void) => {
   return formatUrl(parsed);
 };
 
-export const configureAppAngularModule = (angularModule: IModule) => {
-  const newPlatform = npStart.core;
-  const legacyMetadata = newPlatform.injectedMetadata.getLegacyMetadata();
+export const configureAppAngularModule = (angularModule: IModule, coreStart?: any) => {
+  // Use provided coreStart parameter or fall back to npStart
+  const newPlatform = coreStart || npStart;
 
-  forOwn(newPlatform.injectedMetadata.getInjectedVars(), (val, name) => {
-    if (name !== undefined) {
-      // The legacy platform modifies some of these values, clone to an unfrozen object.
-      angularModule.value(name, cloneDeep(val));
-    }
-  });
+  if (!newPlatform) {
+    console.error('New platform not available for angular module configuration');
+    return;
+  }
 
-  angularModule
-    .value('kbnVersion', newPlatform.injectedMetadata.getKibanaVersion())
-    .value('buildNum', legacyMetadata.buildNum)
-    .value('buildSha', legacyMetadata.buildSha)
-    .value('serverName', legacyMetadata.serverName)
-    .value('sessionId', Date.now())
-    .value('esUrl', getEsUrl(newPlatform))
-    .value('uiCapabilities', capabilities.get())
-    .config(setupCompileProvider(newPlatform))
-    .config(setupLocationProvider(newPlatform))
-    .config($setupXsrfRequestInterceptor(newPlatform))
-    .run(capture$httpLoadingCount(newPlatform))
-    .run($setupBreadcrumbsAutoClear(newPlatform))
-    .run($setupBadgeAutoClear(newPlatform))
-    .run($setupHelpExtensionAutoClear(newPlatform))
-    .run($setupUrlOverflowHandling(newPlatform));
+  if (!newPlatform.injectedMetadata) {
+    console.error('InjectedMetadata service not available');
+    return;
+  }
+
+  let legacyMetadata;
+  try {
+    // Try to get legacy metadata, fallback to using getInjectedVar for individual values
+    legacyMetadata = newPlatform.injectedMetadata.getLegacyMetadata
+      ? newPlatform.injectedMetadata.getLegacyMetadata()
+      : {};
+  } catch (error) {
+    console.warn('Could not get legacy metadata, using fallback approach');
+    legacyMetadata = {};
+  }
+
+  // Safely get injected vars
+  try {
+    const injectedVars = newPlatform.injectedMetadata.getInjectedVars
+      ? newPlatform.injectedMetadata.getInjectedVars()
+      : {};
+
+    forOwn(injectedVars, (val, name) => {
+      if (name !== undefined) {
+        // The legacy platform modifies some of these values, clone to an unfrozen object.
+        angularModule.value(name, cloneDeep(val));
+      }
+    });
+  } catch (error) {
+    console.warn('Could not set injected vars:', error);
+  }
+
+  // Safely configure angular module with fallbacks
+  try {
+    angularModule
+      .value('kbnVersion', newPlatform.injectedMetadata.getKibanaVersion?.() || '7.10.2')
+      .value(
+        'buildNum',
+        legacyMetadata.buildNum ||
+          newPlatform.injectedMetadata.getInjectedVar?.('buildNum') ||
+          'unknown'
+      )
+      .value(
+        'buildSha',
+        legacyMetadata.buildSha ||
+          newPlatform.injectedMetadata.getInjectedVar?.('buildSha') ||
+          'unknown'
+      )
+      .value(
+        'serverName',
+        legacyMetadata.serverName ||
+          newPlatform.injectedMetadata.getInjectedVar?.('serverName') ||
+          'kibana'
+      )
+      .value('sessionId', Date.now())
+      .value('esUrl', getEsUrl(newPlatform))
+      .value('uiCapabilities', capabilities.get())
+      .config(setupCompileProvider(newPlatform))
+      .config(setupLocationProvider(newPlatform))
+      .config($setupXsrfRequestInterceptor(newPlatform))
+      .run(capture$httpLoadingCount(newPlatform))
+      .run($setupBreadcrumbsAutoClear(newPlatform))
+      .run($setupBadgeAutoClear(newPlatform))
+      .run($setupHelpExtensionAutoClear(newPlatform))
+      .run($setupUrlOverflowHandling(newPlatform));
+  } catch (configError) {
+    console.error('Error configuring angular module:', configError);
+  }
 };
 
 const getEsUrl = (newPlatform: CoreStart) => {
