@@ -43,7 +43,7 @@ import * as Rx from 'rxjs';
 import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
 import { format as formatUrl, parse as parseUrl } from 'url';
-import { CoreStart, LegacyCoreStart } from '../../../core/public';
+import type { CoreStart, LegacyCoreStart } from '../../../core/public';
 
 // Legacy UI imports replaced with new platform equivalents
 // @ts-ignore
@@ -57,11 +57,25 @@ const URL_LIMIT_WARN_WITHIN = 1000;
 
 // Legacy compatibility helpers
 const capabilities = {
-  get: () => npStart.application.capabilities,
+  get: () => {
+    try {
+      return npStart?.application?.capabilities || {};
+    } catch (error) {
+      return {};
+    }
+  },
 };
 
 const fatalError = (error: Error) => {
-  npStart.fatalErrors.add(error);
+  try {
+    if (npStart?.fatalErrors?.add) {
+      npStart.fatalErrors.add(error);
+    } else {
+      // console.error('Fatal error (npStart not available):', error);
+    }
+  } catch (e) {
+    // console.error('Fatal error (error handler failed):', error);
+  }
 };
 
 const modifyUrl = (url: string, modifier: (parts: any) => void) => {
@@ -70,107 +84,241 @@ const modifyUrl = (url: string, modifier: (parts: any) => void) => {
   return formatUrl(parsed);
 };
 
-export const configureAppAngularModule = (angularModule: IModule, coreStart?: any) => {
+export const configureAppAngularModule = (
+  angularModule: IModule,
+  coreStart?: any,
+  ...otherArgs: any[]
+) => {
   // Use provided coreStart parameter or fall back to npStart
-  const newPlatform = coreStart || npStart;
+  // Handle different calling conventions (sometimes coreStart.core, sometimes direct coreStart)
+  const newPlatform = coreStart?.core || coreStart || npStart;
 
   if (!newPlatform) {
-    console.error('New platform not available for angular module configuration');
+    // console.warn('New platform not available for angular module configuration, skipping');
     return;
   }
 
-  if (!newPlatform.injectedMetadata) {
-    console.error('InjectedMetadata service not available');
-    return;
-  }
+  // Use fallback approach when injectedMetadata is not available
+  const hasInjectedMetadata =
+    newPlatform.injectedMetadata &&
+    typeof newPlatform.injectedMetadata.getKibanaVersion === 'function';
 
-  let legacyMetadata;
-  try {
-    // Try to get legacy metadata, fallback to using getInjectedVar for individual values
-    legacyMetadata = newPlatform.injectedMetadata.getLegacyMetadata
-      ? newPlatform.injectedMetadata.getLegacyMetadata()
-      : {};
-  } catch (error) {
-    console.warn('Could not get legacy metadata, using fallback approach');
-    legacyMetadata = {};
-  }
+  let legacyMetadata: any = {};
 
-  // Safely get injected vars
-  try {
-    const injectedVars = newPlatform.injectedMetadata.getInjectedVars
-      ? newPlatform.injectedMetadata.getInjectedVars()
-      : {};
+  if (hasInjectedMetadata) {
+    try {
+      // Try to get legacy metadata, fallback to using getInjectedVar for individual values
+      legacyMetadata = newPlatform.injectedMetadata.getLegacyMetadata
+        ? newPlatform.injectedMetadata.getLegacyMetadata()
+        : {};
+    } catch (error) {
+      // console.warn('Could not get legacy metadata, using fallback approach');
+      legacyMetadata = {};
+    }
 
-    forOwn(injectedVars, (val, name) => {
-      if (name !== undefined) {
-        // The legacy platform modifies some of these values, clone to an unfrozen object.
-        angularModule.value(name, cloneDeep(val));
-      }
-    });
-  } catch (error) {
-    console.warn('Could not set injected vars:', error);
+    // Safely get injected vars
+    try {
+      const injectedVars = newPlatform.injectedMetadata.getInjectedVars
+        ? newPlatform.injectedMetadata.getInjectedVars()
+        : {};
+
+      forOwn(injectedVars, (val, name) => {
+        if (name !== undefined) {
+          // The legacy platform modifies some of these values, clone to an unfrozen object.
+          angularModule.value(name, cloneDeep(val));
+        }
+      });
+    } catch (error) {
+      // console.warn('Could not set injected vars:', error);
+    }
   }
 
   // Safely configure angular module with fallbacks
   try {
+    const kbnVersion = hasInjectedMetadata
+      ? newPlatform.injectedMetadata.getKibanaVersion?.() || '7.10.2'
+      : '7.10.2';
+    const buildNum = hasInjectedMetadata
+      ? legacyMetadata.buildNum ||
+        newPlatform.injectedMetadata.getInjectedVar?.('buildNum') ||
+        'unknown'
+      : 'unknown';
+    const buildSha = hasInjectedMetadata
+      ? legacyMetadata.buildSha ||
+        newPlatform.injectedMetadata.getInjectedVar?.('buildSha') ||
+        'unknown'
+      : 'unknown';
+    const serverName = hasInjectedMetadata
+      ? legacyMetadata.serverName ||
+        newPlatform.injectedMetadata.getInjectedVar?.('serverName') ||
+        'kibana'
+      : 'kibana';
+
     angularModule
-      .value('kbnVersion', newPlatform.injectedMetadata.getKibanaVersion?.() || '7.10.2')
-      .value(
-        'buildNum',
-        legacyMetadata.buildNum ||
-          newPlatform.injectedMetadata.getInjectedVar?.('buildNum') ||
-          'unknown'
-      )
-      .value(
-        'buildSha',
-        legacyMetadata.buildSha ||
-          newPlatform.injectedMetadata.getInjectedVar?.('buildSha') ||
-          'unknown'
-      )
-      .value(
-        'serverName',
-        legacyMetadata.serverName ||
-          newPlatform.injectedMetadata.getInjectedVar?.('serverName') ||
-          'kibana'
-      )
+      .value('kbnVersion', kbnVersion)
+      .value('buildNum', buildNum)
+      .value('buildSha', buildSha)
+      .value('serverName', serverName)
       .value('sessionId', Date.now())
       .value('esUrl', getEsUrl(newPlatform))
-      .value('uiCapabilities', capabilities.get())
-      .config(setupCompileProvider(newPlatform))
-      .config(setupLocationProvider(newPlatform))
-      .config($setupXsrfRequestInterceptor(newPlatform))
-      .run(capture$httpLoadingCount(newPlatform))
-      .run($setupBreadcrumbsAutoClear(newPlatform))
-      .run($setupBadgeAutoClear(newPlatform))
-      .run($setupHelpExtensionAutoClear(newPlatform))
-      .run($setupUrlOverflowHandling(newPlatform));
+      .value('uiCapabilities', hasInjectedMetadata ? capabilities.get() : {});
+
+    // Configure providers with error handling
+    try {
+      angularModule.config(setupCompileProvider(newPlatform));
+    } catch (error) {
+      // console.warn('Failed to setup compile provider:', error);
+    }
+
+    try {
+      angularModule.config(setupLocationProvider(newPlatform));
+    } catch (error) {
+      // console.warn('Failed to setup location provider:', error);
+    }
+
+    try {
+      angularModule.config($setupXsrfRequestInterceptor(newPlatform));
+    } catch (error) {
+      // console.warn('Failed to setup XSRF interceptor:', error);
+    }
+
+    // Run setup functions with error handling
+    try {
+      // HTTP loading count with explicit injection
+      angularModule.run([
+        '$rootScope',
+        '$http',
+        function ($rootScope: any, $http: any) {
+          try {
+            capture$httpLoadingCount(newPlatform)($rootScope, $http);
+          } catch (error) {
+            // console.warn('HTTP loading count setup failed:', error);
+          }
+        },
+      ]);
+    } catch (error) {
+      // console.warn('Failed to setup HTTP loading count:', error);
+    }
+
+    try {
+      // Breadcrumbs auto clear with explicit injection
+      angularModule.run([
+        '$rootScope',
+        '$injector',
+        function ($rootScope: any, $injector: any) {
+          try {
+            $setupBreadcrumbsAutoClear(newPlatform)($rootScope, $injector);
+          } catch (error) {
+            // console.warn('Breadcrumbs auto clear setup failed:', error);
+          }
+        },
+      ]);
+    } catch (error) {
+      // console.warn('Failed to setup breadcrumbs auto clear:', error);
+    }
+
+    try {
+      // Badge auto clear with explicit injection
+      angularModule.run([
+        '$rootScope',
+        '$injector',
+        function ($rootScope: any, $injector: any) {
+          try {
+            $setupBadgeAutoClear(newPlatform)($rootScope, $injector);
+          } catch (error) {
+            // console.warn('Badge auto clear setup failed:', error);
+          }
+        },
+      ]);
+    } catch (error) {
+      // console.warn('Failed to setup badge auto clear:', error);
+    }
+
+    try {
+      // Help extension auto clear with explicit injection
+      angularModule.run([
+        '$rootScope',
+        '$injector',
+        function ($rootScope: any, $injector: any) {
+          try {
+            $setupHelpExtensionAutoClear(newPlatform)($rootScope, $injector);
+          } catch (error) {
+            // console.warn('Help extension auto clear setup failed:', error);
+          }
+        },
+      ]);
+    } catch (error) {
+      // console.warn('Failed to setup help extension auto clear:', error);
+    }
+
+    try {
+      // URL overflow handling with explicit injection to avoid dependency issues
+      angularModule.run([
+        '$location',
+        '$rootScope',
+        '$injector',
+        function ($location: any, $rootScope: any, $injector: any) {
+          try {
+            // Get config safely
+            const config = $injector.has('config') ? $injector.get('config') : null;
+            if (config) {
+              $setupUrlOverflowHandling(newPlatform)($location, $rootScope, config);
+            }
+          } catch (error) {
+            // console.warn('URL overflow handling setup failed:', error);
+          }
+        },
+      ]);
+    } catch (error) {
+      // console.warn('Failed to setup URL overflow handling:', error);
+    }
   } catch (configError) {
-    console.error('Error configuring angular module:', configError);
+    // console.warn('Error configuring angular module:', configError);
   }
 };
 
-const getEsUrl = (newPlatform: CoreStart) => {
-  const a = document.createElement('a');
-  a.href = newPlatform.http.basePath.prepend('/elasticsearch');
-  const protocolPort = /https/.test(a.protocol) ? 443 : 80;
-  const port = a.port || protocolPort;
-  return {
-    host: a.hostname,
-    port,
-    protocol: a.protocol,
-    pathname: a.pathname,
-  };
+const getEsUrl = (newPlatform: any) => {
+  try {
+    const a = document.createElement('a');
+    const basePath = newPlatform.http?.basePath?.prepend || ((path: string) => path);
+    a.href = basePath('/elasticsearch');
+    const protocolPort = /https/.test(a.protocol) ? 443 : 80;
+    const port = a.port || protocolPort;
+    return {
+      host: a.hostname,
+      port,
+      protocol: a.protocol,
+      pathname: a.pathname,
+    };
+  } catch (error) {
+    // Fallback URL structure
+    return {
+      host: 'localhost',
+      port: 80,
+      protocol: 'http:',
+      pathname: '/elasticsearch',
+    };
+  }
 };
 
-const setupCompileProvider =
-  (newPlatform: LegacyCoreStart) => ($compileProvider: ICompileProvider) => {
-    if (!newPlatform.injectedMetadata.getLegacyMetadata().devMode) {
+const setupCompileProvider = (newPlatform: any) => ($compileProvider: ICompileProvider) => {
+  try {
+    const hasMetadata =
+      newPlatform.injectedMetadata &&
+      typeof newPlatform.injectedMetadata.getLegacyMetadata === 'function';
+    const legacyMetadata = hasMetadata ? newPlatform.injectedMetadata.getLegacyMetadata() : null;
+
+    if (!legacyMetadata?.devMode) {
       $compileProvider.debugInfoEnabled(false);
     }
-  };
+  } catch (error) {
+    // Default to production mode if unable to get dev mode setting
+    $compileProvider.debugInfoEnabled(false);
+  }
+};
 
-const setupLocationProvider =
-  (newPlatform: CoreStart) => ($locationProvider: ILocationProvider) => {
+const setupLocationProvider = (newPlatform: any) => ($locationProvider: ILocationProvider) => {
+  try {
     $locationProvider.html5Mode({
       enabled: false,
       requireBase: false,
@@ -178,10 +326,27 @@ const setupLocationProvider =
     });
 
     $locationProvider.hashPrefix('');
-  };
+  } catch (error) {
+    // console.warn('Could not setup location provider:', error);
+  }
+};
 
-export const $setupXsrfRequestInterceptor = (newPlatform: LegacyCoreStart) => {
-  const version = newPlatform.injectedMetadata.getLegacyMetadata().version;
+export const $setupXsrfRequestInterceptor = (newPlatform: any) => {
+  let version = '7.10.2'; // fallback version
+  try {
+    const hasMetadata =
+      newPlatform.injectedMetadata &&
+      typeof newPlatform.injectedMetadata.getLegacyMetadata === 'function';
+    if (hasMetadata) {
+      const legacyMetadata = newPlatform.injectedMetadata.getLegacyMetadata();
+      version =
+        legacyMetadata?.version ||
+        newPlatform.injectedMetadata?.getInjectedVar?.('version') ||
+        '7.10.2';
+    }
+  } catch (error) {
+    // Use fallback version if unable to get from metadata
+  }
 
   // Configure jQuery prefilter
   $.ajaxPrefilter(({ kbnXsrfToken = true }: any, originalOptions, jqXHR) => {
@@ -216,17 +381,25 @@ export const $setupXsrfRequestInterceptor = (newPlatform: LegacyCoreStart) => {
  * @return {undefined}
  */
 const capture$httpLoadingCount =
-  (newPlatform: CoreStart) => ($rootScope: IRootScopeService, $http: IHttpService) => {
-    newPlatform.http.addLoadingCount(
-      new Rx.Observable((observer) => {
-        const unwatch = $rootScope.$watch(() => {
-          const reqs = $http.pendingRequests || [];
-          observer.next(reqs.filter((req) => !isSystemApiRequest(req)).length);
-        });
+  (newPlatform: any) => ($rootScope: IRootScopeService, $http: IHttpService) => {
+    try {
+      // Check if addLoadingCount method exists
+      if (newPlatform.http && typeof newPlatform.http.addLoadingCount === 'function') {
+        newPlatform.http.addLoadingCount(
+          new Rx.Observable((observer) => {
+            const unwatch = $rootScope.$watch(() => {
+              const reqs = $http.pendingRequests || [];
+              observer.next(reqs.filter((req) => !isSystemApiRequest(req)).length);
+            });
 
-        return unwatch;
-      })
-    );
+            return unwatch;
+          })
+        );
+      }
+    } catch (error) {
+      // Silently handle if loading count setup fails
+      // console.warn('Could not setup HTTP loading count tracking:', error);
+    }
   };
 
 /**
@@ -235,43 +408,54 @@ const capture$httpLoadingCount =
  * the breadcrumbs if we switch to a Kibana app that does not use breadcrumbs correctly
  */
 const $setupBreadcrumbsAutoClear =
-  (newPlatform: CoreStart) => ($rootScope: IRootScopeService, $injector: any) => {
-    // A flag used to determine if we should automatically
-    // clear the breadcrumbs between angular route changes.
-    let breadcrumbSetSinceRouteChange = false;
-    const $route = $injector.has('$route') ? $injector.get('$route') : {};
+  (newPlatform: any) => ($rootScope: IRootScopeService, $injector: any) => {
+    try {
+      // A flag used to determine if we should automatically
+      // clear the breadcrumbs between angular route changes.
+      let breadcrumbSetSinceRouteChange = false;
+      const $route = $injector.has('$route') ? $injector.get('$route') : {};
 
-    // reset breadcrumbSetSinceRouteChange any time the breadcrumbs change, even
-    // if it was done directly through the new platform
-    newPlatform.chrome.getBreadcrumbs$().subscribe({
-      next() {
-        breadcrumbSetSinceRouteChange = true;
-      },
-    });
-
-    $rootScope.$on('$routeChangeStart', () => {
-      breadcrumbSetSinceRouteChange = false;
-    });
-
-    $rootScope.$on('$routeChangeSuccess', () => {
-      const current = $route.current || {};
-
-      if (breadcrumbSetSinceRouteChange || (current.$$route && current.$$route.redirectTo)) {
-        return;
+      // Check if chrome services are available
+      if (newPlatform.chrome && typeof newPlatform.chrome.getBreadcrumbs$ === 'function') {
+        // reset breadcrumbSetSinceRouteChange any time the breadcrumbs change, even
+        // if it was done directly through the new platform
+        newPlatform.chrome.getBreadcrumbs$().subscribe({
+          next() {
+            breadcrumbSetSinceRouteChange = true;
+          },
+        });
       }
 
-      const k7BreadcrumbsProvider = current.k7Breadcrumbs;
-      if (!k7BreadcrumbsProvider) {
-        newPlatform.chrome.setBreadcrumbs([]);
-        return;
-      }
+      $rootScope.$on('$routeChangeStart', () => {
+        breadcrumbSetSinceRouteChange = false;
+      });
 
-      try {
-        newPlatform.chrome.setBreadcrumbs($injector.invoke(k7BreadcrumbsProvider));
-      } catch (error) {
-        fatalError(error);
-      }
-    });
+      $rootScope.$on('$routeChangeSuccess', () => {
+        const current = $route.current || {};
+
+        if (breadcrumbSetSinceRouteChange || (current.$$route && current.$$route.redirectTo)) {
+          return;
+        }
+
+        const k7BreadcrumbsProvider = current.k7Breadcrumbs;
+        if (!k7BreadcrumbsProvider) {
+          if (newPlatform.chrome && typeof newPlatform.chrome.setBreadcrumbs === 'function') {
+            newPlatform.chrome.setBreadcrumbs([]);
+          }
+          return;
+        }
+
+        try {
+          if (newPlatform.chrome && typeof newPlatform.chrome.setBreadcrumbs === 'function') {
+            newPlatform.chrome.setBreadcrumbs($injector.invoke(k7BreadcrumbsProvider));
+          }
+        } catch (error) {
+          fatalError(error);
+        }
+      });
+    } catch (error) {
+      // console.warn('Could not setup breadcrumbs auto clear:', error);
+    }
   };
 
 /**
@@ -280,35 +464,43 @@ const $setupBreadcrumbsAutoClear =
  * the badge if we switch to a Kibana app that does not use the badge correctly
  */
 const $setupBadgeAutoClear =
-  (newPlatform: CoreStart) => ($rootScope: IRootScopeService, $injector: any) => {
-    // A flag used to determine if we should automatically
-    // clear the badge between angular route changes.
-    let badgeSetSinceRouteChange = false;
-    const $route = $injector.has('$route') ? $injector.get('$route') : {};
+  (newPlatform: any) => ($rootScope: IRootScopeService, $injector: any) => {
+    try {
+      // A flag used to determine if we should automatically
+      // clear the badge between angular route changes.
+      let badgeSetSinceRouteChange = false;
+      const $route = $injector.has('$route') ? $injector.get('$route') : {};
 
-    $rootScope.$on('$routeChangeStart', () => {
-      badgeSetSinceRouteChange = false;
-    });
+      $rootScope.$on('$routeChangeStart', () => {
+        badgeSetSinceRouteChange = false;
+      });
 
-    $rootScope.$on('$routeChangeSuccess', () => {
-      const current = $route.current || {};
+      $rootScope.$on('$routeChangeSuccess', () => {
+        const current = $route.current || {};
 
-      if (badgeSetSinceRouteChange || (current.$$route && current.$$route.redirectTo)) {
-        return;
-      }
+        if (badgeSetSinceRouteChange || (current.$$route && current.$$route.redirectTo)) {
+          return;
+        }
 
-      const badgeProvider = current.badge;
-      if (!badgeProvider) {
-        newPlatform.chrome.setBadge(undefined);
-        return;
-      }
+        const badgeProvider = current.badge;
+        if (!badgeProvider) {
+          if (newPlatform.chrome && typeof newPlatform.chrome.setBadge === 'function') {
+            newPlatform.chrome.setBadge(undefined);
+          }
+          return;
+        }
 
-      try {
-        newPlatform.chrome.setBadge($injector.invoke(badgeProvider));
-      } catch (error) {
-        fatalError(error);
-      }
-    });
+        try {
+          if (newPlatform.chrome && typeof newPlatform.chrome.setBadge === 'function') {
+            newPlatform.chrome.setBadge($injector.invoke(badgeProvider));
+          }
+        } catch (error) {
+          fatalError(error);
+        }
+      });
+    } catch (error) {
+      // console.warn('Could not setup badge auto clear:', error);
+    }
   };
 
 /**
@@ -318,86 +510,99 @@ const $setupBadgeAutoClear =
  * helpExtension
  */
 const $setupHelpExtensionAutoClear =
-  (newPlatform: CoreStart) => ($rootScope: IRootScopeService, $injector: any) => {
-    /**
-     * reset helpExtensionSetSinceRouteChange any time the helpExtension changes, even
-     * if it was done directly through the new platform
-     */
-    let helpExtensionSetSinceRouteChange = false;
-    newPlatform.chrome.getHelpExtension$().subscribe({
-      next() {
-        helpExtensionSetSinceRouteChange = true;
-      },
-    });
+  (newPlatform: any) => ($rootScope: IRootScopeService, $injector: any) => {
+    try {
+      /**
+       * reset helpExtensionSetSinceRouteChange any time the helpExtension changes, even
+       * if it was done directly through the new platform
+       */
+      let helpExtensionSetSinceRouteChange = false;
 
-    const $route = $injector.has('$route') ? $injector.get('$route') : {};
-
-    $rootScope.$on('$routeChangeStart', () => {
-      helpExtensionSetSinceRouteChange = false;
-    });
-
-    $rootScope.$on('$routeChangeSuccess', () => {
-      const current = $route.current || {};
-
-      if (helpExtensionSetSinceRouteChange || (current.$$route && current.$$route.redirectTo)) {
-        return;
+      if (newPlatform.chrome && typeof newPlatform.chrome.getHelpExtension$ === 'function') {
+        newPlatform.chrome.getHelpExtension$().subscribe({
+          next() {
+            helpExtensionSetSinceRouteChange = true;
+          },
+        });
       }
 
-      newPlatform.chrome.setHelpExtension(current.helpExtension);
-    });
+      const $route = $injector.has('$route') ? $injector.get('$route') : {};
+
+      $rootScope.$on('$routeChangeStart', () => {
+        helpExtensionSetSinceRouteChange = false;
+      });
+
+      $rootScope.$on('$routeChangeSuccess', () => {
+        const current = $route.current || {};
+
+        if (helpExtensionSetSinceRouteChange || (current.$$route && current.$$route.redirectTo)) {
+          return;
+        }
+
+        if (newPlatform.chrome && typeof newPlatform.chrome.setHelpExtension === 'function') {
+          newPlatform.chrome.setHelpExtension(current.helpExtension);
+        }
+      });
+    } catch (error) {
+      // console.warn('Could not setup help extension auto clear:', error);
+    }
   };
 
 const $setupUrlOverflowHandling =
-  (newPlatform: CoreStart) =>
-  ($location: ILocationService, $rootScope: IRootScopeService, Private: any, config: any) => {
-    const urlOverflow = new UrlOverflowService();
-    const check = () => {
-      // disable long url checks when storing state in session storage
-      if (config.get('state:storeInSessionStorage')) {
-        return;
-      }
+  (newPlatform: any) =>
+  ($location: ILocationService, $rootScope: IRootScopeService, config: any) => {
+    try {
+      const urlOverflow = new UrlOverflowService();
+      const check = () => {
+        try {
+          // disable long url checks when storing state in session storage
+          if (config.get('state:storeInSessionStorage')) {
+            return;
+          }
 
-      if ($location.path() === '/error/url-overflow') {
-        return;
-      }
+          if ($location.path() === '/error/url-overflow') {
+            return;
+          }
 
-      try {
-        if (urlOverflow.check($location.absUrl()) <= URL_LIMIT_WARN_WITHIN) {
-          toastNotifications.addWarning({
-            title: i18n.translate('common.ui.chrome.bigUrlWarningNotificationTitle', {
-              defaultMessage: 'The URL is big and NetMon-UI might stop working',
-            }),
-            text: (
-              <Fragment>
-                <FormattedMessage
-                  id="common.ui.chrome.bigUrlWarningNotificationMessage"
-                  defaultMessage="Either enable the {storeInSessionStorageParam} option
-                  in {advancedSettingsLink} or simplify the onscreen visuals."
-                  values={{
-                    storeInSessionStorageParam: <code>state:storeInSessionStorage</code>,
-                    advancedSettingsLink: (
-                      <a href="#/management/kibana/settings">
-                        <FormattedMessage
-                          id="common.ui.chrome.bigUrlWarningNotificationMessage.advancedSettingsLinkText"
-                          defaultMessage="advanced settings"
-                        />
-                      </a>
-                    ),
-                  }}
-                />
-              </Fragment>
-            ),
+          if (urlOverflow.check($location.absUrl()) <= URL_LIMIT_WARN_WITHIN) {
+            toastNotifications.addWarning({
+              title: i18n.translate('common.ui.chrome.bigUrlWarningNotificationTitle', {
+                defaultMessage: 'The URL is big and NetMon-UI might stop working',
+              }),
+              text: (
+                <Fragment>
+                  <FormattedMessage
+                    id="common.ui.chrome.bigUrlWarningNotificationMessage"
+                    defaultMessage="Either enable the {storeInSessionStorageParam} option
+                    in {advancedSettingsLink} or simplify the onscreen visuals."
+                    values={{
+                      storeInSessionStorageParam: <code>state:storeInSessionStorage</code>,
+                      advancedSettingsLink: (
+                        <a href="#/management/kibana/settings">
+                          <FormattedMessage
+                            id="common.ui.chrome.bigUrlWarningNotificationMessage.advancedSettingsLinkText"
+                            defaultMessage="advanced settings"
+                          />
+                        </a>
+                      ),
+                    }}
+                  />
+                </Fragment>
+              ),
+            });
+          }
+        } catch (e) {
+          window.location.href = modifyUrl(window.location.href, (parts: any) => {
+            parts.hash = '#/error/url-overflow';
           });
+          // force the browser to reload to that Kibana's potentially unstable state is unloaded
+          window.location.reload();
         }
-      } catch (e) {
-        window.location.href = modifyUrl(window.location.href, (parts: any) => {
-          parts.hash = '#/error/url-overflow';
-        });
-        // force the browser to reload to that Kibana's potentially unstable state is unloaded
-        window.location.reload();
-      }
-    };
+      };
 
-    $rootScope.$on('$routeUpdate', check);
-    $rootScope.$on('$routeChangeStart', check);
+      $rootScope.$on('$routeUpdate', check);
+      $rootScope.$on('$routeChangeStart', check);
+    } catch (error) {
+      // console.warn('Could not setup URL overflow handling:', error);
+    }
   };

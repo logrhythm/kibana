@@ -40,7 +40,11 @@ ExecStart=/usr/local/kibana-7.10.2-linux-x64/bin/kibana
 
 ExecStartPost=/usr/bin/python /usr/local/kibana-7.10.2-linux-x64/scripts/configureKibana.py
 ExecStartPost=/usr/bin/bash scripts/kibana-post-start.sh
-ExecStartPost=/usr/bin/python scripts/removeOldKibanaIndices.py
+#  1. Kibana 7.10.2 manages its own index lifecycle
+#  2. The cleanup script doesn't know which index is "active"
+#  3. Any external deletion of .kibana* indices is dangerous
+#  If really need to clean the indices run scripts/removeOldKibanaIndices.py script manually before staring kibana
+#ExecStartPost=/usr/bin/python scripts/removeOldKibanaIndices.py
 
 TimeoutStopSec=30
 

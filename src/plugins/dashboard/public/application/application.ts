@@ -118,8 +118,20 @@ function mountDashboardApp(appBasePath: string, element: HTMLElement) {
   // bootstrap angular into detached element and attach it later to
   // make angular-within-angular possible
   const $injector = angular.bootstrap(mountpoint, [moduleName]);
+  //console.log('🔍 DEBUG: Angular bootstrapped, injector:', $injector);
   // initialize global state handler
   element.appendChild(mountpoint);
+  //console.log('🔍 DEBUG: Mountpoint appended, innerHTML:', mountpoint.innerHTML);
+
+  // Debug: Check ng-view after Angular has time to initialize
+  setTimeout(() => {
+    const ngView = mountpoint.querySelector('[ng-view]');
+    //console.log('🔍 DEBUG: ng-view found after 2s:', !!ngView);
+    //console.log(
+      '🔍 DEBUG: ng-view innerHTML:',
+      ngView?.innerHTML?.substring(0, 300) || 'NOT FOUND'
+    );
+  }, 2000);
   return $injector;
 }
 

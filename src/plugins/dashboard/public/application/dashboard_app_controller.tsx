@@ -396,8 +396,12 @@ export class DashboardAppController {
         description: dashboardStateManager.getDescription(),
         timeRange: timefilter.getTime(),
         refreshInterval: timefilter.getRefreshInterval(),
+        useMargins: dashboardStateManager.getUseMargins(),
       };
       $scope.panels = dashboardStateManager.getPanels();
+
+      // Set screen title for accessibility - needed for 7.5.2 compatibility
+      $scope.screenTitle = dashboardStateManager.getTitle() || 'Dashboard';
     };
 
     updateState();
@@ -582,7 +586,7 @@ export class DashboardAppController {
 
       Object.keys(_.omit(containerInput, ['filters'])).forEach((key) => {
         const containerValue = (containerInput as { [key: string]: unknown })[key];
-        const appStateValue = ((appStateDashboardInput as unknown) as { [key: string]: unknown })[
+        const appStateValue = (appStateDashboardInput as unknown as { [key: string]: unknown })[
           key
         ];
         if (!_.isEqual(containerValue, appStateValue)) {
@@ -709,6 +713,17 @@ export class DashboardAppController {
     };
     const dashboardNavBar = document.getElementById('dashboardChrome');
     const updateNavBar = () => {
+      // Skip rendering dashboard navigation if LogRhythm navbar is present
+      const logrhythmNavbarExists =
+        document.querySelector('[class*="navbar"], [class*="Navbar"], .nm-section, nav') ||
+        window.logrhythm ||
+        window.netmonDashboards;
+
+      if (logrhythmNavbarExists) {
+        // console.log('LogRhythm navbar detected, skipping Kibana dashboard navigation');
+        return;
+      }
+
       ReactDOM.render(
         <navigation.ui.TopNavMenu
           {...getNavBarProps()}
@@ -719,6 +734,17 @@ export class DashboardAppController {
     };
 
     const unmountNavBar = () => {
+      // Skip unmounting if LogRhythm navbar is handling navigation
+      const logrhythmNavbarExists =
+        document.querySelector('[class*="navbar"], [class*="Navbar"], .nm-section, nav') ||
+        window.logrhythm ||
+        window.netmonDashboards;
+
+      if (logrhythmNavbarExists) {
+        // console.log('LogRhythm navbar detected, skipping Kibana dashboard navigation unmount');
+        return;
+      }
+
       if (dashboardNavBar) {
         ReactDOM.unmountComponentAtNode(dashboardNavBar);
       }
@@ -1063,7 +1089,7 @@ export class DashboardAppController {
           return (
             <EuiCheckboxGroup
               options={checkboxes}
-              idToSelectedMap={(urlParamsSelectedMap as unknown) as EuiCheckboxGroupIdToSelectedMap}
+              idToSelectedMap={urlParamsSelectedMap as unknown as EuiCheckboxGroupIdToSelectedMap}
               onChange={handleChange}
               legend={{
                 children: i18n.translate('dashboard.embedUrlParamExtension.include', {

@@ -66,6 +66,7 @@ export interface DashboardAppScope extends ng.IScope {
 }
 
 export function initDashboardAppDirective(app: any, deps: RenderDeps) {
+  // console.log('🔍 DEBUG: Registering dashboardApp directive');
   app.directive('dashboardApp', () => ({
     restrict: 'E',
     controllerAs: 'dashboardApp',

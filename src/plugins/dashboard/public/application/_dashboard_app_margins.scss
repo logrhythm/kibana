@@ -1,0 +1,9 @@
+// Missing CSS class for dashboard margins functionality
+// This provides compatibility with 7.5.2 behavior
+
+.dshAppContainer--withMargins {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: $euiSizeS;
+}

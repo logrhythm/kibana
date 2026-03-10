@@ -29,17 +29,13 @@ import { makeStyles } from '@material-ui/styles';
 import { AuthContext, AuthContextValue } from '@logrhythm/nm-web-shared/contexts/auth_context';
 import {
   BlockingProcessContext,
-  BlockingProcessContextValue,
+  BlockingProcessContextState,
 } from '@logrhythm/nm-web-shared/contexts/blocking_process_context';
+import BlockingProcessModal from '@logrhythm/nm-web-shared/components/blocking_process/blocking_process_modal';
 import { Navbar } from '@logrhythm/nm-web-shared/components/navigation/navbar/navbar';
+import Auth from '@logrhythm/nm-web-shared/services/auth';
 import { useSessionSync } from '@logrhythm/nm-web-shared/hooks/session_sync_hooks';
 import NotificationHandler from './notification_handler';
-
-/* eslint-disable @typescript-eslint/no-var-requires */
-const AuthService = require('@logrhythm/nm-web-shared/services/auth').default;
-const BlockingProcessModal =
-  require('@logrhythm/nm-web-shared/components/blocking_process/blocking_process_modal').default;
-/* eslint-enable @typescript-eslint/no-var-requires */
 
 const useStyles = makeStyles(
   {
@@ -63,50 +59,29 @@ const useStyles = makeStyles(
 
 const LogRhythmNavbar = () => {
   const classes = useStyles();
-  const [authState, setAuthState] = useState<AuthContextValue | undefined>(undefined);
 
-  // Always call hooks in the same order - handle errors in useEffect
+  const [authState, setAuthState] = useState<AuthContextValue>(undefined);
+
   const checkingToken = useSessionSync('token');
   const checkingNotifications = useSessionSync('notificationsAlreadySeen');
 
   const [blockingProcessMsg, setBlockingProcessMsg] = useState<string>('');
-  const blockingProcessContextState: BlockingProcessContextValue = {
+  const blockingProcessContextState: BlockingProcessContextState = {
     message: blockingProcessMsg,
     block: setBlockingProcessMsg,
     unblock: () => setBlockingProcessMsg(''),
   };
 
   useEffect(() => {
-    // Apply LogRhythm 7.5.2 compatible styling
-    document.body.classList.add('logrhythm-theme', 'kibana-7-5-2-compat');
-
     if (checkingToken || checkingNotifications) {
       return;
     }
 
-    try {
-      const unsub = AuthService.subscribe((newAuthState: AuthContextValue) => {
-        setAuthState(newAuthState);
-      });
+    const unsub = Auth.subscribe(setAuthState);
 
-      AuthService.getCurrentUser();
-      return unsub;
-    } catch (authError) {
-      // Handle auth error silently and set default state
-      setAuthState({
-        user: null,
-        isAuthenticated: false,
-        isLoading: false,
-        error: null,
-        login: async () => Promise.resolve(),
-        logout: async () => Promise.resolve(),
-      } as AuthContextValue);
-    }
+    Auth.getCurrentUser();
 
-    // Cleanup function
-    return () => {
-      document.body.classList.remove('logrhythm-theme', 'kibana-7-5-2-compat');
-    };
+    return unsub;
   }, [checkingToken, checkingNotifications]);
 
   if (authState === undefined) {
@@ -124,14 +99,11 @@ const LogRhythmNavbar = () => {
         >
           <Navbar />
           <NotificationHandler />
-          {React.createElement(BlockingProcessModal, {
-            isOpen: !!blockingProcessMsg,
-            message: blockingProcessMsg,
-          })}
+          <BlockingProcessModal />
         </SnackbarProvider>
       </BlockingProcessContext.Provider>
     </AuthContext.Provider>
   );
 };
 
-export { LogRhythmNavbar };
+export default LogRhythmNavbar;

@@ -24,6 +24,8 @@ import dashboardTemplate from './dashboard_app.html';
 import dashboardListingTemplate from './listing/dashboard_listing_ng_wrapper.html';
 import { createHashHistory } from 'history';
 
+// Debug: Check if dashboard template is loading
+console.log('🔍 DEBUG: Dashboard template:', dashboardTemplate);
 import { initDashboardAppDirective } from './dashboard_app';
 import { createDashboardEditUrl, DashboardConstants } from '../dashboard_constants';
 import {
@@ -55,6 +57,7 @@ export function initDashboardApp(app, deps) {
   });
 
   function createNewDashboardCtrl($scope) {
+    console.log('🔍 DEBUG: Dashboard controller called, scope:', $scope);
     $scope.visitVisualizeAppLinkText = i18n.translate('dashboard.visitVisualizeAppLinkText', {
       defaultMessage: 'visit the Visualize app',
     });
@@ -71,6 +74,8 @@ export function initDashboardApp(app, deps) {
   );
 
   app.config(function ($routeProvider) {
+    console.log('🔍 DEBUG: Configuring routes, template available:', !!dashboardTemplate);
+    console.log('🔍 DEBUG: Template content preview:', dashboardTemplate?.substring(0, 100));
     const defaults = {
       reloadOnSearch: false,
       requireUICapability: 'dashboard.show',
@@ -257,5 +262,34 @@ export function initDashboardApp(app, deps) {
           return new Promise(() => {});
         },
       });
+  });
+
+  // Debug: Monitor route changes - inside initDashboardApp function
+  app.run(function ($rootScope, $location) {
+    console.log('🔍 DEBUG: Angular app.run() executed');
+    console.log('🔍 DEBUG: Initial location:', $location.path());
+
+    $rootScope.$on('$routeChangeStart', function (event, next, current) {
+      console.log('🔍 DEBUG: Route change START');
+      console.log('🔍 DEBUG: From:', current?.$$route?.originalPath || 'none');
+      console.log('🔍 DEBUG: To:', next?.$$route?.originalPath || 'unknown');
+      console.log('🔍 DEBUG: Next template available:', !!next?.template);
+      console.log('🔍 DEBUG: Location path:', $location.path());
+    });
+
+    $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
+      console.log('🔍 DEBUG: Route change SUCCESS');
+      console.log('🔍 DEBUG: Current route:', current?.$$route?.originalPath);
+      setTimeout(() => {
+        const ngView = document.querySelector('[ng-view]');
+        console.log('🔍 DEBUG: ng-view element:', ngView);
+        console.log('🔍 DEBUG: ng-view content:', ngView?.innerHTML?.substring(0, 300));
+      }, 500);
+    });
+
+    $rootScope.$on('$routeChangeError', function (event, current, previous, rejection) {
+      console.error('🔍 DEBUG: Route change ERROR:', rejection);
+      console.log('🔍 DEBUG: Failed route:', current?.$$route?.originalPath);
+    });
   });
 }

@@ -58,7 +58,7 @@ import {
 
 import { i18n } from '@kbn/i18n';
 import { InjectedIntl, injectI18n } from '@kbn/i18n/react';
-import { LogRhythmNavbar } from '../../../../../netmon/components/navbar';
+import LogRhythmNavbar from '../../../../../netmon/components/navbar';
 
 import {
   ChromeBadge,
@@ -359,11 +359,22 @@ class HeaderUI extends Component<Props, State> {
     ];
 
     return (
-      <header>
-        {/* LogRhythm Navbar - renders full navbar with Analyze dropdown for Kibana dashboards */}
-        <LogRhythmNavbar />
+      <div className="chrHeaderWrapper hide-for-sharing" data-test-subj="headerGlobalNav">
+        <header>
+          {/* Add body positioning for LogRhythm fixed navbar */}
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `
+              body { margin-top: 50px !important; }
+              body.coreSystemRootDomElement { margin-top: 50px !important; }
+            `,
+            }}
+          />
 
-        {/* <EuiHeader>
+          {/* LogRhythm Navbar - renders full navbar with Analyze dropdown for Kibana dashboards */}
+          <LogRhythmNavbar />
+
+          {/* <EuiHeader>
           <EuiHeaderSection grow={false}>
             <EuiShowFor sizes={['xs', 's']}>
               <EuiHeaderSectionItem border="right">{this.renderMenuTrigger()}</EuiHeaderSectionItem>
@@ -389,17 +400,18 @@ class HeaderUI extends Component<Props, State> {
           </EuiHeaderSection>
         </EuiHeader> */}
 
-        <EuiNavDrawer
-          ref={this.navDrawerRef}
-          data-test-subj="navDrawer"
-          isLocked={isLocked}
-          onIsLockedUpdate={onIsLockedUpdate}
-        >
-          <EuiNavDrawerGroup listItems={recentLinksArray} />
-          <EuiHorizontalRule margin="none" />
-          <EuiNavDrawerGroup data-test-subj="navDrawerAppsMenu" listItems={navLinksArray} />
-        </EuiNavDrawer>
-      </header>
+          <EuiNavDrawer
+            ref={this.navDrawerRef}
+            data-test-subj="navDrawer"
+            isLocked={isLocked}
+            onIsLockedUpdate={onIsLockedUpdate}
+          >
+            <EuiNavDrawerGroup listItems={recentLinksArray} />
+            <EuiHorizontalRule margin="none" />
+            <EuiNavDrawerGroup data-test-subj="navDrawerAppsMenu" listItems={navLinksArray} />
+          </EuiNavDrawer>
+        </header>
+      </div>
     );
   }
 

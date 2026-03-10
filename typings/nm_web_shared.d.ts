@@ -33,14 +33,18 @@ declare module '@logrhythm/nm-web-shared/hooks/notistack_hooks' {
 declare module '@logrhythm/nm-web-shared/contexts/auth_context' {
   import React from 'react';
 
-  export interface AuthContextValue {
-    user?: any;
-    isAuthenticated: boolean;
-    login: (credentials: any) => Promise<void>;
-    logout: () => Promise<void>;
+  export interface IUser {
+    licensed: boolean;
+    role: string;
+    username: string;
+    timeToResetPass: boolean;
   }
 
-  export const AuthContext: React.Context<any>;
+  export type AuthContextValue = IUser | null | undefined;
+
+  export type AuthContextState = [AuthContextValue, (newState: AuthContextValue) => void];
+
+  export const AuthContext: React.Context<AuthContextState>;
 }
 
 declare module '@logrhythm/nm-web-shared/contexts/blocking_process_context' {
@@ -52,6 +56,8 @@ declare module '@logrhythm/nm-web-shared/contexts/blocking_process_context' {
     unblock: () => void;
   }
 
+  export type BlockingProcessContextState = BlockingProcessContextValue;
+
   export const BlockingProcessContext: React.Context<BlockingProcessContextValue>;
   export function useBlockingProcess(): BlockingProcessContextValue;
 }
@@ -60,39 +66,80 @@ declare module '@logrhythm/nm-web-shared/components/blocking_process/blocking_pr
   import React from 'react';
 
   interface Props {
-    isOpen: boolean;
+    isOpen?: boolean;
     message?: string;
   }
 
-  export const BlockingProcessModal: React.ComponentType<Props>;
+  const BlockingProcessModal: React.ComponentType<Props>;
+  export default BlockingProcessModal;
 }
 
 declare module '@logrhythm/nm-web-shared/components/navigation/navbar/navbar' {
   import React from 'react';
 
   interface NavbarProps {
-    title?: string;
-    user?: any;
-    onLogout?: () => void;
+    checkForAdminRedirect?: boolean;
   }
 
   export const Navbar: React.ComponentType<NavbarProps>;
 }
 
 declare module '@logrhythm/nm-web-shared/services/auth' {
+  export interface IUser {
+    licensed: boolean;
+    role: string;
+    username: string;
+    timeToResetPass: boolean;
+  }
+
   interface AuthService {
     login(credentials: any): Promise<any>;
     logout(): Promise<void>;
-    getCurrentUser(): any;
+    getCurrentUser(): Promise<IUser | null>;
     isAuthenticated(): boolean;
-    subscribe(callback: (state: any) => void): () => void;
+    subscribe(callback: (state: IUser | null) => void): () => void;
   }
 
-  export const Auth: AuthService;
+  const Auth: AuthService;
+  export default Auth;
 }
 
 declare module '@logrhythm/nm-web-shared/hooks/session_sync_hooks' {
   export function useSessionSync(key?: string): boolean;
+}
+
+declare module '@logrhythm/nm-web-shared/hooks/ui_theme_hooks' {
+  export function useUiTheme(): string;
+}
+
+declare module '@logrhythm/nm-web-shared/hooks/event_hooks' {
+  export function useEvent(eventName: string, handler: () => void): void;
+}
+
+declare module '@logrhythm/nm-web-shared/services/events' {
+  interface EventEmitter {
+    on(event: string, listener: () => void): void;
+    removeListener(event: string, listener: () => void): void;
+  }
+
+  interface Events {
+    events: EventEmitter;
+    eventNames: {
+      licenseCheck: string;
+      passwordCheck: string;
+      timeSyncCheck: string;
+    };
+    licenseCheck(): void;
+    passwordCheck(): void;
+    timeSyncCheck(): void;
+  }
+
+  const Events: Events;
+  export default Events;
+}
+
+declare module '@logrhythm/nm-web-shared/services/ui_theme' {
+  export function getUiTheme(): string;
 }
 
 declare module '@logrhythm/nm-web-shared/services/session_files' {
