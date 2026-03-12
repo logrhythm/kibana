@@ -34,6 +34,8 @@ import * as Rx from 'rxjs';
 import 'jquery';
 import 'tether';
 import 'bootstrap';
+// Import LogRhythm lr-style CSS for proper UI alignment
+import 'lr-style/dist/lr-style.css';
 
 import {
   // TODO: add type annotations
@@ -59,6 +61,8 @@ import {
 import { i18n } from '@kbn/i18n';
 import { InjectedIntl, injectI18n } from '@kbn/i18n/react';
 import LogRhythmNavbar from '../../../../../netmon/components/navbar';
+// Import LogRhythm lr-style CSS for dashboard compatibility
+import 'lr-style/dist/lr-style.css';
 
 import {
   ChromeBadge,
@@ -367,6 +371,16 @@ class HeaderUI extends Component<Props, State> {
               __html: `
               body { margin-top: 50px !important; }
               body.coreSystemRootDomElement { margin-top: 50px !important; }
+
+              /* Fix header menu visibility issues */
+              .euiHeader .euiHeaderSection .euiHeaderSectionItem {
+                z-index: 9999 !important;
+              }
+
+              /* Ensure header dropdown menus are visible */
+              .euiPopover__panel, .euiContextMenu, .euiContextMenuPanel {
+                z-index: 10000 !important;
+              }
             `,
             }}
           />

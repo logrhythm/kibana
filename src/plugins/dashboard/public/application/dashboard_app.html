@@ -2,7 +2,31 @@
   class="app-container dshAppContainer"
   ng-class="{'dshAppContainer--withMargins': model.useMargins}"
 >
-  <div id="dashboardChrome"></div>
+  <kbn-top-nav
+    ng-show="chrome.getVisible()"
+    app-name="'dashboard'"
+    config="topNavMenu"
+    showSearchBar="chrome.getVisible()"
+    showFilterBar="showFilterBar()"
+    showSaveQuery="showSaveQuery"
+    filters="model.filters"
+    query="model.query"
+    savedQuery="savedQuery"
+    screenTitle="screenTitle"
+    onQuerySubmit="updateQueryAndFetch"
+    indexPatterns="indexPatterns"
+    onFiltersUpdated="onFiltersUpdated"
+    dateRangeFrom="model.timeRange.from"
+    dateRangeTo="model.timeRange.to"
+    isRefreshPaused="model.refreshInterval.pause"
+    refreshInterval="model.refreshInterval.value"
+    onSaved="onQuerySaved"
+    onSavedQueryUpdated="onSavedQueryUpdated"
+    onClearSavedQuery="onClearSavedQuery"
+    onRefreshChange="onRefreshChange"
+    useDefaultBehaviors="true">
+  </kbn-top-nav>
+
   <h1 class="euiScreenReaderOnly">{{screenTitle}}</h1>
   <div id="dashboardViewport"></div>
 

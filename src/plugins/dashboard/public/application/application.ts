@@ -41,7 +41,12 @@ import { EmbeddableStart } from '../../../embeddable/public';
 import { NavigationPublicPluginStart as NavigationStart } from '../../../navigation/public';
 import { DataPublicPluginStart } from '../../../data/public';
 import { SharePluginStart } from '../../../share/public';
-import { KibanaLegacyStart, configureAppAngularModule } from '../../../kibana_legacy/public';
+import {
+  KibanaLegacyStart,
+  configureAppAngularModule,
+  createTopNavDirective,
+  createTopNavHelper,
+} from '../../../kibana_legacy/public';
 import { UrlForwardingStart } from '../../../url_forwarding/public';
 import { SavedObjectLoader, SavedObjectsStart } from '../../../saved_objects/public';
 
@@ -83,7 +88,7 @@ let angularModuleInstance: IModule | null = null;
 
 export const renderApp = (element: HTMLElement, appBasePath: string, deps: RenderDeps) => {
   if (!angularModuleInstance) {
-    angularModuleInstance = createLocalAngularModule();
+    angularModuleInstance = createLocalAngularModule(deps.navigation);
     // global routing stuff
     configureAppAngularModule(
       angularModuleInstance,
@@ -118,31 +123,26 @@ function mountDashboardApp(appBasePath: string, element: HTMLElement) {
   // bootstrap angular into detached element and attach it later to
   // make angular-within-angular possible
   const $injector = angular.bootstrap(mountpoint, [moduleName]);
-  //console.log('🔍 DEBUG: Angular bootstrapped, injector:', $injector);
   // initialize global state handler
   element.appendChild(mountpoint);
-  //console.log('🔍 DEBUG: Mountpoint appended, innerHTML:', mountpoint.innerHTML);
 
   // Debug: Check ng-view after Angular has time to initialize
   setTimeout(() => {
     const ngView = mountpoint.querySelector('[ng-view]');
-    //console.log('🔍 DEBUG: ng-view found after 2s:', !!ngView);
-    //console.log(
-      '🔍 DEBUG: ng-view innerHTML:',
-      ngView?.innerHTML?.substring(0, 300) || 'NOT FOUND'
-    );
   }, 2000);
   return $injector;
 }
 
-function createLocalAngularModule() {
+function createLocalAngularModule(navigation) {
   createLocalI18nModule();
+  createLocalTopNavModule(navigation);
   createLocalIconModule();
 
   const dashboardAngularModule = angular.module(moduleName, [
     ...thirdPartyAngularDependencies,
     'app/dashboard/I18n',
     'app/dashboard/icon',
+    'app/dashboard/topNav',
   ]);
   return dashboardAngularModule;
 }
@@ -151,6 +151,13 @@ function createLocalIconModule() {
   angular
     .module('app/dashboard/icon', ['react'])
     .directive('icon', (reactDirective) => reactDirective(EuiIcon));
+}
+
+function createLocalTopNavModule(navigation) {
+  angular
+    .module('app/dashboard/topNav', ['react'])
+    .directive('kbnTopNav', createTopNavDirective)
+    .directive('kbnTopNavHelper', createTopNavHelper(navigation.ui));
 }
 
 function createLocalI18nModule() {

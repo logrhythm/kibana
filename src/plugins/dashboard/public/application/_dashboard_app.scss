@@ -4,6 +4,13 @@
   flex: 1;
 }
 
+.dshAppContainer--withMargins {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: $euiSizeS;
+}
+
 .dshStartScreen {
   text-align: center;
 }

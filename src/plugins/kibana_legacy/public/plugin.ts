@@ -22,6 +22,8 @@ import { ConfigSchema } from '../config';
 import { getDashboardConfig } from './dashboard_config';
 import { injectHeaderStyle } from './utils/inject_header_style';
 import { setNpStart } from './new_platform';
+// Import LogRhythm lr-style CSS
+import 'lr-style/dist/lr-style.css';
 
 export class KibanaLegacyPlugin {
   constructor(private readonly initializerContext: PluginInitializerContext<ConfigSchema>) {}
@@ -145,7 +147,6 @@ export class KibanaLegacyPlugin {
       (window as any).getNetMonDashboards = () => dashboards;
       (window as any).getNmDashboards = () => dashboards; // Alternative name
 
-      // console.log('NetMon dashboards configured from kibana_legacy plugin:', dashboards.length);
       return dashboards;
     };
 
@@ -172,6 +173,14 @@ export class KibanaLegacyPlugin {
       }
     });
 
+    // Also force add dashboard class immediately for dashboard URLs
+    if (
+      window.location.pathname.includes('dashboard') ||
+      window.location.hash.includes('dashboard')
+    ) {
+      chrome.addApplicationClass('tab-dashboard');
+    }
+
     // Error handling setup for subscribe calls
 
     // Add safety wrapper for subscribe calls
@@ -193,7 +202,112 @@ export class KibanaLegacyPlugin {
       // Silently handle patch errors
     }
 
+    // Debug: Monitor and fix application classes in DOM
+    setInterval(() => {
+      const appContainer = document.querySelector('.application');
+      if (appContainer) {
+        const hasTabDashboard = appContainer.classList.contains('tab-dashboard');
+        if (
+          !hasTabDashboard &&
+          (window.location.hash.includes('dashboard') ||
+            window.location.pathname.includes('dashboard'))
+        ) {
+          appContainer.classList.add('tab-dashboard');
+        }
+      }
+    }, 2000);
+
     injectHeaderStyle(uiSettings);
+
+    // Inject additional CSS fixes for UI positioning and visibility
+    const additionalCSS = `
+      <style id="netmon-ui-fixes">
+        /* Ensure proper body positioning with LogRhythm navbar */
+        body.coreSystemRootDomElement {
+          margin-top: 50px !important;
+          padding-top: 0 !important;
+        }
+
+        /* Fix header menu visibility issues */
+        .euiHeader .euiHeaderSection .euiHeaderSectionItem {
+          display: flex !important;
+          visibility: visible !important;
+          opacity: 1 !important;
+        }
+
+        /* Ensure proper z-index for dropdowns and menus */
+        .euiPopover__panel, .euiContextMenu, .euiContextMenuPanel {
+          z-index: 10000 !important;
+        }
+
+        /* Fix search and filter bar visibility */
+        .kbnTopNavMenu__wrapper {
+          display: flex !important;
+        }
+
+        .globalFilterBar {
+          display: flex !important;
+          visibility: visible !important;
+        }
+
+        /* Ensure dashboard viewport positioning */
+        .dshAppContainer {
+          margin-top: 0 !important;
+          padding-top: 0 !important;
+        }
+
+        /* Fix for dashboard margins functionality */
+        .dshAppContainer--withMargins {
+          padding: 16px !important;
+        }
+
+        /* Additional navbar and component fixes for nm-web-shared compatibility */
+        .logrhythm-navbar, .navbar {
+          position: fixed !important;
+          top: 0 !important;
+          left: 0 !important;
+          right: 0 !important;
+          z-index: 9999 !important;
+          height: 50px !important;
+        }
+
+        /* Fix for missing search input in kbn-top-nav */
+        .kbnTopNavMenu .kbnTopNavMenu__wrapper {
+          display: flex !important;
+          align-items: center !important;
+        }
+
+        .kbnTopNavMenu__datePickerWrapper {
+          display: flex !important;
+        }
+
+        .globalQueryBar {
+          display: flex !important;
+          flex-grow: 1 !important;
+        }
+
+        /* Ensure dashboard content is properly positioned */
+        .application {
+          margin-top: 0 !important;
+          padding-top: 0 !important;
+        }
+
+        .application.tab-dashboard {
+          display: flex !important;
+          flex-direction: column !important;
+        }
+
+      </style>
+    `;
+
+    // Inject the CSS into the document head
+    if (typeof document !== 'undefined') {
+      const head = document.querySelector('head');
+      if (head && !head.querySelector('#netmon-ui-fixes')) {
+        head.insertAdjacentHTML('beforeend', additionalCSS);
+      }
+    }
+
     return {
       /**
        * Used to power dashboard mode. Should be removed when dashboard mode is removed eventually.
@@ -218,3 +332,15 @@ export class KibanaLegacyPlugin {
 
 export type KibanaLegacySetup = ReturnType<KibanaLegacyPlugin['setup']>;
 export type KibanaLegacyStart = ReturnType<KibanaLegacyPlugin['start']>;
+
+// Debug: Check CSS and layout after everything loads
+setTimeout(() => {
+  const appContainer = document.querySelector('.application');
+  const body = document.body;
+  const navbar = document.querySelector('nav, .navbar, .logrhythm-navbar, [class*="navbar"]');
+
+  // Check if nm-web-shared styles are loaded
+  const hasNmStyles = !!document.querySelector(
+    '[href*="nm-web-shared"], style[data-nm], link[data-nm]'
+  );
+}, 5000);

@@ -411,6 +411,7 @@ export class DashboardAppController {
     let outputSubscription: Subscription | undefined;
 
     const dashboardDom = document.getElementById('dashboardViewport');
+    const dashboardNavBar = document.getElementById('dashboardChrome');
     const dashboardFactory = embeddable.getEmbeddableFactory<
       DashboardContainerInput,
       ContainerOutput,
@@ -616,6 +617,12 @@ export class DashboardAppController {
       }
     };
 
+    // Add missing showFilterBar function for template
+    $scope.showFilterBar = function () {
+      // Always show filter bar unless explicitly hidden or in full screen mode
+      return !dashboardStateManager.getFullScreenMode();
+    };
+
     const updateStateFromSavedQuery = (savedQuery: SavedQuery) => {
       const allFilters = filterManager.getFilters();
       dashboardStateManager.applyFilters(savedQuery.attributes.query, allFilters);
@@ -711,40 +718,20 @@ export class DashboardAppController {
         onQuerySubmit: $scope.handleRefresh,
       };
     };
-    const dashboardNavBar = document.getElementById('dashboardChrome');
+
     const updateNavBar = () => {
-      // Skip rendering dashboard navigation if LogRhythm navbar is present
-      const logrhythmNavbarExists =
-        document.querySelector('[class*="navbar"], [class*="Navbar"], .nm-section, nav') ||
-        window.logrhythm ||
-        window.netmonDashboards;
-
-      if (logrhythmNavbarExists) {
-        // console.log('LogRhythm navbar detected, skipping Kibana dashboard navigation');
-        return;
-      }
-
-      ReactDOM.render(
-        <navigation.ui.TopNavMenu
-          {...getNavBarProps()}
-          {...(isEmbeddedExternally ? {} : { setMenuMountPoint: setHeaderActionMenu })}
-        />,
-        dashboardNavBar
+      //console.log('🔍 DEBUG: updateNavBar called - using Angular kbn-top-nav directive');
+      //console.log('🔍 DEBUG: topNavMenu config:', $scope.topNavMenu);
+      //console.log(
+        '🔍 DEBUG: Angular will handle navigation rendering through <kbn-top-nav> directive'
       );
+
+      // No React rendering needed - Angular kbn-top-nav directive handles everything
+      // The template now contains: <kbn-top-nav config="topNavMenu" ...></kbn-top-nav>
     };
 
     const unmountNavBar = () => {
-      // Skip unmounting if LogRhythm navbar is handling navigation
-      const logrhythmNavbarExists =
-        document.querySelector('[class*="navbar"], [class*="Navbar"], .nm-section, nav') ||
-        window.logrhythm ||
-        window.netmonDashboards;
-
-      if (logrhythmNavbarExists) {
-        // console.log('LogRhythm navbar detected, skipping Kibana dashboard navigation unmount');
-        return;
-      }
-
+      //console.log('🔍 DEBUG: Unmounting dashboard navigation');
       if (dashboardNavBar) {
         ReactDOM.unmountComponentAtNode(dashboardNavBar);
       }

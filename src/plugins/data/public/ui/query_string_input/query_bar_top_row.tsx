@@ -35,7 +35,14 @@ import { EuiSuperUpdateButton, OnRefreshProps } from '@elastic/eui';
 import { FormattedMessage, InjectedIntl, injectI18n } from '@kbn/i18n/react';
 import { Toast } from 'src/core/public';
 import { TimeRange } from 'src/plugins/data/public';
-import { convertQuery } from '@logrhythm/nm-web-shared/services/query_mapping';
+// Import with try-catch to handle missing nm-web-shared package gracefully
+let convertQuery: (query: string) => Promise<string>;
+try {
+  convertQuery = require('@logrhythm/nm-web-shared/services/query_mapping').convertQuery;
+} catch (e) {
+  // Fallback implementation when nm-web-shared is not available
+  convertQuery = (query: string): Promise<string> => Promise.resolve(query);
+}
 import { doesKueryExpressionHaveLuceneSyntaxError } from '../../../common/es_query';
 import { useKibana } from '../../../../kibana_react/public';
 
