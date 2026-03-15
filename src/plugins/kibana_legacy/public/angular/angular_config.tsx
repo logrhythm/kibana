@@ -55,13 +55,63 @@ import { isSystemApiRequest } from '../system_api';
 
 const URL_LIMIT_WARN_WITHIN = 1000;
 
-// Legacy compatibility helpers
+// Legacy compatibility helpers with proper capability defaults
 const capabilities = {
   get: () => {
     try {
-      return npStart?.application?.capabilities || {};
+      const platformCapabilities = npStart?.application?.capabilities;
+      if (platformCapabilities && Object.keys(platformCapabilities).length > 0) {
+        return platformCapabilities;
+      }
+
+      // Fallback with essential capabilities for Discover and other plugins
+      return {
+        discover: {
+          save: true,
+          saveQuery: true,
+          show: true,
+          createShortUrl: true,
+        },
+        dashboard: {
+          createNew: true,
+          show: true,
+          showWriteControls: true,
+        },
+        visualize: {
+          createShortUrl: true,
+          delete: true,
+          save: true,
+          saveQuery: true,
+          show: true,
+        },
+        management: {
+          kibana: {
+            settings: true,
+            objects: true,
+          },
+        },
+        navLinks: {
+          discover: true,
+          dashboard: true,
+          visualize: true,
+          management: true,
+        },
+      };
     } catch (error) {
-      return {};
+      // Fallback with essential capabilities
+      return {
+        discover: {
+          save: true,
+          saveQuery: true,
+          show: true,
+          createShortUrl: true,
+        },
+        dashboard: {
+          createNew: true,
+          show: true,
+          showWriteControls: true,
+        },
+      };
     }
   },
 };

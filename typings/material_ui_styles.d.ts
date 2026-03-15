@@ -25,9 +25,11 @@ declare module '@material-ui/styles' {
 
   export function useTheme<Theme = {}>(): Theme;
 
-  export interface StylesProvider {
+  export interface StylesProviderProps {
     children?: React.ReactNode;
+    generateId?: (rule: any, sheet?: any) => string;
+    jss?: any;
   }
 
-  export const StylesProvider: React.ComponentType<StylesProvider>;
+  export const StylesProvider: React.ComponentType<StylesProviderProps>;
 }

@@ -23,7 +23,10 @@ import { CoreStart } from 'src/core/public';
 import { IStorageWrapper } from 'src/plugins/kibana_utils/public';
 import { KibanaContextProvider } from '../../../../kibana_react/public';
 import { QueryStart, SavedQuery } from '../../query';
-import { SearchBar, SearchBarOwnProps } from './';
+import SearchBarUI, { SearchBarOwnProps } from './search_bar';
+import { withKibana } from '../../../../kibana_react/public';
+
+const SearchBarComponent = withKibana(SearchBarUI);
 import { useFilterManager } from './lib/use_filter_manager';
 import { useTimefilter } from './lib/use_timefilter';
 import { useSavedQuery } from './lib/use_saved_query';
@@ -173,7 +176,7 @@ export function createSearchBar({ core, storage, data }: StatefulSearchBarDeps) 
           ...core,
         }}
       >
-        <SearchBar
+        <SearchBarComponent
           showAutoRefreshOnly={props.showAutoRefreshOnly}
           showDatePicker={props.showDatePicker}
           showFilterBar={props.showFilterBar}

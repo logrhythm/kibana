@@ -45,6 +45,7 @@ import { DashboardEmptyScreen, DashboardEmptyScreenProps } from './dashboard_emp
 import {
   connectToQueryState,
   esFilters,
+  Filter,
   IndexPattern,
   IndexPatternsContract,
   QueryState,
@@ -140,7 +141,7 @@ export class DashboardAppController {
     dashboardCapabilities,
     scopedHistory,
     embeddableCapabilities: { visualizeCapabilities, mapsCapabilities },
-    data: { query: queryService },
+    data,
     core: {
       notifications,
       overlays,
@@ -158,6 +159,7 @@ export class DashboardAppController {
     usageCollection,
     navigation,
   }: DashboardAppControllerDependencies) {
+    const queryService = data.query;
     const filterManager = queryService.filterManager;
     const timefilter = queryService.timefilter.timefilter;
     const queryStringManager = queryService.queryString;
@@ -617,10 +619,44 @@ export class DashboardAppController {
       }
     };
 
-    // Add missing showFilterBar function for template
+    // Add showFilterBar function for template
     $scope.showFilterBar = function () {
-      // Always show filter bar unless explicitly hidden or in full screen mode
-      return !dashboardStateManager.getFullScreenMode();
+      return (
+        !forceHideFilterBar &&
+        ($scope.model.filters.length > 0 || !dashboardStateManager.getFullScreenMode())
+      );
+    };
+
+    // Make data service available to template
+    $scope.data = data;
+
+    // Add missing template functions that were lost during merge conflicts
+    $scope.updateQueryAndFetch = $scope.handleRefresh;
+    $scope.onFiltersUpdated = (filters: Filter[]) => {
+      filterManager.setFilters(filters);
+    };
+    $scope.onQuerySaved = (savedQuery: SavedQuery) => {
+      $scope.savedQuery = savedQuery;
+    };
+    $scope.onSavedQueryUpdated = (savedQuery: SavedQuery) => {
+      $scope.savedQuery = savedQuery;
+      updateStateFromSavedQuery(savedQuery);
+    };
+    $scope.onClearSavedQuery = () => {
+      delete $scope.savedQuery;
+      dashboardStateManager.setSavedQueryId(undefined);
+    };
+    $scope.onRefreshChange = ({
+      isPaused,
+      refreshInterval,
+    }: {
+      isPaused: boolean;
+      refreshInterval: number;
+    }) => {
+      timefilter.setRefreshInterval({
+        pause: isPaused,
+        value: refreshInterval,
+      });
     };
 
     const updateStateFromSavedQuery = (savedQuery: SavedQuery) => {
@@ -688,50 +724,15 @@ export class DashboardAppController {
     const shouldShowNavBarComponent = (forceShow: boolean): boolean =>
       (forceShow || $scope.isVisible) && !dashboardStateManager.getFullScreenMode();
 
-    const getNavBarProps = () => {
-      const isFullScreenMode = dashboardStateManager.getFullScreenMode();
-      const screenTitle = dashboardStateManager.getTitle();
-      const showTopNavMenu = shouldShowNavBarComponent(forceShowTopNavMenu);
-      const showQueryInput = shouldShowNavBarComponent(forceShowQueryInput);
-      const showDatePicker = shouldShowNavBarComponent(forceShowDatePicker);
-      const showQueryBar = showQueryInput || showDatePicker;
-      const showFilterBar = shouldShowFilterBar(forceHideFilterBar);
-      const showSearchBar = showQueryBar || showFilterBar;
-
-      return {
-        appName: 'dashboard',
-        config: showTopNavMenu ? $scope.topNavMenu : undefined,
-        className: isFullScreenMode ? 'kbnTopNavMenu-isFullScreen' : undefined,
-        screenTitle,
-        showTopNavMenu,
-        showSearchBar,
-        showQueryBar,
-        showQueryInput,
-        showDatePicker,
-        showFilterBar,
-        indexPatterns: $scope.indexPatterns,
-        showSaveQuery: $scope.showSaveQuery,
-        savedQuery: $scope.savedQuery,
-        onSavedQueryIdChange,
-        savedQueryId: dashboardStateManager.getSavedQueryId(),
-        useDefaultBehaviors: true,
-        onQuerySubmit: $scope.handleRefresh,
-      };
-    };
+    // getNavBarProps removed - Angular template handles TopNavMenu directly
 
     const updateNavBar = () => {
-      //console.log('🔍 DEBUG: updateNavBar called - using Angular kbn-top-nav directive');
-      //console.log('🔍 DEBUG: topNavMenu config:', $scope.topNavMenu);
-      //console.log(
-        '🔍 DEBUG: Angular will handle navigation rendering through <kbn-top-nav> directive'
-      );
-
-      // No React rendering needed - Angular kbn-top-nav directive handles everything
-      // The template now contains: <kbn-top-nav config="topNavMenu" ...></kbn-top-nav>
+      // Angular kbn-top-nav directive handles rendering automatically
+      // No manual React rendering needed
     };
 
     const unmountNavBar = () => {
-      //console.log('🔍 DEBUG: Unmounting dashboard navigation');
+      // console.log('🔍 DEBUG: Unmounting dashboard navigation');
       if (dashboardNavBar) {
         ReactDOM.unmountComponentAtNode(dashboardNavBar);
       }
@@ -1131,11 +1132,16 @@ export class DashboardAppController {
       },
     });
 
+    // Set initial visibility state - avoid Observable subscription that caused infinite digest loop
+    $scope.isVisible = true; // Default to visible for dashboard navigation
+
+    // Alternative approach: use direct subscription without $evalAsync
     const visibleSubscription = chrome.getIsVisible$().subscribe((isVisible) => {
-      $scope.$evalAsync(() => {
-        $scope.isVisible = isVisible;
-        updateNavBar();
-      });
+      $scope.isVisible = isVisible;
+      // Trigger digest cycle safely
+      if (!$scope.$$phase) {
+        $scope.$apply();
+      }
     });
 
     dashboardStateManager.registerChangeListener(() => {

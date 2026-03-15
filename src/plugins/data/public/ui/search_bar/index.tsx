@@ -25,12 +25,13 @@ import type { SearchBarProps } from './search_bar';
 const Fallback = () => <div />;
 
 const LazySearchBar = React.lazy(() => import('./search_bar'));
-const WrappedSearchBar = (props: SearchBarProps) => (
-  <React.Suspense fallback={<Fallback />}>
-    <LazySearchBar {...props} />
-  </React.Suspense>
-);
 
-export const SearchBar = injectI18n(withKibana(WrappedSearchBar));
+export const SearchBar = injectI18n(
+  withKibana((props: SearchBarProps) => (
+    <React.Suspense fallback={<Fallback />}>
+      <LazySearchBar {...props} />
+    </React.Suspense>
+  ))
+);
 export { StatefulSearchBarProps } from './create_search_bar';
 export type { SearchBarProps, SearchBarOwnProps } from './search_bar';

@@ -18,15 +18,15 @@
  */
 
 import { compact } from 'lodash';
-import { InjectedIntl, injectI18n } from '@kbn/i18n/react';
+import { InjectedIntl } from '@kbn/i18n/react';
 import classNames from 'classnames';
 import React, { Component } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import { get, isEqual } from 'lodash';
 
-import { withKibana, KibanaReactContextValue } from '../../../../kibana_react/public';
+import { KibanaReactContextValue } from '../../../../kibana_react/public';
 
-import QueryBarTopRow from '../query_string_input/query_bar_top_row';
+import { QueryBarTopRow } from '../query_string_input';
 import { SavedQueryAttributes, TimeHistoryContract, SavedQuery } from '../../query';
 import { IDataPluginServices } from '../../types';
 import { TimeRange, Query, Filter, IIndexPattern } from '../../../common';
@@ -469,4 +469,4 @@ class SearchBarUI extends Component<SearchBarProps, State> {
 
 // Needed for React.lazy
 // eslint-disable-next-line import/no-default-export
-export default injectI18n(withKibana(SearchBarUI));
+export default SearchBarUI;

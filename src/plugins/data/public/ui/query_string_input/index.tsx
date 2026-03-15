@@ -24,17 +24,22 @@ import type { QueryStringInputProps } from './query_string_input';
 
 const Fallback = () => <div />;
 
-const LazyQueryBarTopRow = React.lazy(() => import('./query_bar_top_row'));
+const LazyQueryBarTopRow = React.lazy(() =>
+  import('./query_bar_top_row').then((module) => ({ default: module.QueryBarTopRow }))
+);
 export const QueryBarTopRow = (props: QueryBarTopRowProps) => (
   <React.Suspense fallback={<Fallback />}>
     <LazyQueryBarTopRow {...props} />
   </React.Suspense>
 );
 
-const LazyQueryStringInputUI = withKibana(React.lazy(() => import('./query_string_input')));
-export const QueryStringInput = (props: QueryStringInputProps) => (
+const LazyQueryStringInputUI = React.lazy(() => import('./query_string_input'));
+
+const WrappedQueryStringInputUI = (props: QueryStringInputProps) => (
   <React.Suspense fallback={<Fallback />}>
     <LazyQueryStringInputUI {...props} />
   </React.Suspense>
 );
+
+export const QueryStringInput = withKibana(WrappedQueryStringInputUI);
 export type { QueryStringInputProps };

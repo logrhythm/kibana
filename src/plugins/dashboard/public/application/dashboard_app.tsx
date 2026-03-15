@@ -43,6 +43,7 @@ export interface DashboardAppScope extends ng.IScope {
       | TimeRange
       | { to: string | moment.Moment | undefined; from: string | moment.Moment | undefined };
     refreshInterval: any;
+    useMargins: boolean;
   };
   savedQuery?: SavedQuery;
   refreshInterval: any;
@@ -63,6 +64,15 @@ export interface DashboardAppScope extends ng.IScope {
   enterEditMode: () => void;
   timefilterSubscriptions$: Subscription;
   isVisible: boolean;
+  screenTitle: string;
+  showFilterBar: () => boolean;
+  data: any;
+  updateQueryAndFetch: (payload: any, isUpdate?: boolean) => void;
+  onFiltersUpdated: (filters: Filter[]) => void;
+  onQuerySaved: (savedQuery: SavedQuery) => void;
+  onSavedQueryUpdated: (savedQuery: SavedQuery) => void;
+  onClearSavedQuery: () => void;
+  onRefreshChange: (config: { isPaused: boolean; refreshInterval: number }) => void;
 }
 
 export function initDashboardAppDirective(app: any, deps: RenderDeps) {
