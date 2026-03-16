@@ -55,63 +55,108 @@ import { isSystemApiRequest } from '../system_api';
 
 const URL_LIMIT_WARN_WITHIN = 1000;
 
-// Legacy compatibility helpers with proper capability defaults
+// Enhanced capabilities with comprehensive fallbacks for all plugins
+const createDefaultCapabilities = () => ({
+  discover: {
+    save: true,
+    saveQuery: true,
+    show: true,
+    createShortUrl: true,
+  },
+  dashboard: {
+    createNew: true,
+    save: true,
+    saveQuery: true,
+    show: true,
+    showWriteControls: true,
+    storeSearchSession: true,
+  },
+  visualize: {
+    createShortUrl: true,
+    delete: true,
+    save: true,
+    saveQuery: true,
+    show: true,
+  },
+  canvas: {
+    save: true,
+    show: true,
+  },
+  maps: {
+    save: true,
+    show: true,
+  },
+  ml: {
+    canAccessML: false,
+    canCreateJob: false,
+    canDeleteJob: false,
+  },
+  management: {
+    kibana: {
+      settings: true,
+      objects: true,
+      indexPatterns: true,
+      savedObjectsManagement: true,
+      spaces: false,
+      users: false,
+      roles: false,
+    },
+  },
+  navLinks: {
+    discover: true,
+    dashboard: true,
+    visualize: true,
+    canvas: false,
+    maps: false,
+    ml: false,
+    management: true,
+    dev_tools: false,
+    monitoring: false,
+  },
+  catalogue: {
+    discover: true,
+    dashboard: true,
+    visualize: true,
+    console: false,
+    advanced_settings: true,
+    index_patterns: true,
+  },
+});
+
 const capabilities = {
   get: () => {
     try {
       const platformCapabilities = npStart?.application?.capabilities;
-      if (platformCapabilities && Object.keys(platformCapabilities).length > 0) {
-        return platformCapabilities;
+
+      // Always start with default capabilities as base
+      const defaultCaps = createDefaultCapabilities();
+
+      if (
+        platformCapabilities &&
+        typeof platformCapabilities === 'object' &&
+        Object.keys(platformCapabilities).length > 0
+      ) {
+        // Merge platform capabilities with defaults, ensuring no undefined values
+        const mergedCaps = { ...defaultCaps };
+
+        Object.keys(platformCapabilities).forEach((key) => {
+          if (platformCapabilities[key] && typeof platformCapabilities[key] === 'object') {
+            mergedCaps[key] = {
+              ...defaultCaps[key],
+              ...platformCapabilities[key],
+            };
+          }
+        });
+
+        //console.log('🔍 DEBUG: Using merged platform + default capabilities');
+        return mergedCaps;
       }
 
-      // Fallback with essential capabilities for Discover and other plugins
-      return {
-        discover: {
-          save: true,
-          saveQuery: true,
-          show: true,
-          createShortUrl: true,
-        },
-        dashboard: {
-          createNew: true,
-          show: true,
-          showWriteControls: true,
-        },
-        visualize: {
-          createShortUrl: true,
-          delete: true,
-          save: true,
-          saveQuery: true,
-          show: true,
-        },
-        management: {
-          kibana: {
-            settings: true,
-            objects: true,
-          },
-        },
-        navLinks: {
-          discover: true,
-          dashboard: true,
-          visualize: true,
-          management: true,
-        },
-      };
+      //console.log('🔍 DEBUG: Using fallback default capabilities');
+      return defaultCaps;
     } catch (error) {
-      // Fallback with essential capabilities
-      return {
-        discover: {
-          save: true,
-          saveQuery: true,
-          show: true,
-          createShortUrl: true,
-        },
-        dashboard: {
-          createNew: true,
-          show: true,
-          showWriteControls: true,
-        },
-      };
+      //console.warn('🔍 ERROR: Capabilities setup failed, using minimal fallback:', error);
+      return createDefaultCapabilities();
     }
   },
 };
@@ -121,10 +166,10 @@ const fatalError = (error: Error) => {
     if (npStart?.fatalErrors?.add) {
       npStart.fatalErrors.add(error);
     } else {
-      // console.error('Fatal error (npStart not available):', error);
+      //console.error('Fatal error (npStart not available):', error);
     }
   } catch (e) {
-    // console.error('Fatal error (error handler failed):', error);
+    //console.error('Fatal error (error handler failed):', error);
   }
 };
 
@@ -144,7 +189,7 @@ export const configureAppAngularModule = (
   const newPlatform = coreStart?.core || coreStart || npStart;
 
   if (!newPlatform) {
-    // console.warn('New platform not available for angular module configuration, skipping');
+    //console.warn('New platform not available for angular module configuration, skipping');
     return;
   }
 
@@ -162,7 +207,7 @@ export const configureAppAngularModule = (
         ? newPlatform.injectedMetadata.getLegacyMetadata()
         : {};
     } catch (error) {
-      // console.warn('Could not get legacy metadata, using fallback approach');
+      //console.warn('Could not get legacy metadata, using fallback approach');
       legacyMetadata = {};
     }
 
@@ -179,7 +224,7 @@ export const configureAppAngularModule = (
         }
       });
     } catch (error) {
-      // console.warn('Could not set injected vars:', error);
+      //console.warn('Could not set injected vars:', error);
     }
   }
 
@@ -204,6 +249,12 @@ export const configureAppAngularModule = (
         'kibana'
       : 'kibana';
 
+    const uiCapabilities = capabilities.get();
+    //console.log(
+      '🔍 DEBUG: Setting uiCapabilities in Angular DI:',
+      JSON.stringify(uiCapabilities, null, 2)
+    );
+
     angularModule
       .value('kbnVersion', kbnVersion)
       .value('buildNum', buildNum)
@@ -211,25 +262,44 @@ export const configureAppAngularModule = (
       .value('serverName', serverName)
       .value('sessionId', Date.now())
       .value('esUrl', getEsUrl(newPlatform))
-      .value('uiCapabilities', hasInjectedMetadata ? capabilities.get() : {});
+      .value('uiCapabilities', uiCapabilities)
+      // Additional safety injection for discover specifically
+      .constant('discoverCapabilities', {
+        save: true,
+        saveQuery: true,
+        show: true,
+        createShortUrl: true,
+      })
+      // Global capability service for fallback
+      .service('capabilityService', function () {
+        this.get = function () {
+          return uiCapabilities;
+        };
+        this.discover = uiCapabilities.discover || {
+          save: true,
+          saveQuery: true,
+          show: true,
+          createShortUrl: true,
+        };
+      });
 
     // Configure providers with error handling
     try {
       angularModule.config(setupCompileProvider(newPlatform));
     } catch (error) {
-      // console.warn('Failed to setup compile provider:', error);
+      //console.warn('Failed to setup compile provider:', error);
     }
 
     try {
       angularModule.config(setupLocationProvider(newPlatform));
     } catch (error) {
-      // console.warn('Failed to setup location provider:', error);
+      //console.warn('Failed to setup location provider:', error);
     }
 
     try {
       angularModule.config($setupXsrfRequestInterceptor(newPlatform));
     } catch (error) {
-      // console.warn('Failed to setup XSRF interceptor:', error);
+      //console.warn('Failed to setup XSRF interceptor:', error);
     }
 
     // Run setup functions with error handling
@@ -242,12 +312,12 @@ export const configureAppAngularModule = (
           try {
             capture$httpLoadingCount(newPlatform)($rootScope, $http);
           } catch (error) {
-            // console.warn('HTTP loading count setup failed:', error);
+            //console.warn('HTTP loading count setup failed:', error);
           }
         },
       ]);
     } catch (error) {
-      // console.warn('Failed to setup HTTP loading count:', error);
+      //console.warn('Failed to setup HTTP loading count:', error);
     }
 
     try {
@@ -259,12 +329,12 @@ export const configureAppAngularModule = (
           try {
             $setupBreadcrumbsAutoClear(newPlatform)($rootScope, $injector);
           } catch (error) {
-            // console.warn('Breadcrumbs auto clear setup failed:', error);
+            //console.warn('Breadcrumbs auto clear setup failed:', error);
           }
         },
       ]);
     } catch (error) {
-      // console.warn('Failed to setup breadcrumbs auto clear:', error);
+      //console.warn('Failed to setup breadcrumbs auto clear:', error);
     }
 
     try {
@@ -276,12 +346,12 @@ export const configureAppAngularModule = (
           try {
             $setupBadgeAutoClear(newPlatform)($rootScope, $injector);
           } catch (error) {
-            // console.warn('Badge auto clear setup failed:', error);
+            //console.warn('Badge auto clear setup failed:', error);
           }
         },
       ]);
     } catch (error) {
-      // console.warn('Failed to setup badge auto clear:', error);
+      //console.warn('Failed to setup badge auto clear:', error);
     }
 
     try {
@@ -293,12 +363,12 @@ export const configureAppAngularModule = (
           try {
             $setupHelpExtensionAutoClear(newPlatform)($rootScope, $injector);
           } catch (error) {
-            // console.warn('Help extension auto clear setup failed:', error);
+            //console.warn('Help extension auto clear setup failed:', error);
           }
         },
       ]);
     } catch (error) {
-      // console.warn('Failed to setup help extension auto clear:', error);
+      //console.warn('Failed to setup help extension auto clear:', error);
     }
 
     try {
@@ -315,15 +385,15 @@ export const configureAppAngularModule = (
               $setupUrlOverflowHandling(newPlatform)($location, $rootScope, config);
             }
           } catch (error) {
-            // console.warn('URL overflow handling setup failed:', error);
+            //console.warn('URL overflow handling setup failed:', error);
           }
         },
       ]);
     } catch (error) {
-      // console.warn('Failed to setup URL overflow handling:', error);
+      //console.warn('Failed to setup URL overflow handling:', error);
     }
   } catch (configError) {
-    // console.warn('Error configuring angular module:', configError);
+    //console.warn('Error configuring angular module:', configError);
   }
 };
 
@@ -377,7 +447,7 @@ const setupLocationProvider = (newPlatform: any) => ($locationProvider: ILocatio
 
     $locationProvider.hashPrefix('');
   } catch (error) {
-    // console.warn('Could not setup location provider:', error);
+    //console.warn('Could not setup location provider:', error);
   }
 };
 
@@ -448,7 +518,7 @@ const capture$httpLoadingCount =
       }
     } catch (error) {
       // Silently handle if loading count setup fails
-      // console.warn('Could not setup HTTP loading count tracking:', error);
+      //console.warn('Could not setup HTTP loading count tracking:', error);
     }
   };
 
@@ -504,7 +574,7 @@ const $setupBreadcrumbsAutoClear =
         }
       });
     } catch (error) {
-      // console.warn('Could not setup breadcrumbs auto clear:', error);
+      //console.warn('Could not setup breadcrumbs auto clear:', error);
     }
   };
 
@@ -549,7 +619,7 @@ const $setupBadgeAutoClear =
         }
       });
     } catch (error) {
-      // console.warn('Could not setup badge auto clear:', error);
+      //console.warn('Could not setup badge auto clear:', error);
     }
   };
 
@@ -594,7 +664,7 @@ const $setupHelpExtensionAutoClear =
         }
       });
     } catch (error) {
-      // console.warn('Could not setup help extension auto clear:', error);
+      //console.warn('Could not setup help extension auto clear:', error);
     }
   };
 
@@ -653,6 +723,6 @@ const $setupUrlOverflowHandling =
       $rootScope.$on('$routeUpdate', check);
       $rootScope.$on('$routeChangeStart', check);
     } catch (error) {
-      // console.warn('Could not setup URL overflow handling:', error);
+      //console.warn('Could not setup URL overflow handling:', error);
     }
   };

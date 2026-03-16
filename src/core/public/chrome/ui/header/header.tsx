@@ -363,67 +363,130 @@ class HeaderUI extends Component<Props, State> {
     ];
 
     return (
-      <div className="chrHeaderWrapper hide-for-sharing" data-test-subj="headerGlobalNav">
+      <div
+        className="chrHeaderWrapper hide-for-sharing"
+        data-test-subj="headerGlobalNav"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '50px',
+          zIndex: 18500,
+          pointerEvents: 'none',
+          backgroundColor: 'transparent',
+        }}
+      >
         <header>
-          {/* Add body positioning for LogRhythm fixed navbar */}
+          {/* LogRhythm Navbar - positioned at absolute top */}
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              zIndex: 19999,
+              height: '50px',
+              backgroundColor: 'inherit',
+              pointerEvents: 'auto',
+            }}
+          >
+            <LogRhythmNavbar />
+          </div>
+
+          {/* CSS fixes for proper positioning and dropdown visibility */}
           <style
             dangerouslySetInnerHTML={{
               __html: `
-              body { margin-top: 50px !important; }
-              body.coreSystemRootDomElement { margin-top: 50px !important; }
-
-              /* Fix header menu visibility issues */
-              .euiHeader .euiHeaderSection .euiHeaderSectionItem {
-                z-index: 9999 !important;
+              /* Essential body positioning for LogRhythm navbar */
+              body, body.coreSystemRootDomElement {
+                margin-top: 50px !important;
+                position: relative !important;
               }
 
-              /* Ensure header dropdown menus are visible */
-              .euiPopover__panel, .euiContextMenu, .euiContextMenuPanel {
-                z-index: 10000 !important;
+              /* CRITICAL: Ensure LogRhythm navbar dropdowns appear above everything */
+              .logrhythm-navbar *, .navbar *, nav[class*="jss"] *,
+              [class*="jss"] .MuiPopover-root,
+              [class*="jss"] .MuiMenu-root,
+              [class*="jss"] .MuiMenuList-root {
+                z-index: 20000 !important;
+              }
+
+              /* FIXED: chrHeaderWrapper positioned at top navbar level */
+              .chrHeaderWrapper {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                height: 50px !important;
+                z-index: 18500 !important;
+                pointer-events: none !important;
+                background: transparent !important;
+              }
+
+              /* Fix app-wrapper-panel positioning - Account for nav drawer */
+              .app-wrapper-panel {
+                position: relative !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: auto !important;
+                margin-top: 50px !important;
+                padding: 0 !important;
+                box-sizing: border-box !important;
+                transition: margin-left 0.25s ease !important;
+              }
+
+              /* When nav drawer is collapsed (default) - small margin */
+              body:not(.euiNavDrawer--isOpen) .app-wrapper-panel {
+                margin-left: 48px !important;
+                width: calc(100% - 48px) !important;
+              }
+
+              /* When nav drawer is open - larger margin */
+              body.euiNavDrawer--isOpen .app-wrapper-panel,
+              .euiNavDrawer--isOpen ~ * .app-wrapper-panel {
+                margin-left: 240px !important;
+                width: calc(100% - 240px) !important;
+              }
+
+              /* Fix nav drawer positioning */
+              .euiNavDrawer {
+                top: 50px !important;
+                height: calc(100vh - 50px) !important;
+                z-index: 18000 !important;
+                pointer-events: auto !important;
+              }
+
+              /* Ensure main content doesn't block navbar dropdowns */
+              .application, .app-container, .dshAppContainer {
+                position: relative !important;
+                z-index: 1000 !important;
+              }
+
+              /* Make sure search/filter bars are positioned correctly */
+              .globalFilterBar, [data-test-subj="globalFilterBar"],
+              .kbnTopNavMenu {
+                z-index: 1100 !important;
+                margin-top: 0 !important;
               }
             `,
             }}
           />
 
-          {/* LogRhythm Navbar - renders full navbar with Analyze dropdown for Kibana dashboards */}
-          <LogRhythmNavbar />
-
-          {/* <EuiHeader>
-          <EuiHeaderSection grow={false}>
-            <EuiShowFor sizes={['xs', 's']}>
-              <EuiHeaderSectionItem border="right">{this.renderMenuTrigger()}</EuiHeaderSectionItem>
-            </EuiShowFor>
-
-            <EuiHeaderSectionItem border="right">{this.renderLogo()}</EuiHeaderSectionItem>
-
-            <HeaderNavControls side="left" navControls={navControlsLeft} />
-          </EuiHeaderSection>
-
-          <HeaderBreadcrumbs appTitle={appTitle} breadcrumbs$={breadcrumbs$} />
-
-          <HeaderBadge badge$={badge$} />
-
-          <EuiHeaderSection side="right">
-            <EuiHeaderSectionItem>
-              <HeaderHelpMenu
-                {...{ isCloudEnabled, helpExtension$, kibanaDocLink, kibanaVersion }}
-              />
-            </EuiHeaderSectionItem>
-
-            <HeaderNavControls side="right" navControls={navControlsRight} />
-          </EuiHeaderSection>
-        </EuiHeader> */}
-
-          <EuiNavDrawer
-            ref={this.navDrawerRef}
-            data-test-subj="navDrawer"
-            isLocked={isLocked}
-            onIsLockedUpdate={onIsLockedUpdate}
-          >
-            <EuiNavDrawerGroup listItems={recentLinksArray} />
-            <EuiHorizontalRule margin="none" />
-            <EuiNavDrawerGroup data-test-subj="navDrawerAppsMenu" listItems={navLinksArray} />
-          </EuiNavDrawer>
+          {/* Keep Kibana nav drawer for side navigation with pointer events */}
+          <div style={{ pointerEvents: 'auto' }}>
+            <EuiNavDrawer
+              ref={this.navDrawerRef}
+              data-test-subj="navDrawer"
+              isLocked={isLocked}
+              onIsLockedUpdate={onIsLockedUpdate}
+            >
+              <EuiNavDrawerGroup listItems={recentLinksArray} />
+              <EuiHorizontalRule margin="none" />
+              <EuiNavDrawerGroup data-test-subj="navDrawerAppsMenu" listItems={navLinksArray} />
+            </EuiNavDrawer>
+          </div>
         </header>
       </div>
     );

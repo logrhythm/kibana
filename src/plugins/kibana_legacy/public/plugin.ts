@@ -145,7 +145,7 @@ export class KibanaLegacyPlugin {
 
       // Create API functions
       (window as any).getNetMonDashboards = () => dashboards;
-      (window as any).getNmDashboards = () => dashboards; // Alternative name
+      (window as any).getNmDashboards = () => dashboards;
 
       // console.log('NetMon dashboards configured from kibana_legacy plugin:', dashboards.length);
       return dashboards;
@@ -160,6 +160,36 @@ export class KibanaLegacyPlugin {
     } else {
       setTimeout(setupNetMonDashboards, 100);
     }
+
+    // Additional safety measure: ensure capabilities are available globally
+    const ensureCapabilities = () => {
+      if (!(window as any).kibanaCapabilities) {
+        (window as any).kibanaCapabilities = {
+          discover: {
+            save: true,
+            saveQuery: true,
+            show: true,
+            createShortUrl: true,
+          },
+          dashboard: {
+            createNew: true,
+            save: true,
+            saveQuery: true,
+            show: true,
+            showWriteControls: true,
+          },
+          visualize: {
+            save: true,
+            saveQuery: true,
+            show: true,
+            createShortUrl: true,
+          },
+        };
+        // console.log('🔍 DEBUG: Set global kibanaCapabilities fallback');
+      }
+    };
+
+    ensureCapabilities();
 
     // Add application classes for proper dashboard styling (7.5.2 compatibility)
     application.currentAppId$.subscribe((appId) => {
@@ -202,80 +232,43 @@ export class KibanaLegacyPlugin {
 
     injectHeaderStyle(uiSettings);
 
-    // Inject comprehensive CSS fixes for LogRhythm UI compatibility
+    // MINIMAL CSS: Support for LogRhythm navbar integration
     const minimalCSS = `
       <style id="netmon-ui-fixes">
-        /* Essential body positioning for LogRhythm navbar */
-        body, body.coreSystemRootDomElement {
-          margin-top: 50px !important;
-          padding-top: 0 !important;
-        }
-
-        /* Ensure chrHeaderWrapper doesn't interfere with positioning */
-        .chrHeaderWrapper {
-          position: relative !important;
-          top: 0 !important;
-          margin-top: 0 !important;
-          padding-top: 0 !important;
-        }
-
-        /* LogRhythm navbar positioning - ensure it stays at top */
-        .logrhythm-navbar, .navbar, nav[class*="jss"] {
-          position: fixed !important;
-          top: 0 !important;
-          left: 0 !important;
-          right: 0 !important;
-          z-index: 9999 !important;
-          height: 50px !important;
-          width: 100% !important;
-        }
-
-        /* Fix header menu visibility */
-        .euiHeader .euiHeaderSection .euiHeaderSectionItem {
-          visibility: visible !important;
-          opacity: 1 !important;
-        }
-
-        /* Ensure proper z-index for dropdowns */
-        .euiPopover__panel, .euiContextMenu, .euiContextMenuPanel {
-          z-index: 10000 !important;
-        }
-
-        /* Fix for search and filter bar visibility */
+        /* 1. Search filter visibility and positioning */
         .globalFilterBar, [data-test-subj="globalFilterBar"] {
           display: flex !important;
           visibility: visible !important;
-          opacity: 1 !important;
-        }
-
-        /* Ensure Kibana header content is below LogRhythm navbar */
-        .kbnTopNavMenu, .kbn-top-nav {
+          z-index: 1100 !important;
+          position: relative !important;
           margin-top: 0 !important;
         }
 
-        /* Fix application container positioning */
-        .application {
+        /* Dashboard content positioning */
+        .dshAppContainer, .app-container {
           margin-top: 0 !important;
           padding-top: 0 !important;
         }
 
-        /* Ensure dashboard content is properly positioned */
-        .dashboard-container, .dshDashboardViewport {
-          margin-top: 0 !important;
+        /* 2. LogRhythm navbar constraint and dropdown support */
+        .logrhythm-navbar, .navbar, nav[class*="jss"] {
+          max-height: 50px !important;
+          overflow: visible !important; /* Allow dropdowns */
         }
 
-        /* Material-UI JSS styles should be consistent */
-        [class*="jss"]:empty {
-          display: none;
+        /* 3. Additional dropdown support for Material-UI components */
+        .MuiPopover-root, .MuiMenu-root, .MuiPaper-root[role="menu"] {
+          z-index: 20000 !important;
         }
 
-        /* Simple fix for app-wrapper-panel overlap with Kibana euiNavDrawer */
-        .euiNavDrawer {
-          z-index: 8000 !important;
-        }
-
+        /* 4. Support nav drawer responsive behavior */
         .app-wrapper-panel {
-          z-index: 1000 !important;
+          transition: margin-left 0.25s ease, width 0.25s ease !important;
+        }
+
+        /* Ensure main application content doesn't get pushed too far */
+        .application {
+          margin-left: 0 !important;
         }
       </style>
     `;
@@ -288,26 +281,14 @@ export class KibanaLegacyPlugin {
       }
     }
 
-    // Lightweight CSS-only approach for nav drawer overlap (no heavy observers)
-    // The CSS handles the overlap automatically with selectors
+    // NetMon integration complete - positioning handled by header.tsx CSS
+    // console.log('✅ NetMon navbar integration initialized successfully');
 
     return {
-      /**
-       * Used to power dashboard mode. Should be removed when dashboard mode is removed eventually.
-       * @deprecated
-       */
       dashboardConfig: getDashboardConfig(!application.capabilities.dashboard.showWriteControls),
-      /**
-       * Loads the font-awesome icon font. Should be removed once the last consumer has migrated to EUI
-       * @deprecated
-       */
       loadFontAwesome: async () => {
         await import('./font_awesome');
       },
-      /**
-       * @deprecated
-       * Just exported for wiring up with dashboard mode, should not be used.
-       */
       config: this.initializerContext.config.get(),
     };
   }
@@ -315,11 +296,3 @@ export class KibanaLegacyPlugin {
 
 export type KibanaLegacySetup = ReturnType<KibanaLegacyPlugin['setup']>;
 export type KibanaLegacyStart = ReturnType<KibanaLegacyPlugin['start']>;
-
-// Lightweight final check after page loads
-setTimeout(() => {
-  const navbar = document.querySelector('nav, .navbar, .logrhythm-navbar');
-  const hasNmStyles = !!navbar || !!document.querySelector('[class*="jss"]');
-  // console.log('🔍 DEBUG: LogRhythm navbar detected:', !!navbar);
-  // console.log('🔍 DEBUG: nm-web-shared styles detected:', hasNmStyles);
-}, 3000);
