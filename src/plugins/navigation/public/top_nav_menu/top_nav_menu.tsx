@@ -101,6 +101,24 @@ export function TopNavMenu(props: TopNavMenuProps): ReactElement | null {
     return <SearchBar {...searchBarProps} />;
   }
 
+  function renderScreenTitle(): ReactElement | null {
+    // Render the screen title for 7.5.2 compatibility
+    if (!props.screenTitle) return null;
+    return (
+      <h1
+        className="kuiLocalBreadcrumb"
+        style={{
+          fontSize: '18px',
+          padding: '12px 0px 0px 8px',
+          margin: 0,
+          lineHeight: 1.2,
+        }}
+      >
+        {props.screenTitle}
+      </h1>
+    );
+  }
+
   function renderLayout() {
     const { setMenuMountPoint } = props;
     const menuClassName = classNames('kbnTopNavMenu', props.className);
@@ -109,7 +127,10 @@ export function TopNavMenu(props: TopNavMenuProps): ReactElement | null {
       return (
         <>
           <MountPointPortal setMountPoint={setMenuMountPoint}>
-            <span className={wrapperClassName}>{renderMenu(menuClassName)}</span>
+            <span className={wrapperClassName}>
+              {renderScreenTitle()}
+              {renderMenu(menuClassName)}
+            </span>
           </MountPointPortal>
           <span className={wrapperClassName}>{renderSearchBar()}</span>
         </>
@@ -117,6 +138,7 @@ export function TopNavMenu(props: TopNavMenuProps): ReactElement | null {
     } else {
       return (
         <span className={wrapperClassName}>
+          {renderScreenTitle()}
           {renderMenu(menuClassName)}
           {renderSearchBar()}
         </span>

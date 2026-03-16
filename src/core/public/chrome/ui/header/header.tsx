@@ -404,13 +404,65 @@ class HeaderUI extends Component<Props, State> {
                 position: relative !important;
               }
 
-              /* CRITICAL: Ensure LogRhythm navbar dropdowns appear above everything */
-              .logrhythm-navbar *, .navbar *, nav[class*="jss"] *,
-              [class*="jss"] .MuiPopover-root,
-              [class*="jss"] .MuiMenu-root,
-              [class*="jss"] .MuiMenuList-root {
+              /* CORRECTED: LogRhythm uses Bootstrap navbar, not Material-UI! */
+              .navbar.navbar-fixed-top {
+                z-index: 19999 !important;
+                overflow: visible !important;
+                height: 50px !important;
+                min-height: 50px !important;
+              }
+
+              /* Bootstrap navbar dropdown menus */
+              .navbar .dropdown-menu {
                 z-index: 20000 !important;
               }
+
+              /* CORRECTED: Only target top-level navbar elements, NOT dropdown contents */
+
+              /* Bootstrap navbar brand and toggle button */
+              .navbar-brand,
+              .navbar .navbar-toggle {
+                visibility: visible !important;
+                opacity: 1 !important;
+              }
+
+              /* Bootstrap navbar-nav container (right side menu) */
+              .navbar-nav {
+                visibility: visible !important;
+                opacity: 1 !important;
+                display: flex !important;
+              }
+
+              /* Top-level nav items (li containers) - visible but don't force dropdown contents */
+              .navbar-nav > li {
+                visibility: visible !important;
+                opacity: 1 !important;
+                display: list-item !important;
+              }
+
+              /* CORRECTED: Only top-level buttons/links in nav items, NOT dropdown contents */
+              .navbar-nav > li > a,
+              .navbar-nav > li > button {
+                visibility: visible !important;
+                opacity: 1 !important;
+                display: inline-block !important;
+              }
+
+              /* Bootstrap navbar icons in top-level buttons only */
+              .navbar-nav > li > a .glyphicon,
+              .navbar-nav > li > a .fa,
+              .navbar-nav > li > a i,
+              .navbar-nav > li > a svg,
+              .navbar-nav > li > button .glyphicon,
+              .navbar-nav > li > button .fa,
+              .navbar-nav > li > button i,
+              .navbar-nav > li > button svg {
+                visibility: visible !important;
+                opacity: 1 !important;
+              }
+
+              /* DO NOT force visibility on dropdown menu contents - let Bootstrap control them */
+              /* .navbar .dropdown-menu * - REMOVED to allow proper Bootstrap dropdown behavior */
 
               /* FIXED: chrHeaderWrapper positioned at top navbar level */
               .chrHeaderWrapper {
@@ -431,7 +483,7 @@ class HeaderUI extends Component<Props, State> {
                 left: 0 !important;
                 width: 100% !important;
                 height: auto !important;
-                margin-top: 50px !important;
+                margin-top: 0 !important; /* FIXED: Don't push content down - body already has margin-top: 50px */
                 padding: 0 !important;
                 box-sizing: border-box !important;
                 transition: margin-left 0.25s ease !important;
@@ -464,11 +516,148 @@ class HeaderUI extends Component<Props, State> {
                 z-index: 1000 !important;
               }
 
-              /* Make sure search/filter bars are positioned correctly */
+              /* Make sure search/filter bars and dashboard title are positioned correctly */
               .globalFilterBar, [data-test-subj="globalFilterBar"],
               .kbnTopNavMenu {
                 z-index: 1100 !important;
                 margin-top: 0 !important;
+              }
+
+              /* Ensure dashboard title/breadcrumbs are visible and positioned correctly */
+              kbn-top-nav,
+              [data-test-subj="breadcrumbs"],
+              .euiBreadcrumbs,
+              .screen-title,
+              .kuiLocalBreadcrumb {
+                visibility: visible !important;
+                opacity: 1 !important;
+                display: block !important;
+                position: relative !important;
+                z-index: 1100 !important;
+              }
+
+              /* Dashboard title text visibility - DYNAMIC dashboard title */
+              .euiBreadcrumbs__list,
+              .euiBreadcrumb,
+              .euiTitle h1,
+              .kuiLocalBreadcrumb,
+              .kbnTopNavMenu__wrapper h1 {
+                visibility: visible !important;
+                opacity: 1 !important;
+                color: #343741 !important;
+                font-size: 18px !important;
+                padding: 12px 0px 0px 8px !important;
+                margin: 0 !important;
+                line-height: 1.2 !important;
+                display: block !important;
+                position: relative !important;
+                z-index: 1200 !important;
+              }
+
+              /* Ensure dynamic dashboard title is visible */
+              .kbnTopNavMenu__wrapper h1,
+              [data-test-subj*="title"] h1,
+              .screen-title h1 {
+                visibility: visible !important;
+                opacity: 1 !important;
+                display: block !important;
+                font-weight: 400 !important;
+                text-overflow: ellipsis !important;
+                overflow: hidden !important;
+                white-space: nowrap !important;
+                max-width: 400px !important;
+              }
+
+              /* Ensure kbn-top-nav wrapper is properly positioned */
+              .kbnTopNavMenu__wrapper {
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                position: relative !important;
+                z-index: 1100 !important;
+              }
+
+              /* Bootstrap navbar right-side: Support ICON-ONLY buttons (7.5.2 behavior) */
+              .navbar-right,
+              .navbar-nav .dropdown .nav-link {
+                visibility: visible !important;
+                opacity: 1 !important;
+              }
+
+              /* CORRECTED: Target both 7.5.2 and 7.10.2 JSS class names */
+              /* 7.5.2 JSS classes: jss4, jss6, jss8, jss9 */
+              /* 7.10.2 JSS classes: jss2, jss4, jss6, jss7 */
+              .navbar-right .jss2,  /* 7.10.2 container */
+              .navbar-right .jss4,  /* 7.5.2 container, 7.10.2 administration */
+              .navbar-right .jss6,  /* 7.5.2 administration, 7.10.2 user */
+              .navbar-right .jss7,  /* 7.10.2 help */
+              .navbar-right .jss8,  /* 7.5.2 user */
+              .navbar-right .jss9 { /* 7.5.2 help */
+                visibility: visible !important;
+                opacity: 1 !important;
+                display: block !important;
+              }
+
+              /* Target all JSS-generated divs in navbar-right */
+              .navbar-right div[class*="jss"] {
+                visibility: visible !important;
+                opacity: 1 !important;
+                display: block !important;
+              }
+
+              /* Bootstrap navbar icons - make sure they display properly */
+              .navbar-right .header-icon,
+              .navbar-right .icon-administration,
+              .navbar-right .icon-user,
+              .navbar-right .icon-question,
+              .icon-administration,
+              .icon-user,
+              .icon-question {
+                visibility: visible !important;
+                opacity: 1 !important;
+                display: inline-block !important;
+                font-size: 16px !important;
+              }
+
+              /* Icon dropdown arrows */
+              .icon-down {
+                visibility: visible !important;
+                opacity: 1 !important;
+                display: inline-block !important;
+              }
+
+              /* Ensure dropdown nav items are visible */
+              .navbar-right .dropdown.nav-item {
+                visibility: visible !important;
+                opacity: 1 !important;
+                display: list-item !important;
+              }
+
+              /* Make sure nav-link pointers are visible */
+              .navbar-right .nav-link.pointer {
+                visibility: visible !important;
+                opacity: 1 !important;
+                display: inline-block !important;
+              }
+
+              /* FIX: Force proper width for navbar-right icon elements (they were showing as 7px wide) */
+              /* MINIMAL FIX: Only fix width constraint, let LogRhythm handle styling */
+              .navbar-right .nav-link,
+              .navbar-right .dropdown > .nav-link,
+              .navbar-right .nav-item > .nav-link,
+              .navbar-right [title="Administration"],
+              .navbar-right [title="User Options"],
+              .navbar-right [title="Help"] {
+                min-width: 48px !important;
+                width: auto !important;
+                /* Removed text-align, padding, font-size - let LogRhythm handle styling */
+              }
+
+              /* Force proper dimensions for navbar-right containers */
+              .navbar-right .dropdown.nav-item,
+              .navbar-right .nav-item {
+                min-width: 48px !important;
+                width: auto !important;
               }
             `,
             }}

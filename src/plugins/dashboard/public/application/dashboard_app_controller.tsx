@@ -732,7 +732,6 @@ export class DashboardAppController {
     };
 
     const unmountNavBar = () => {
-      // console.log('🔍 DEBUG: Unmounting dashboard navigation');
       if (dashboardNavBar) {
         ReactDOM.unmountComponentAtNode(dashboardNavBar);
       }
