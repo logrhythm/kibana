@@ -36,6 +36,8 @@ import 'tether';
 import 'bootstrap';
 // Import LogRhythm lr-style CSS for proper UI alignment
 import 'lr-style/dist/lr-style.css';
+// Import FontAwesome for icon conversion fix
+import 'font-awesome/css/font-awesome.min.css';
 
 import {
   // TODO: add type annotations
@@ -624,6 +626,155 @@ class HeaderUI extends Component<Props, State> {
                 visibility: visible !important;
                 opacity: 1 !important;
                 display: inline-block !important;
+              }
+
+              /* CRITICAL FIX: Convert text labels to FontAwesome icons for 7.5.2 compatibility */
+              /* From debug: Icons show as text "Administration", "User Options", "Help" instead of FontAwesome */
+              /* Solution: Hide text content and add FontAwesome icons via CSS pseudo-elements */
+
+              /* FontAwesome font will be loaded via import at file level */
+
+              /* Target JSS classes from debug logs: .jss4 (Administration), .jss6 (User), .jss7 (Help) */
+              .navbar-right .jss4:not(.dropdown-menu):not(.dropdown-item),
+              .navbar-right .jss6:not(.dropdown-menu):not(.dropdown-item),
+              .navbar-right .jss7:not(.dropdown-menu):not(.dropdown-item) {
+                font-size: 0 !important; /* Hide text */
+                text-indent: -9999px !important;
+                overflow: hidden !important;
+                width: 48px !important;
+                height: 32px !important;
+                position: relative !important;
+              }
+
+              /* JSS class-based icon rendering */
+              .navbar-right .jss4:not(.dropdown-menu):not(.dropdown-item):before {
+                content: "\f013" !important; /* fa-cog for Administration */
+                font-family: "FontAwesome" !important;
+                font-weight: normal !important;
+                font-size: 16px !important;
+                color: #373a3c !important;
+                position: absolute !important;
+                left: 50% !important;
+                top: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                text-indent: 0 !important;
+                display: inline-block !important;
+                line-height: 1 !important;
+              }
+
+              .navbar-right .jss6:not(.dropdown-menu):not(.dropdown-item):before {
+                content: "\f007" !important; /* fa-user for User Options */
+                font-family: "FontAwesome" !important;
+                font-weight: normal !important;
+                font-size: 16px !important;
+                color: #373a3c !important;
+                position: absolute !important;
+                left: 50% !important;
+                top: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                text-indent: 0 !important;
+                display: inline-block !important;
+                line-height: 1 !important;
+              }
+
+              .navbar-right .jss7:not(.dropdown-menu):not(.dropdown-item):before {
+                content: "\f059" !important; /* fa-question-circle for Help */
+                font-family: "FontAwesome" !important;
+                font-weight: normal !important;
+                font-size: 16px !important;
+                color: #373a3c !important;
+                position: absolute !important;
+                left: 50% !important;
+                top: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                text-indent: 0 !important;
+                display: inline-block !important;
+                line-height: 1 !important;
+              }
+
+              /* Administration Button - Convert to cog icon */
+              .navbar-right .nav-link[title="Administration"],
+              .navbar-right a[href*="admin"]:not(.dropdown-item),
+              .navbar-right .nav-item .nav-link:first-child:not(.dropdown-toggle) {
+                font-size: 0 !important; /* Hide text content */
+                text-indent: -9999px !important;
+                overflow: hidden !important;
+                width: 48px !important;
+                height: 32px !important;
+                position: relative !important;
+              }
+
+              .navbar-right .nav-link[title="Administration"]:before,
+              .navbar-right a[href*="admin"]:not(.dropdown-item):before,
+              .navbar-right .nav-item:nth-last-child(3) .nav-link:first-child:not(.dropdown-toggle):before {
+                content: "\f013" !important; /* FontAwesome fa-cog */
+                font-family: "FontAwesome", "Font Awesome 5 Free" !important;
+                font-weight: 900 !important;
+                font-size: 16px !important;
+                color: #373a3c !important;
+                position: absolute !important;
+                left: 50% !important;
+                top: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                text-indent: 0 !important;
+                display: inline-block !important;
+                line-height: 1 !important;
+              }
+
+              /* User Options Button - Convert to user icon */
+              .navbar-right .nav-link[title="User Options"],
+              .navbar-right a[href*="user"]:not(.dropdown-item) {
+                font-size: 0 !important;
+                text-indent: -9999px !important;
+                overflow: hidden !important;
+                width: 48px !important;
+                height: 32px !important;
+                position: relative !important;
+              }
+
+              .navbar-right .nav-link[title="User Options"]:before,
+              .navbar-right a[href*="user"]:not(.dropdown-item):before,
+              .navbar-right .nav-item:nth-last-child(2) .nav-link:first-child:not(.dropdown-toggle):before {
+                content: "\f007" !important; /* FontAwesome fa-user */
+                font-family: "FontAwesome", "Font Awesome 5 Free" !important;
+                font-weight: 900 !important;
+                font-size: 16px !important;
+                color: #373a3c !important;
+                position: absolute !important;
+                left: 50% !important;
+                top: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                text-indent: 0 !important;
+                display: inline-block !important;
+                line-height: 1 !important;
+              }
+
+              /* Help Button - Convert to question icon */
+              .navbar-right .nav-link[title="Help"],
+              .navbar-right a[href*="help"]:not(.dropdown-item) {
+                font-size: 0 !important;
+                text-indent: -9999px !important;
+                overflow: hidden !important;
+                width: 48px !important;
+                height: 32px !important;
+                position: relative !important;
+              }
+
+              .navbar-right .nav-link[title="Help"]:before,
+              .navbar-right a[href*="help"]:not(.dropdown-item):before,
+              .navbar-right .nav-item:last-child .nav-link:first-child:not(.dropdown-toggle):before {
+                content: "\f059" !important; /* FontAwesome fa-question-circle */
+                font-family: "FontAwesome", "Font Awesome 5 Free" !important;
+                font-weight: 900 !important;
+                font-size: 16px !important;
+                color: #373a3c !important;
+                position: absolute !important;
+                left: 50% !important;
+                top: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                text-indent: 0 !important;
+                display: inline-block !important;
+                line-height: 1 !important;
               }
 
               /* Ensure dropdown nav items are visible */

@@ -147,7 +147,7 @@ export class KibanaLegacyPlugin {
       (window as any).getNetMonDashboards = () => dashboards;
       (window as any).getNmDashboards = () => dashboards;
 
-      //console.log('NetMon dashboards configured from kibana_legacy plugin:', dashboards.length);
+      // console.log('NetMon dashboards configured from kibana_legacy plugin:', dashboards.length);
       return dashboards;
     };
 
@@ -185,7 +185,7 @@ export class KibanaLegacyPlugin {
             createShortUrl: true,
           },
         };
-        //console.log('🔍 DEBUG: Set global kibanaCapabilities fallback');
+        // console.log('🔍 DEBUG: Set global kibanaCapabilities fallback');
       }
     };
 
@@ -193,7 +193,7 @@ export class KibanaLegacyPlugin {
 
     // Add application classes for proper dashboard styling (7.5.2 compatibility)
     application.currentAppId$.subscribe((appId) => {
-      //console.log('🔍 DEBUG: Application ID changed to:', appId);
+      // console.log('🔍 DEBUG: Application ID changed to:', appId);
       // Remove previous tab classes
       chrome.removeApplicationClass('tab-dashboard');
       chrome.removeApplicationClass('tab-visualize');
@@ -202,7 +202,7 @@ export class KibanaLegacyPlugin {
       // Add current app tab class
       if (appId) {
         chrome.addApplicationClass(`tab-${appId}`);
-        //console.log('🔍 DEBUG: Added application class:', `tab-${appId}`);
+        // console.log('🔍 DEBUG: Added application class:', `tab-${appId}`);
       }
     });
 
@@ -212,7 +212,7 @@ export class KibanaLegacyPlugin {
       window.location.hash.includes('dashboard')
     ) {
       chrome.addApplicationClass('tab-dashboard');
-      //console.log('🔍 DEBUG: Force added tab-dashboard class for dashboard URL');
+      // console.log('🔍 DEBUG: Force added tab-dashboard class for dashboard URL');
     }
 
     // Removed heavy Observable patching to improve performance
@@ -226,7 +226,7 @@ export class KibanaLegacyPlugin {
           window.location.pathname.includes('dashboard'))
       ) {
         appContainer.classList.add('tab-dashboard');
-        //console.log('🔍 DEBUG: Added tab-dashboard class for dashboard URL');
+        // console.log('🔍 DEBUG: Added tab-dashboard class for dashboard URL');
       }
     }, 1000);
 
@@ -238,12 +238,12 @@ export class KibanaLegacyPlugin {
     // DEBUG: Multiple delayed checks to catch LogRhythm navbar when fully loaded
     const checkNavbar = (attempt: number, maxAttempts: number) => {
       if (attempt > maxAttempts) {
-        //console.log('🔍 DEBUG: Max attempts reached, navbar may not be fully loaded');
+        // console.log('🔍 DEBUG: Max attempts reached, navbar may not be fully loaded');
         return;
       }
 
       setTimeout(() => {
-        //console.log('🔍 DEBUG: Checking LogRhythm navbar menu items...');
+        // console.log('🔍 DEBUG: Checking LogRhythm navbar menu items...');
 
         // ENHANCED: Check for DYNAMIC dashboard title visibility
         const kbnTopNav = document.querySelector('kbn-top-nav');
@@ -253,17 +253,17 @@ export class KibanaLegacyPlugin {
         const breadcrumbs = document.querySelector('[data-test-subj="breadcrumbs"]');
         const kuiLocalBreadcrumb = document.querySelector('.kuiLocalBreadcrumb');
 
-        //console.log('🔍 DEBUG: DYNAMIC Dashboard title elements:');
-        //console.log('🔍 DEBUG: kbn-top-nav found:', !!kbnTopNav);
-        //console.log('🔍 DEBUG: screen title element found:', !!screenTitle);
-        //console.log('🔍 DEBUG: top nav menu found:', !!topNavMenu);
-        //console.log('🔍 DEBUG: top nav wrapper found:', !!topNavWrapper);
-        //console.log('🔍 DEBUG: breadcrumbs found:', !!breadcrumbs);
-        //console.log('🔍 DEBUG: kuiLocalBreadcrumb found:', !!kuiLocalBreadcrumb);
+        // console.log('🔍 DEBUG: DYNAMIC Dashboard title elements:');
+        // console.log('🔍 DEBUG: kbn-top-nav found:', !!kbnTopNav);
+        // console.log('🔍 DEBUG: screen title element found:', !!screenTitle);
+        // console.log('🔍 DEBUG: top nav menu found:', !!topNavMenu);
+        // console.log('🔍 DEBUG: top nav wrapper found:', !!topNavWrapper);
+        // console.log('🔍 DEBUG: breadcrumbs found:', !!breadcrumbs);
+        // console.log('🔍 DEBUG: kuiLocalBreadcrumb found:', !!kuiLocalBreadcrumb);
 
         if (kbnTopNav) {
           const topNavStyles = window.getComputedStyle(kbnTopNav);
-          /*console.log(
+          /* console.log(
             '🔍 DEBUG: kbn-top-nav visibility - display:',
             topNavStyles.display,
             'visibility:',
@@ -276,8 +276,8 @@ export class KibanaLegacyPlugin {
         if (screenTitle) {
           const titleStyles = window.getComputedStyle(screenTitle);
           const titleText = screenTitle.textContent?.trim() || '';
-          //console.log('🔍 DEBUG: Screen title text:', titleText);
-          /*console.log(
+          // console.log('🔍 DEBUG: Screen title text:', titleText);
+          /* console.log(
             '🔍 DEBUG: Screen title visibility - display:',
             titleStyles.display,
             'visibility:',
@@ -289,7 +289,7 @@ export class KibanaLegacyPlugin {
 
         if (topNavMenu) {
           const menuStyles = window.getComputedStyle(topNavMenu);
-          /*console.log(
+          /* console.log(
             '🔍 DEBUG: Top nav menu visibility - display:',
             menuStyles.display,
             'visibility:',
@@ -301,7 +301,7 @@ export class KibanaLegacyPlugin {
 
         if (topNavWrapper) {
           const wrapperStyles = window.getComputedStyle(topNavWrapper);
-          /*console.log(
+          /* console.log(
             '🔍 DEBUG: Top nav wrapper visibility - display:',
             wrapperStyles.display,
             'visibility:',
@@ -315,8 +315,8 @@ export class KibanaLegacyPlugin {
           if (wrapperTitle) {
             const titleText = wrapperTitle.textContent?.trim() || '';
             const titleStyles = window.getComputedStyle(wrapperTitle);
-            //console.log('🔍 DEBUG: ✨ DYNAMIC wrapper title text:', titleText);
-            /*console.log(
+            // console.log('🔍 DEBUG: ✨ DYNAMIC wrapper title text:', titleText);
+            /* console.log(
               '🔍 DEBUG: ✨ DYNAMIC wrapper title visibility - display:',
               titleStyles.display,
               'visibility:',
@@ -325,15 +325,15 @@ export class KibanaLegacyPlugin {
               titleStyles.opacity
             );*/
           } else {
-            //console.log('🔍 DEBUG: ⚠️ No h1 found in top nav wrapper');
+            // console.log('🔍 DEBUG: ⚠️ No h1 found in top nav wrapper');
           }
         }
 
         if (kuiLocalBreadcrumb) {
           const breadcrumbStyles = window.getComputedStyle(kuiLocalBreadcrumb);
           const breadcrumbText = kuiLocalBreadcrumb.textContent?.trim() || '';
-          //console.log('🔍 DEBUG: ✨ DYNAMIC kuiLocalBreadcrumb text:', breadcrumbText);
-          /*console.log(
+          // console.log('🔍 DEBUG: ✨ DYNAMIC kuiLocalBreadcrumb text:', breadcrumbText);
+          /* console.log(
             '🔍 DEBUG: ✨ DYNAMIC kuiLocalBreadcrumb visibility - display:',
             breadcrumbStyles.display,
             'visibility:',
@@ -348,9 +348,9 @@ export class KibanaLegacyPlugin {
         if (fixedKuiLocalBreadcrumb) {
           const fixedText = fixedKuiLocalBreadcrumb.textContent?.trim() || '';
           const fixedStyles = window.getComputedStyle(fixedKuiLocalBreadcrumb);
-          //console.log('🎉 SUCCESS: FIXED h1.kuiLocalBreadcrumb found!');
-          //console.log('🎉 SUCCESS: DYNAMIC title text:', fixedText);
-          /*console.log(
+          // console.log('🎉 SUCCESS: FIXED h1.kuiLocalBreadcrumb found!');
+          // console.log('🎉 SUCCESS: DYNAMIC title text:', fixedText);
+          /* console.log(
             '🎉 SUCCESS: FIXED title visibility - display:',
             fixedStyles.display,
             'visibility:',
@@ -359,14 +359,14 @@ export class KibanaLegacyPlugin {
             fixedStyles.opacity
           );*/
         } else {
-          /*console.log(
+          /* console.log(
             '⚠️ WARNING: FIXED h1.kuiLocalBreadcrumb NOT found - TopNavMenu fix may not be working'
           );*/
         }
 
         // Check for ALL h1 elements that might contain dashboard title
         const allH1s = document.querySelectorAll('h1');
-        //console.log('🔍 DEBUG: Total h1 elements found:', allH1s.length);
+        // console.log('🔍 DEBUG: Total h1 elements found:', allH1s.length);
         allH1s.forEach((h1, index) => {
           const text = h1.textContent?.trim() || '';
           const styles = window.getComputedStyle(h1);
@@ -376,7 +376,7 @@ export class KibanaLegacyPlugin {
             text.includes('Analyze') ||
             text.length > 5
           ) {
-           /* console.log(
+            /* console.log(
               `🔍 DEBUG: ✨ H1 ${index} (potential title): "${text}" - display:${styles.display}, visibility:${styles.visibility}, opacity:${styles.opacity}`
             );*/
           }
@@ -386,14 +386,14 @@ export class KibanaLegacyPlugin {
         const bootstrapNavbar = document.querySelector(
           '.navbar.navbar-fixed-top[data-testid="navbar"]'
         );
-        //console.log('🔍 DEBUG: Bootstrap LogRhythm navbar found:', !!bootstrapNavbar);
+        // console.log('🔍 DEBUG: Bootstrap LogRhythm navbar found:', !!bootstrapNavbar);
 
         if (bootstrapNavbar) {
-          //console.log('🔍 DEBUG: Bootstrap navbar classes:', bootstrapNavbar.className);
+          // console.log('🔍 DEBUG: Bootstrap navbar classes:', bootstrapNavbar.className);
 
           // Look for Bootstrap navbar buttons and links
           const allButtons = bootstrapNavbar.querySelectorAll('button, a, .btn, .navbar-nav li');
-          //console.log('🔍 DEBUG: Total Bootstrap navbar buttons/links found:', allButtons.length);
+          // console.log('🔍 DEBUG: Total Bootstrap navbar buttons/links found:', allButtons.length);
 
           allButtons.forEach((btn, index) => {
             const text =
@@ -403,42 +403,42 @@ export class KibanaLegacyPlugin {
               btn.getAttribute('data-original-title') ||
               '';
             const styles = window.getComputedStyle(btn);
-           /* console.log(
+            /* console.log(
               `🔍 DEBUG: Bootstrap Button ${index}: "${text}" - display:${styles.display}, visibility:${styles.visibility}, opacity:${styles.opacity}`
             );*/
           });
 
           // Look for Bootstrap navbar-right (right side menu with icons)
           const navbarRight = bootstrapNavbar.querySelector('.navbar-right');
-          //console.log('🔍 DEBUG: Bootstrap .navbar-right found:', !!navbarRight);
+          // console.log('🔍 DEBUG: Bootstrap .navbar-right found:', !!navbarRight);
 
           // Also check main navbar-nav (left side menu)
           const navbarNav = bootstrapNavbar.querySelector('.navbar-nav');
-          //console.log('🔍 DEBUG: Bootstrap .navbar-nav found:', !!navbarNav);
+          // console.log('🔍 DEBUG: Bootstrap .navbar-nav found:', !!navbarNav);
           if (navbarNav) {
             const navItems = navbarNav.children;
-            //console.log('🔍 DEBUG: Navbar nav items count:', navItems.length);
+            // console.log('🔍 DEBUG: Navbar nav items count:', navItems.length);
 
             // Check each nav item (likely Administration, User Options, Help)
             for (let i = 0; i < navItems.length; i++) {
               const navItem = navItems[i];
-              /*console.log(
+              /* console.log(
                 `🔍 DEBUG: Nav item ${i}:`,
                 navItem.className,
                 navItem.textContent?.substring(0, 50)
               );*/
 
               const navItemStyles = window.getComputedStyle(navItem);
-              /*console.log(
+              /* console.log(
                 `🔍 DEBUG: Nav item ${i} visibility - display:${navItemStyles.display}, visibility:${navItemStyles.visibility}, opacity:${navItemStyles.opacity}`
               );*/
 
               // Check for dropdown menu in this nav item
               const dropdownMenu = navItem.querySelector('.dropdown-menu');
               if (dropdownMenu) {
-                //console.log(`🔍 DEBUG: Nav item ${i} has dropdown menu`);
+                // console.log(`🔍 DEBUG: Nav item ${i} has dropdown menu`);
                 const dropdownStyles = window.getComputedStyle(dropdownMenu);
-                /*console.log(
+                /* console.log(
                   `🔍 DEBUG: Dropdown ${i} - display:${dropdownStyles.display}, visibility:${dropdownStyles.visibility}`
                 );*/
               }
@@ -450,7 +450,7 @@ export class KibanaLegacyPlugin {
                 const text = btn.getAttribute('title') || btn.textContent?.trim() || 'no label';
 
                 if (btnStyles.visibility === 'hidden' || btnStyles.opacity === '0') {
-                  //console.log(`⚠️ WARNING: Nav ${i} Button ${btnIndex} ("${text}") appears hidden`);
+                  // console.log(`⚠️ WARNING: Nav ${i} Button ${btnIndex} ("${text}") appears hidden`);
                 }
               });
             }
@@ -458,7 +458,6 @@ export class KibanaLegacyPlugin {
 
           // Check for right-side navbar icons (Administration, User Options, Help)
           if (navbarRight) {
-
             // Check JSS class structure (7.5.2 vs 7.10.2)
             const jssClasses = ['jss2', 'jss4', 'jss6', 'jss7', 'jss8', 'jss9'];
             jssClasses.forEach((jssClass) => {
@@ -483,7 +482,7 @@ export class KibanaLegacyPlugin {
             const allIcons = navbarRight.querySelectorAll(
               'i, .icon, [class*="icon"], span[class*="fa"], .material-icons, button, a'
             );
-            //console.log('🔍 DEBUG: Total navbar-right icons/buttons found:', allIcons.length);
+            // console.log('🔍 DEBUG: Total navbar-right icons/buttons found:', allIcons.length);
 
             // Focus on the empty-text buttons (likely the icon buttons)
             const emptyButtons = Array.from(allIcons).filter((icon) => {
@@ -491,7 +490,7 @@ export class KibanaLegacyPlugin {
               return text === '' && icon.tagName === 'BUTTON';
             });
 
-            //console.log('🔍 DEBUG: Empty button count (likely icons):', emptyButtons.length);
+            // console.log('🔍 DEBUG: Empty button count (likely icons):', emptyButtons.length);
             emptyButtons.forEach((icon, index) => {
               const iconStyles = window.getComputedStyle(icon);
               const classes = icon.className || 'no-classes';
@@ -507,7 +506,7 @@ export class KibanaLegacyPlugin {
                 iconStyles.color === 'rgba(0, 0, 0, 0)' ||
                 iconStyles.color === 'transparent'
               ) {
-                //console.log(`⚠️ HIDDEN PROPERTY: Empty Button ${index} has hiding CSS!`);
+                // console.log(`⚠️ HIDDEN PROPERTY: Empty Button ${index} has hiding CSS!`);
               }
             });
 
@@ -521,58 +520,58 @@ export class KibanaLegacyPlugin {
                 'no-label';
             });
 
-            //console.log('🔍 DEBUG: Administration icon found:', !!adminIcon);
-            //console.log('🔍 DEBUG: User Options icon found:', !!userIcon);
-            //console.log('🔍 DEBUG: Help icon found:', !!helpIcon);
+            // console.log('🔍 DEBUG: Administration icon found:', !!adminIcon);
+            // console.log('🔍 DEBUG: User Options icon found:', !!userIcon);
+            // console.log('🔍 DEBUG: Help icon found:', !!helpIcon);
 
             if (adminIcon) {
-              //console.log('🔍 DEBUG: ADMIN ICON ANALYSIS STARTING...');
+              // console.log('🔍 DEBUG: ADMIN ICON ANALYSIS STARTING...');
               try {
                 const adminStyles = window.getComputedStyle(adminIcon);
 
                 // Check for common icon font hiding techniques
                 if (adminStyles.fontSize === '0px' || adminStyles.fontSize === '0') {
-                  //console.log('⚠️ ISSUE FOUND: Admin icon has fontSize 0!');
+                  // console.log('⚠️ ISSUE FOUND: Admin icon has fontSize 0!');
                 }
                 if (
                   adminStyles.color === 'rgba(0, 0, 0, 0)' ||
                   adminStyles.color === 'transparent'
                 ) {
-                  //console.log('⚠️ ISSUE FOUND: Admin icon has transparent color!');
+                  // console.log('⚠️ ISSUE FOUND: Admin icon has transparent color!');
                 }
                 if (adminStyles.width === '0px' || adminStyles.height === '0px') {
-                  //console.log('⚠️ ISSUE FOUND: Admin icon has zero dimensions!');
+                  // console.log('⚠️ ISSUE FOUND: Admin icon has zero dimensions!');
                 }
 
                 // Check pseudo-elements (::before and ::after) for icon content
                 const beforeStyles = window.getComputedStyle(adminIcon, '::before');
                 const afterStyles = window.getComputedStyle(adminIcon, '::after');
               } catch (error) {
-                //console.log('❌ ERROR in admin icon analysis:', error.message);
+                // console.log('❌ ERROR in admin icon analysis:', error.message);
               }
             }
 
             if (userIcon) {
-              //console.log('🔍 DEBUG: USER ICON ANALYSIS STARTING...');
+              // console.log('🔍 DEBUG: USER ICON ANALYSIS STARTING...');
               try {
                 const userStyles = window.getComputedStyle(userIcon);
 
                 // Check pseudo-elements
                 const beforeStyles = window.getComputedStyle(userIcon, '::before');
               } catch (error) {
-                //console.log('❌ ERROR in user icon analysis:', error.message);
+                // console.log('❌ ERROR in user icon analysis:', error.message);
               }
             }
 
             if (helpIcon) {
-              //console.log('🔍 DEBUG: HELP ICON ANALYSIS STARTING...');
+              // console.log('🔍 DEBUG: HELP ICON ANALYSIS STARTING...');
               try {
                 const helpStyles = window.getComputedStyle(helpIcon);
 
                 // Check pseudo-elements
                 const beforeStyles = window.getComputedStyle(helpIcon, '::before');
               } catch (error) {
-                //console.log('❌ ERROR in help icon analysis:', error.message);
+                // console.log('❌ ERROR in help icon analysis:', error.message);
               }
             }
           }
@@ -581,23 +580,20 @@ export class KibanaLegacyPlugin {
 
           // If no buttons found and it's an early attempt, try again
           if (allButtons.length === 0 && attempt < maxAttempts) {
-            //console.log(`🔍 DEBUG: Attempt ${attempt}: No buttons found, retrying...`);
+            // console.log(`🔍 DEBUG: Attempt ${attempt}: No buttons found, retrying...`);
             checkNavbar(attempt + 1, maxAttempts);
           }
         } else {
           // Fallback: check all possible navbar elements
-          //console.log('🔍 DEBUG: LogRhythm container not found, checking all navbars...');
+          // console.log('🔍 DEBUG: LogRhythm container not found, checking all navbars...');
           const allNavbars = document.querySelectorAll('nav, .navbar, [class*="navbar"]');
           allNavbars.forEach((nav, index) => {
             const styles = window.getComputedStyle(nav);
-            //console.log(
-              `🔍 DEBUG: Navbar ${index}: position:${styles.position}, top:${styles.top}, zIndex:${styles.zIndex}`
-            );
           });
 
           // Retry if container not found
           if (attempt < maxAttempts) {
-            //console.log(`🔍 DEBUG: Attempt ${attempt}: Container not found, retrying...`);
+            // console.log(`🔍 DEBUG: Attempt ${attempt}: Container not found, retrying...`);
             checkNavbar(attempt + 1, maxAttempts);
           }
         }
@@ -607,7 +603,7 @@ export class KibanaLegacyPlugin {
     // Start checking with multiple attempts
     checkNavbar(1, 5);
 
-    //console.log('✅ NetMon navbar integration initialized successfully');
+    // console.log('✅ NetMon navbar integration initialized successfully');
 
     return {
       dashboardConfig: getDashboardConfig(!application.capabilities.dashboard.showWriteControls),
