@@ -36,8 +36,8 @@ import 'tether';
 import 'bootstrap';
 // Import LogRhythm lr-style CSS for proper UI alignment
 import 'lr-style/dist/lr-style.css';
-// Import FontAwesome for icon conversion fix
-import 'font-awesome/css/font-awesome.min.css';
+// Import LogRhythm icons CSS for proper icon rendering
+import '@logrhythm/icons/icons.css';
 
 import {
   // TODO: add type annotations
@@ -63,8 +63,6 @@ import {
 import { i18n } from '@kbn/i18n';
 import { InjectedIntl, injectI18n } from '@kbn/i18n/react';
 import LogRhythmNavbar from '../../../../../netmon/components/navbar';
-// Import LogRhythm lr-style CSS for dashboard compatibility
-import 'lr-style/dist/lr-style.css';
 
 import {
   ChromeBadge,
@@ -419,52 +417,15 @@ class HeaderUI extends Component<Props, State> {
                 z-index: 20000 !important;
               }
 
-              /* CORRECTED: Only target top-level navbar elements, NOT dropdown contents */
+              /* Essential navbar visibility only - let LogRhythm CSS handle the rest */
 
-              /* Bootstrap navbar brand and toggle button */
-              .navbar-brand,
-              .navbar .navbar-toggle {
-                visibility: visible !important;
-                opacity: 1 !important;
-              }
-
-              /* Bootstrap navbar-nav container (right side menu) */
+              /* Bootstrap navbar container - basic visibility */
               .navbar-nav {
                 visibility: visible !important;
                 opacity: 1 !important;
-                display: flex !important;
               }
 
-              /* Top-level nav items (li containers) - visible but don't force dropdown contents */
-              .navbar-nav > li {
-                visibility: visible !important;
-                opacity: 1 !important;
-                display: list-item !important;
-              }
-
-              /* CORRECTED: Only top-level buttons/links in nav items, NOT dropdown contents */
-              .navbar-nav > li > a,
-              .navbar-nav > li > button {
-                visibility: visible !important;
-                opacity: 1 !important;
-                display: inline-block !important;
-              }
-
-              /* Bootstrap navbar icons in top-level buttons only */
-              .navbar-nav > li > a .glyphicon,
-              .navbar-nav > li > a .fa,
-              .navbar-nav > li > a i,
-              .navbar-nav > li > a svg,
-              .navbar-nav > li > button .glyphicon,
-              .navbar-nav > li > button .fa,
-              .navbar-nav > li > button i,
-              .navbar-nav > li > button svg {
-                visibility: visible !important;
-                opacity: 1 !important;
-              }
-
-              /* DO NOT force visibility on dropdown menu contents - let Bootstrap control them */
-              /* .navbar .dropdown-menu * - REMOVED to allow proper Bootstrap dropdown behavior */
+              /* Let LogRhythm icons handle all specific element styling */
 
               /* FIXED: chrHeaderWrapper positioned at top navbar level */
               .chrHeaderWrapper {
@@ -579,236 +540,39 @@ class HeaderUI extends Component<Props, State> {
                 z-index: 1100 !important;
               }
 
-              /* Bootstrap navbar right-side: Support ICON-ONLY buttons (7.5.2 behavior) */
-              .navbar-right,
-              .navbar-nav .dropdown .nav-link {
+              /* LogRhythm navbar: Ensure proper structure and icon visibility */
+              .navbar-right {
                 visibility: visible !important;
                 opacity: 1 !important;
               }
 
-              /* CORRECTED: Target both 7.5.2 and 7.10.2 JSS class names */
-              /* 7.5.2 JSS classes: jss4, jss6, jss8, jss9 */
-              /* 7.10.2 JSS classes: jss2, jss4, jss6, jss7 */
-              .navbar-right .jss2,  /* 7.10.2 container */
-              .navbar-right .jss4,  /* 7.5.2 container, 7.10.2 administration */
-              .navbar-right .jss6,  /* 7.5.2 administration, 7.10.2 user */
-              .navbar-right .jss7,  /* 7.10.2 help */
-              .navbar-right .jss8,  /* 7.5.2 user */
-              .navbar-right .jss9 { /* 7.5.2 help */
-                visibility: visible !important;
-                opacity: 1 !important;
-                display: block !important;
-              }
-
-              /* Target all JSS-generated divs in navbar-right */
-              .navbar-right div[class*="jss"] {
-                visibility: visible !important;
-                opacity: 1 !important;
-                display: block !important;
-              }
-
-              /* Bootstrap navbar icons - make sure they display properly */
-              .navbar-right .header-icon,
-              .navbar-right .icon-administration,
-              .navbar-right .icon-user,
-              .navbar-right .icon-question,
+              /* Ensure LogRhythm icons are properly displayed */
               .icon-administration,
               .icon-user,
               .icon-question {
+                font-family: 'lr-web' !important;
+                display: inline-block !important;
                 visibility: visible !important;
                 opacity: 1 !important;
-                display: inline-block !important;
                 font-size: 16px !important;
+                line-height: 1 !important;
               }
 
-              /* Icon dropdown arrows */
-              .icon-down {
+              /* Ensure all navbar items are visible and properly positioned */
+              .navbar-right .nav-item,
+              .navbar-right .dropdown {
+                display: inline-block !important;
                 visibility: visible !important;
                 opacity: 1 !important;
+              }
+
+              /* Fix any display issues with nav links */
+              .navbar-right .nav-link {
                 display: inline-block !important;
-              }
-
-              /* CRITICAL FIX: Convert text labels to FontAwesome icons for 7.5.2 compatibility */
-              /* From debug: Icons show as text "Administration", "User Options", "Help" instead of FontAwesome */
-              /* Solution: Hide text content and add FontAwesome icons via CSS pseudo-elements */
-
-              /* FontAwesome font will be loaded via import at file level */
-
-              /* Target JSS classes from debug logs: .jss4 (Administration), .jss6 (User), .jss7 (Help) */
-              .navbar-right .jss4:not(.dropdown-menu):not(.dropdown-item),
-              .navbar-right .jss6:not(.dropdown-menu):not(.dropdown-item),
-              .navbar-right .jss7:not(.dropdown-menu):not(.dropdown-item) {
-                font-size: 0 !important; /* Hide text */
-                text-indent: -9999px !important;
-                overflow: hidden !important;
-                width: 48px !important;
-                height: 32px !important;
-                position: relative !important;
-              }
-
-              /* JSS class-based icon rendering */
-              .navbar-right .jss4:not(.dropdown-menu):not(.dropdown-item):before {
-                content: "\f013" !important; /* fa-cog for Administration */
-                font-family: "FontAwesome" !important;
-                font-weight: normal !important;
-                font-size: 16px !important;
-                color: #373a3c !important;
-                position: absolute !important;
-                left: 50% !important;
-                top: 50% !important;
-                transform: translate(-50%, -50%) !important;
-                text-indent: 0 !important;
-                display: inline-block !important;
-                line-height: 1 !important;
-              }
-
-              .navbar-right .jss6:not(.dropdown-menu):not(.dropdown-item):before {
-                content: "\f007" !important; /* fa-user for User Options */
-                font-family: "FontAwesome" !important;
-                font-weight: normal !important;
-                font-size: 16px !important;
-                color: #373a3c !important;
-                position: absolute !important;
-                left: 50% !important;
-                top: 50% !important;
-                transform: translate(-50%, -50%) !important;
-                text-indent: 0 !important;
-                display: inline-block !important;
-                line-height: 1 !important;
-              }
-
-              .navbar-right .jss7:not(.dropdown-menu):not(.dropdown-item):before {
-                content: "\f059" !important; /* fa-question-circle for Help */
-                font-family: "FontAwesome" !important;
-                font-weight: normal !important;
-                font-size: 16px !important;
-                color: #373a3c !important;
-                position: absolute !important;
-                left: 50% !important;
-                top: 50% !important;
-                transform: translate(-50%, -50%) !important;
-                text-indent: 0 !important;
-                display: inline-block !important;
-                line-height: 1 !important;
-              }
-
-              /* Administration Button - Convert to cog icon */
-              .navbar-right .nav-link[title="Administration"],
-              .navbar-right a[href*="admin"]:not(.dropdown-item),
-              .navbar-right .nav-item .nav-link:first-child:not(.dropdown-toggle) {
-                font-size: 0 !important; /* Hide text content */
-                text-indent: -9999px !important;
-                overflow: hidden !important;
-                width: 48px !important;
-                height: 32px !important;
-                position: relative !important;
-              }
-
-              .navbar-right .nav-link[title="Administration"]:before,
-              .navbar-right a[href*="admin"]:not(.dropdown-item):before,
-              .navbar-right .nav-item:nth-last-child(3) .nav-link:first-child:not(.dropdown-toggle):before {
-                content: "\f013" !important; /* FontAwesome fa-cog */
-                font-family: "FontAwesome", "Font Awesome 5 Free" !important;
-                font-weight: 900 !important;
-                font-size: 16px !important;
-                color: #373a3c !important;
-                position: absolute !important;
-                left: 50% !important;
-                top: 50% !important;
-                transform: translate(-50%, -50%) !important;
-                text-indent: 0 !important;
-                display: inline-block !important;
-                line-height: 1 !important;
-              }
-
-              /* User Options Button - Convert to user icon */
-              .navbar-right .nav-link[title="User Options"],
-              .navbar-right a[href*="user"]:not(.dropdown-item) {
-                font-size: 0 !important;
-                text-indent: -9999px !important;
-                overflow: hidden !important;
-                width: 48px !important;
-                height: 32px !important;
-                position: relative !important;
-              }
-
-              .navbar-right .nav-link[title="User Options"]:before,
-              .navbar-right a[href*="user"]:not(.dropdown-item):before,
-              .navbar-right .nav-item:nth-last-child(2) .nav-link:first-child:not(.dropdown-toggle):before {
-                content: "\f007" !important; /* FontAwesome fa-user */
-                font-family: "FontAwesome", "Font Awesome 5 Free" !important;
-                font-weight: 900 !important;
-                font-size: 16px !important;
-                color: #373a3c !important;
-                position: absolute !important;
-                left: 50% !important;
-                top: 50% !important;
-                transform: translate(-50%, -50%) !important;
-                text-indent: 0 !important;
-                display: inline-block !important;
-                line-height: 1 !important;
-              }
-
-              /* Help Button - Convert to question icon */
-              .navbar-right .nav-link[title="Help"],
-              .navbar-right a[href*="help"]:not(.dropdown-item) {
-                font-size: 0 !important;
-                text-indent: -9999px !important;
-                overflow: hidden !important;
-                width: 48px !important;
-                height: 32px !important;
-                position: relative !important;
-              }
-
-              .navbar-right .nav-link[title="Help"]:before,
-              .navbar-right a[href*="help"]:not(.dropdown-item):before,
-              .navbar-right .nav-item:last-child .nav-link:first-child:not(.dropdown-toggle):before {
-                content: "\f059" !important; /* FontAwesome fa-question-circle */
-                font-family: "FontAwesome", "Font Awesome 5 Free" !important;
-                font-weight: 900 !important;
-                font-size: 16px !important;
-                color: #373a3c !important;
-                position: absolute !important;
-                left: 50% !important;
-                top: 50% !important;
-                transform: translate(-50%, -50%) !important;
-                text-indent: 0 !important;
-                display: inline-block !important;
-                line-height: 1 !important;
-              }
-
-              /* Ensure dropdown nav items are visible */
-              .navbar-right .dropdown.nav-item {
                 visibility: visible !important;
                 opacity: 1 !important;
-                display: list-item !important;
-              }
-
-              /* Make sure nav-link pointers are visible */
-              .navbar-right .nav-link.pointer {
-                visibility: visible !important;
-                opacity: 1 !important;
-                display: inline-block !important;
-              }
-
-              /* FIX: Force proper width for navbar-right icon elements (they were showing as 7px wide) */
-              /* MINIMAL FIX: Only fix width constraint, let LogRhythm handle styling */
-              .navbar-right .nav-link,
-              .navbar-right .dropdown > .nav-link,
-              .navbar-right .nav-item > .nav-link,
-              .navbar-right [title="Administration"],
-              .navbar-right [title="User Options"],
-              .navbar-right [title="Help"] {
-                min-width: 48px !important;
-                width: auto !important;
-                /* Removed text-align, padding, font-size - let LogRhythm handle styling */
-              }
-
-              /* Force proper dimensions for navbar-right containers */
-              .navbar-right .dropdown.nav-item,
-              .navbar-right .nav-item {
-                min-width: 48px !important;
-                width: auto !important;
+                min-width: 40px !important;
+                text-align: center !important;
               }
             `,
             }}

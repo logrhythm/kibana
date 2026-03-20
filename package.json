@@ -185,6 +185,8 @@
     "re2": "1.15.4",
     "elastic-apm-node": "3.8.0",
     "filelist": "1.0.4",
+    "@noble/hashes": "1.0.0",
+    "@noble/ciphers": "0.2.0",
     "history": "4.10.1"
   },
   "workspaces": {
