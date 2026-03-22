@@ -98,6 +98,7 @@ ln -sf /usr/local/%{name}-%{kibana_version}-linux-x86_64 %{buildroot}/usr/local/
 
 %post
 # Disable the kibana.service first to clean up old dependency symlinks
+chown -R nginx:nginx /usr/local/kibana-7.10.2-linux-x64
 /usr/bin/systemctl disable kibana.service
 /usr/bin/systemctl enable kibana.service
 
