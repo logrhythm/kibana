@@ -64,14 +64,14 @@ mkdir -p %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64
 cp -a build/oss/%{name}-%{kibana_version}-linux-x86_64/* %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/
 cp -a resources/ %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/
 
+# FIX: Create the data directory explicitly so RPM sets permissions on it
+mkdir -p %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/data
+
 # Copy Tether to Kibana's assets directory
 cp node_modules/tether/dist/js/tether.min.js %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/src/core/server/core_app/assets/
 
 # Ensure all plugin target directories and bundles are properly copied
-# The new platform expects to find plugin bundles in their target directories
-# This copies the entire target structure from the build output
 if [ -d "build/oss/%{name}-%{kibana_version}-linux-x86_64/src" ]; then
-    # Copy the src directory structure which contains target directories
     cp -r build/oss/%{name}-%{kibana_version}-linux-x86_64/src/* %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/src/ 2>/dev/null || true
 fi
 
@@ -94,11 +94,13 @@ find %{buildroot} -type f \( -name "*.md" -o -name "*.json" -o -name "*.js" \) -
 find %{buildroot} -path "*/node-gyp/gyp/*" -type f -exec sed -i '1s|#!.*python|#!/usr/bin/python2|' {} +
 
 mkdir -p %{buildroot}/usr/local/www/probe/
-ln -sf /usr/local/%{name}-%{kibana_version}-linux-x86_64 %{buildroot}/usr/local/www/probe/%{name}-%{kibana_version}-linux-x86_64
+# FIX: Adjusted symlink to point to the linux-x64 directory created above
+ln -sf /usr/local/%{name}-%{kibana_version}-linux-x64 %{buildroot}/usr/local/www/probe/%{name}-%{kibana_version}-linux-x64
 
 %post
-# Disable the kibana.service first to clean up old dependency symlinks
-chown -R nginx:nginx /usr/local/kibana-7.10.2-linux-x64
+# Use the dynamic version variable to ensure the path is always correct
+chown -R nginx:nginx /usr/local/%{name}-%{kibana_version}-linux-x64
+/usr/bin/systemctl daemon-reload
 /usr/bin/systemctl disable kibana.service
 /usr/bin/systemctl enable kibana.service
 
