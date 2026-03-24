@@ -144,7 +144,7 @@ export class ChromeService {
 
       getHeaderComponent: () => (
         <React.Fragment>
-          <LoadingIndicator loadingCount$={http.getLoadingCount$()} />
+          <LoadingIndicator loadingCount$={http.getLoadingCount$()} showAsBar={true} />
 
           <Header
             isCloudEnabled={injectedMetadata.getInjectedVar('isCloudEnabled') as boolean}

@@ -48,12 +48,9 @@ import {
   EuiHeaderSection,
   // @ts-expect-error
   EuiHeaderSectionItem,
-  EuiHeaderSectionItemButton,
   // @ts-expect-error
   EuiHideFor,
   EuiHorizontalRule,
-  EuiIcon,
-  EuiImage,
   EuiNavDrawer,
   EuiNavDrawerGroup,
   // @ts-expect-error
@@ -63,6 +60,15 @@ import {
 import { i18n } from '@kbn/i18n';
 import { InjectedIntl, injectI18n } from '@kbn/i18n/react';
 import LogRhythmNavbar from '../../../../../netmon/components/navbar';
+
+const ExabeamMark = () => (
+  <svg viewBox="0 0 256 192" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <polygon points="1,191 40,191 158,29" fill="#00B400" />
+    <polygon points="82,166 121,166 195,61" fill="#00B400" />
+    <polygon points="127,191 166,191 231,98" fill="#1A73E8" />
+    <polygon points="210,166 249,166 256,148" fill="#1A73E8" />
+  </svg>
+);
 
 import {
   ChromeBadge,
@@ -270,73 +276,68 @@ class HeaderUI extends Component<Props, State> {
     return (
       <EuiHeaderLogo
         data-test-subj="logo"
-        iconType="logoKibana"
+        iconType={ExabeamMark}
+        iconTitle="Netmon"
         onClick={this.onNavClick}
         href={homeHref}
         aria-label={intl.formatMessage({
           id: 'core.ui.chrome.headerGlobalNav.goHomePageIconAriaLabel',
           defaultMessage: 'Go to home page',
         })}
-      />
+      >
+        Exabeam
+      </EuiHeaderLogo>
     );
   }
 
   public renderMenuTrigger() {
-    return (
-      <EuiHeaderSectionItemButton
-        aria-label="Toggle side navigation"
-        onClick={() => this.navDrawerRef.current?.toggleOpen()}
-      >
-        <EuiIcon type="apps" size="m" />
-      </EuiHeaderSectionItemButton>
-    );
+    return null;
   }
 
   public render() {
-    const { application, basePath, intl, isLocked, onIsLockedUpdate, legacyMode } = this.props;
-    const { currentAppId, isVisible, navLinks, recentlyAccessed } = this.state;
-
+    const { application, basePath, intl, onIsLockedUpdate } = this.props;
+    const { currentAppId, isVisible, recentlyAccessed } = this.state;
     if (!isVisible) {
       return null;
     }
 
-    const navLinksArray = navLinks
-      .filter((navLink) => !navLink.hidden)
-      .map((navLink) => ({
-        key: navLink.id,
-        label: navLink.title,
+    const createSideNavItem = (
+      key: string,
+      label: string,
+      path: string,
+      iconType: string,
+      activeAppIds: string[]
+    ) => {
+      const href = relativeToAbsolute(basePath.prepend(path));
 
-        // Use href and onClick to support "open in new tab" and SPA navigation in the same link
-        href: navLink.href,
+      return {
+        key,
+        label,
+        href,
+        iconType,
+        isActive: activeAppIds.includes(currentAppId || ''),
+        isDisabled: false,
+        'data-test-subj': 'navDrawerAppsMenuLink',
         onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-          if (
-            !legacyMode && // ignore when in legacy mode
-            !navLink.legacy && // ignore links to legacy apps
-            !event.defaultPrevented && // onClick prevented default
-            event.button === 0 && // ignore everything but left clicks
-            !isModifiedEvent(event) // ignore clicks with modifier keys
-          ) {
+          if (!event.defaultPrevented && event.button === 0 && !isModifiedEvent(event)) {
             event.preventDefault();
-            application.navigateToApp(navLink.id);
+            application.navigateToUrl(href);
           }
         },
+      };
+    };
 
-        // Legacy apps use `active` property, NP apps should match the current app
-        isActive: navLink.active || currentAppId === navLink.id,
-        isDisabled: navLink.disabled,
-
-        iconType: navLink.euiIconType,
-        icon:
-          !navLink.euiIconType && navLink.icon ? (
-            <EuiImage
-              size="s"
-              alt=""
-              aria-hidden={true}
-              url={basePath.prepend(`/${navLink.icon}`)}
-            />
-          ) : undefined,
-        'data-test-subj': 'navDrawerAppsMenuLink',
-      }));
+    const sideNavLinksArray = [
+      createSideNavItem('discover', 'Discover', '/app/discover', 'discoverApp', ['discover']),
+      createSideNavItem('dashboard', 'Dashboard', '/app/dashboards#/list', 'dashboardApp', [
+        'dashboard',
+      ]),
+      createSideNavItem('visualize', 'Visualize', '/app/visualize', 'visualizeApp', ['visualize']),
+      createSideNavItem('dev_tools', 'Dev Tools', '/app/dev_tools', 'devToolsApp', ['dev_tools']),
+      createSideNavItem('management', 'Management', '/app/management', 'managementApp', [
+        'management',
+      ]),
+    ];
 
     const recentLinksArray = [
       {
@@ -345,7 +346,7 @@ class HeaderUI extends Component<Props, State> {
           defaultMessage: 'Recently viewed',
         }),
         iconType: 'clock',
-        isDisabled: recentlyAccessed.length > 0 ? false : true,
+        isDisabled: recentlyAccessed.length === 0,
         flyoutMenu: {
           title: intl.formatMessage({
             id: 'core.ui.chrome.sideGlobalNav.viewRecentItemsFlyoutTitle',
@@ -439,38 +440,61 @@ class HeaderUI extends Component<Props, State> {
                 background: transparent !important;
               }
 
+              /* Global loading bar: thin pink/red strip at top like legacy UI */
+              [data-test-subj="globalLoadingIndicator"],
+              [data-test-subj="globalLoadingIndicator-hidden"] {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                z-index: 21050 !important;
+                pointer-events: none !important;
+              }
+
+              [data-test-subj="globalLoadingIndicator"].euiProgress,
+              [data-test-subj="globalLoadingIndicator-hidden"].euiProgress {
+                height: 2px !important;
+                min-height: 2px !important;
+                background-color: rgba(232, 76, 139, 0.18) !important;
+              }
+
+              [data-test-subj="globalLoadingIndicator"].euiProgress.euiProgress--indeterminate:before {
+                background-color: #e84c8b !important;
+                box-shadow: 0 0 8px rgba(232, 76, 139, 0.65) !important;
+              }
+
               /* Fix app-wrapper-panel positioning - Account for nav drawer */
+                /* Keep app content full-width below the top navbar */
               .app-wrapper-panel {
                 position: relative !important;
                 top: 0 !important;
                 left: 0 !important;
-                width: 100% !important;
+                width: calc(100% - 48px) !important;
                 height: auto !important;
                 margin-top: 0 !important; /* FIXED: Don't push content down - body already has margin-top: 50px */
+                margin-left: 48px !important;
                 padding: 0 !important;
                 box-sizing: border-box !important;
-                transition: margin-left 0.25s ease !important;
+                  transition: none !important;
               }
 
-              /* When nav drawer is collapsed (default) - small margin */
-              body:not(.euiNavDrawer--isOpen) .app-wrapper-panel {
-                margin-left: 48px !important;
-                width: calc(100% - 48px) !important;
-              }
-
-              /* When nav drawer is open - larger margin */
-              body.euiNavDrawer--isOpen .app-wrapper-panel,
-              .euiNavDrawer--isOpen ~ * .app-wrapper-panel {
-                margin-left: 240px !important;
-                width: calc(100% - 240px) !important;
-              }
-
-              /* Fix nav drawer positioning */
+                /* Keep Kibana side drawer visible and positioned below top navbar */
               .euiNavDrawer {
-                top: 50px !important;
-                height: calc(100vh - 50px) !important;
-                z-index: 18000 !important;
-                pointer-events: auto !important;
+                  top: 50px !important;
+                  height: calc(100vh - 50px) !important;
+                  z-index: 18000 !important;
+                  pointer-events: auto !important;
+              }
+
+              /* Keep side-nav tooltips visible and correctly layered */
+              .chrHeaderWrapper .euiNavDrawer .euiToolTip {
+                margin-top: 0 !important;
+                z-index: 21000 !important;
+              }
+
+              .chrHeaderWrapper .euiNavDrawer .euiToolTipPopover {
+                margin-top: -50px !important;
+                z-index: 21000 !important;
               }
 
               /* Ensure main content doesn't block navbar dropdowns */
@@ -578,17 +602,17 @@ class HeaderUI extends Component<Props, State> {
             }}
           />
 
-          {/* Keep Kibana nav drawer for side navigation with pointer events */}
+          {/* Left icon rail (side navigation) */}
           <div style={{ pointerEvents: 'auto' }}>
             <EuiNavDrawer
               ref={this.navDrawerRef}
               data-test-subj="navDrawer"
-              isLocked={isLocked}
+              isLocked={false}
               onIsLockedUpdate={onIsLockedUpdate}
             >
               <EuiNavDrawerGroup listItems={recentLinksArray} />
               <EuiHorizontalRule margin="none" />
-              <EuiNavDrawerGroup data-test-subj="navDrawerAppsMenu" listItems={navLinksArray} />
+              <EuiNavDrawerGroup data-test-subj="navDrawerAppsMenu" listItems={sideNavLinksArray} />
             </EuiNavDrawer>
           </div>
         </header>

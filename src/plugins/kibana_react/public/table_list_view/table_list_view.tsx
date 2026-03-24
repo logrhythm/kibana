@@ -97,10 +97,17 @@ class TableListView extends React.Component<TableListViewProps, TableListViewSta
   constructor(props: TableListViewProps) {
     super(props);
 
+    const initialPageSize =
+      Number.isFinite(props.initialPageSize) && props.initialPageSize > 0
+        ? props.initialPageSize
+        : 10;
+
     this.pagination = {
       initialPageIndex: 0,
-      initialPageSize: props.initialPageSize,
-      pageSizeOptions: uniq([10, 20, 50, props.initialPageSize]).sort(),
+      initialPageSize,
+      pageSizeOptions: uniq([10, 20, 50, initialPageSize])
+        .filter((size) => Number.isFinite(size) && size > 0)
+        .sort((a, b) => a - b),
     };
     this.state = {
       items: [],

@@ -125,9 +125,9 @@ export class InspectorViewChooser extends Component<Props, State> {
         button={triggerButton}
         isOpen={this.state.isSelectorOpen}
         closePopover={this.closeSelector}
+        panelClassName="insInspectorViewChooserPanel"
         panelPaddingSize="none"
         anchorPosition="downRight"
-        repositionOnScroll
       >
         <EuiContextMenuPanel items={views.map(this.renderView)} />
       </EuiPopover>

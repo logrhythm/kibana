@@ -103,6 +103,7 @@ export class InspectorPublicPlugin implements Plugin<Setup, Start> {
       return core.overlays.openFlyout(
         toMountPoint(<InspectorPanel views={views} adapters={adapters} title={options.title} />),
         {
+          className: 'insInspectorFlyout',
           'data-test-subj': 'inspectorPanel',
           closeButtonAriaLabel: closeButtonLabel,
         }
