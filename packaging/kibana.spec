@@ -96,10 +96,9 @@ find %{buildroot} -path "*/node-gyp/gyp/*" -type f -exec sed -i '1s|#!.*python|#
 mkdir -p %{buildroot}/usr/local/www/probe/
 # FIX: Adjusted symlink to point to the linux-x64 directory created above
 ln -sf /usr/local/%{name}-%{kibana_version}-linux-x64 %{buildroot}/usr/local/www/probe/%{name}-%{kibana_version}-linux-x64
+chown -R nginx:nginx %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64
 
 %post
-# Use the dynamic version variable to ensure the path is always correct
-chown -R nginx:nginx /usr/local/%{name}-%{kibana_version}-linux-x64
 /usr/bin/systemctl daemon-reload
 /usr/bin/systemctl disable kibana.service
 /usr/bin/systemctl enable kibana.service
