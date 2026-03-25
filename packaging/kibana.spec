@@ -41,6 +41,15 @@ if [ $? -ne 0 ]; then
 fi
 rm -rf plugins/network_vis/images/
 
+getent group nginx > /dev/null || groupadd -f -g 904 -r nginx
+if ! getent passwd nginx >/dev/null ; then
+    if ! getent passwd 904 >/dev/null ; then
+      useradd -r -u 904 -g nginx -s /sbin/nologin -c "LogRhythm nginx" nginx
+    else
+      useradd -r -g nginx -s /sbin/nologin -c "LogRhythm nginx" nginx
+    fi
+fi
+
 %build
 #must install kibana dependencies before running build due to a `yarn kbn bootstrap` bug that strips auth
 cd %{name}
@@ -96,9 +105,10 @@ find %{buildroot} -path "*/node-gyp/gyp/*" -type f -exec sed -i '1s|#!.*python|#
 mkdir -p %{buildroot}/usr/local/www/probe/
 # FIX: Adjusted symlink to point to the linux-x64 directory created above
 ln -sf /usr/local/%{name}-%{kibana_version}-linux-x64 %{buildroot}/usr/local/www/probe/%{name}-%{kibana_version}-linux-x64
-chown -R nginx:nginx %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64
 
 %post
+# FIX: Set proper ownership after installation
+chown -R nginx:nginx /usr/local/%{name}-%{kibana_version}-linux-x64
 /usr/bin/systemctl daemon-reload
 /usr/bin/systemctl disable kibana.service
 /usr/bin/systemctl enable kibana.service
