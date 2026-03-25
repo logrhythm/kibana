@@ -47,15 +47,14 @@ export const ManagementLandingPage = ({ version, setBreadcrumbs }: ManagementLan
             <h1>
               <FormattedMessage
                 id="management.landing.header"
-                defaultMessage="Welcome to Stack Management {version}"
-                values={{ version }}
+                defaultMessage="NetMon-UI management"
               />
             </h1>
           </EuiTitle>
           <EuiText>
             <FormattedMessage
               id="management.landing.subhead"
-              defaultMessage="Manage your indices, index patterns, saved objects, Kibana settings, and more."
+              defaultMessage="Manage your indices, index patterns, saved objects, NetMon-UI settings, and more."
             />
           </EuiText>
         </div>
@@ -66,7 +65,7 @@ export const ManagementLandingPage = ({ version, setBreadcrumbs }: ManagementLan
           <p>
             <FormattedMessage
               id="management.landing.text"
-              defaultMessage="A complete list of apps is in the menu on the left."
+              defaultMessage="A full list of tools can be found in the left menu"
             />
           </p>
         </EuiText>

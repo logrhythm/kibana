@@ -35,13 +35,11 @@ export function usageProvider(core: CoreSetup): SearchUsage {
         .then(([coreStart]) => coreStart.savedObjects.createInternalRepository());
 
       let attributes: Usage;
-      let doesSavedObjectExist: boolean = true;
 
       try {
         const response = await repository.get<Usage>(SAVED_OBJECT_ID, SAVED_OBJECT_ID);
         attributes = response.attributes;
       } catch (e) {
-        doesSavedObjectExist = false;
         attributes = {
           successCount: 0,
           errorCount: 0,
@@ -58,13 +56,12 @@ export function usageProvider(core: CoreSetup): SearchUsage {
       }
 
       try {
-        if (doesSavedObjectExist) {
-          await repository.update(SAVED_OBJECT_ID, SAVED_OBJECT_ID, attributes);
-        } else {
-          await repository.create(SAVED_OBJECT_ID, attributes, { id: SAVED_OBJECT_ID });
-        }
+        await repository.create(SAVED_OBJECT_ID, attributes, {
+          id: SAVED_OBJECT_ID,
+          overwrite: true,
+        });
       } catch (e) {
-        // Version conflict error, swallow
+        // Swallow write errors to keep telemetry best-effort.
       }
     };
   };

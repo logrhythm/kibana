@@ -90,21 +90,24 @@ export const Styles: FunctionComponent<Props> = ({ darkMode }) => {
           }
 
           .kbnWelcomeText {
-            font-family:
-            display: inline-block;
+            display: block;
             font-size: 14px;
             font-family: sans-serif;
-            line-height: 40px !important;
-            height: 40px !important;
+            line-height: 20px !important;
+            height: auto !important;
+            margin-top: 8px;
             color: #98a2b3;
             color: ${darkMode ? '#98A2B3' : '#69707D'};
           }
 
           .kbnLoaderWrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             text-align: center;
             line-height: 1;
-            text-align: center;
-            font-faimily: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial !important;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial !important;
             letter-spacing: -.005em;
             -webkit-text-size-adjust: 100%;
             -ms-text-size-adjust: 100%;
@@ -118,6 +121,47 @@ export const Styles: FunctionComponent<Props> = ({ darkMode }) => {
             margin: auto;
             line-height: 1;
           }
+
+          .kbnNetmonSpinnerWrapper {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 84px;
+            height: 84px;
+            margin: 0 auto 8px;
+            background: #ffffff;
+          }
+
+          .kbnNetmonSpinner {
+            position: relative;
+            width: 56px;
+            height: 56px;
+            animation: kbnNetmonSpin 1.1s linear infinite;
+          }
+
+          .kbnNetmonSpinner span {
+            position: absolute;
+            left: 26px;
+            top: 1px;
+            width: 4px;
+            height: 15px;
+            border-radius: 2px;
+            background: #20252b;
+            transform-origin: 2px 27px;
+          }
+
+          .kbnNetmonSpinner span:nth-child(1) { transform: rotate(0deg); opacity: 1.00; }
+          .kbnNetmonSpinner span:nth-child(2) { transform: rotate(30deg); opacity: 0.92; }
+          .kbnNetmonSpinner span:nth-child(3) { transform: rotate(60deg); opacity: 0.84; }
+          .kbnNetmonSpinner span:nth-child(4) { transform: rotate(90deg); opacity: 0.76; }
+          .kbnNetmonSpinner span:nth-child(5) { transform: rotate(120deg); opacity: 0.68; }
+          .kbnNetmonSpinner span:nth-child(6) { transform: rotate(150deg); opacity: 0.60; }
+          .kbnNetmonSpinner span:nth-child(7) { transform: rotate(180deg); opacity: 0.52; }
+          .kbnNetmonSpinner span:nth-child(8) { transform: rotate(210deg); opacity: 0.44; }
+          .kbnNetmonSpinner span:nth-child(9) { transform: rotate(240deg); opacity: 0.36; }
+          .kbnNetmonSpinner span:nth-child(10) { transform: rotate(270deg); opacity: 0.28; }
+          .kbnNetmonSpinner span:nth-child(11) { transform: rotate(300deg); opacity: 0.20; }
+          .kbnNetmonSpinner span:nth-child(12) { transform: rotate(330deg); opacity: 0.12; }
 
           .kbnLoader path {
             stroke: white;
@@ -153,6 +197,16 @@ export const Styles: FunctionComponent<Props> = ({ darkMode }) => {
 
             100% {
               transform: scaleX(1) translateX(100%);
+            }
+          }
+
+          @keyframes kbnNetmonSpin {
+            0% {
+              transform: rotate(0deg);
+            }
+
+            100% {
+              transform: rotate(360deg);
             }
           }
         `,

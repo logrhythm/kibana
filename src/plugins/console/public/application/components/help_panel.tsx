@@ -35,7 +35,12 @@ interface Props {
 
 export function HelpPanel(props: Props) {
   return (
-    <EuiFlyout onClose={props.onClose} data-test-subj="helpFlyout" size="s">
+    <EuiFlyout
+      onClose={props.onClose}
+      data-test-subj="helpFlyout"
+      size="s"
+      className="conHelpFlyout"
+    >
       <EuiFlyoutHeader hasBorder>
         <EuiTitle size="m">
           <h2>

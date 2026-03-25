@@ -1,3 +1,8 @@
+.insInspectorFlyout {
+  top: 4rem !important;
+  height: calc(100% - 4rem) !important;
+}
+
 .insInspectorPanel__flyoutBody {
   // TODO: EUI to allow for custom classNames to inner elements
   // Or supply this as default
@@ -8,5 +13,18 @@
     > div {
       flex-grow: 1;
     }
+  }
+}
+
+[data-test-subj='inspectorPanel'] {
+  .euiFlyout__closeButton {
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  .euiFlyout__closeButton .euiButtonIcon {
+    color: #343741 !important;
+    opacity: 1 !important;
   }
 }

@@ -65,6 +65,7 @@ export interface TableListViewProps {
   tableColumns: Column[];
   tableListTitle: string;
   toastNotifications: ToastsStart;
+  searchBoxProps?: Record<string, unknown>;
   /**
    * Id of the heading element describing the table. This id will be used as `aria-labelledby` of the wrapper element.
    * If the table is not empty, this component renders its own h1 element using the same id.
@@ -97,10 +98,17 @@ class TableListView extends React.Component<TableListViewProps, TableListViewSta
   constructor(props: TableListViewProps) {
     super(props);
 
+    const initialPageSize =
+      Number.isFinite(props.initialPageSize) && props.initialPageSize > 0
+        ? props.initialPageSize
+        : 10;
+
     this.pagination = {
       initialPageIndex: 0,
-      initialPageSize: props.initialPageSize,
-      pageSizeOptions: uniq([10, 20, 50, props.initialPageSize]).sort(),
+      initialPageSize,
+      pageSizeOptions: uniq([10, 20, 50, initialPageSize])
+        .filter((size) => Number.isFinite(size) && size > 0)
+        .sort((a, b) => a - b),
     };
     this.state = {
       items: [],
@@ -149,13 +157,14 @@ class TableListView extends React.Component<TableListViewProps, TableListViewSta
         });
       }
     } catch (fetchError) {
+      const typedFetchError = fetchError as HttpFetchError;
       this.setState({
         hasInitialFetchReturned: true,
         isFetchingItems: false,
         items: [],
         totalItems: 0,
         showLimitError: false,
-        fetchError,
+        fetchError: typedFetchError,
       });
     }
   }, 300);
@@ -438,6 +447,7 @@ class TableListView extends React.Component<TableListViewProps, TableListViewSta
       defaultQuery: this.state.filter,
       box: {
         incremental: true,
+        ...(this.props.searchBoxProps ?? {}),
       },
     };
 
@@ -463,7 +473,7 @@ class TableListView extends React.Component<TableListViewProps, TableListViewSta
       <EuiInMemoryTable
         itemId="id"
         items={this.state.items}
-        columns={(columns as unknown) as Array<EuiBasicTableColumn<object>>} // EuiBasicTableColumn is stricter than Column
+        columns={columns as unknown as Array<EuiBasicTableColumn<object>>} // EuiBasicTableColumn is stricter than Column
         pagination={this.pagination}
         loading={this.state.isFetchingItems}
         message={noItemsMessage}

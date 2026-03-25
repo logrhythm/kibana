@@ -92,6 +92,18 @@ interface Props {
   navigateToApp: (appId: string) => void;
 }
 
+const LogRhythmMark = () => (
+  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle cx="91" cy="37" r="23" fill="currentColor" />
+    <circle cx="158" cy="37" r="23" fill="currentColor" />
+    <circle cx="158" cy="105" r="23" fill="currentColor" />
+    <circle cx="91" cy="173" r="23" fill="currentColor" />
+    <circle cx="23" cy="173" r="23" fill="currentColor" />
+    <circle cx="23" cy="105" r="23" fill="currentColor" />
+    <circle cx="91" cy="105" r="23" fill="currentColor" opacity="0.45" />
+  </svg>
+);
+
 export function HeaderLogo({ href, navigateToApp, ...observables }: Props) {
   const forceNavigation = useObservable(observables.forceNavigation$, false);
   const navLinks = useObservable(observables.navLinks$, []);
@@ -99,14 +111,15 @@ export function HeaderLogo({ href, navigateToApp, ...observables }: Props) {
   return (
     <EuiHeaderLogo
       data-test-subj="logo"
-      iconType="logoElastic"
+      iconType={LogRhythmMark}
+      iconTitle="Exabeam"
       onClick={(e) => onClick(e, forceNavigation, navLinks, navigateToApp)}
       href={href}
       aria-label={i18n.translate('core.ui.chrome.headerGlobalNav.goHomePageIconAriaLabel', {
         defaultMessage: 'Go to home page',
       })}
     >
-      Elastic
+      Exabeam
     </EuiHeaderLogo>
   );
 }
