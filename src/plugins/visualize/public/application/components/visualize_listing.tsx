@@ -147,6 +147,12 @@ export const VisualizeListing = () => {
       entityNamePlural={i18n.translate('visualize.listing.table.entityNamePlural', {
         defaultMessage: 'visualizations',
       })}
+      searchBoxProps={{
+        fullWidth: true,
+        style: {
+          width: '-webkit-fill-available',
+        },
+      }}
       tableListTitle={i18n.translate('visualize.listing.table.listTitle', {
         defaultMessage: 'Visualizations',
       })}

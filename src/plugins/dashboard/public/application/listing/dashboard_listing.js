@@ -64,6 +64,12 @@ export class DashboardListing extends React.Component {
         entityNamePlural={i18n.translate('kbn.dashboard.listing.table.entityNamePlural', {
           defaultMessage: 'dashboards',
         })}
+        searchBoxProps={{
+          fullWidth: true,
+          style: {
+            width: '-webkit-fill-available',
+          },
+        }}
         tableListTitle={i18n.translate('kbn.dashboard.listing.dashboardsTitle', {
           defaultMessage: 'Dashboards',
         })}

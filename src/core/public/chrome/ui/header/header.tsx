@@ -329,10 +329,10 @@ class HeaderUI extends Component<Props, State> {
 
     const sideNavLinksArray = [
       createSideNavItem('discover', 'Discover', '/app/discover', 'discoverApp', ['discover']),
+      createSideNavItem('visualize', 'Visualize', '/app/visualize', 'visualizeApp', ['visualize']),
       createSideNavItem('dashboard', 'Dashboard', '/app/dashboards#/list', 'dashboardApp', [
         'dashboard',
       ]),
-      createSideNavItem('visualize', 'Visualize', '/app/visualize', 'visualizeApp', ['visualize']),
       createSideNavItem('dev_tools', 'Dev Tools', '/app/dev_tools', 'devToolsApp', ['dev_tools']),
       createSideNavItem('management', 'Management', '/app/management', 'managementApp', [
         'management',

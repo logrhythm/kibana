@@ -53,11 +53,11 @@ const sectionTip = i18n.translate('management.sections.section.tip', {
 });
 
 const kibanaTitle = i18n.translate('management.sections.kibanaTitle', {
-  defaultMessage: 'Kibana',
+  defaultMessage: 'NetMon-UI',
 });
 
 const kibanaTip = i18n.translate('management.sections.kibanaTip', {
-  defaultMessage: 'Customize Kibana and manage saved objects',
+  defaultMessage: 'Customize NetMon-UI and manage saved objects',
 });
 
 const stackTitle = i18n.translate('management.sections.stackTitle', {
