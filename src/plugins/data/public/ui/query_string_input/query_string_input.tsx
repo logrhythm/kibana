@@ -184,11 +184,15 @@ export default class QueryStringInputUI extends Component<Props, State> {
       return [...suggestions, ...recentSearchSuggestions];
     } catch (e) {
       // LOGRHYTHM FIX: Enhanced abort error handling
-      if (e.name === 'AbortError' || e.message === 'The user aborted a request.' || e.message === 'Request aborted') {
+      if (
+        e.name === 'AbortError' ||
+        e.message === 'The user aborted a request.' ||
+        e.message === 'Request aborted'
+      ) {
         return [];
       }
       // Only log non-abort errors
-      console.warn('Autocomplete suggestion error:', e.message);
+      // console.warn('Autocomplete suggestion error:', e.message);
       return [];
     }
   };

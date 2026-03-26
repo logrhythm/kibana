@@ -148,7 +148,11 @@ function QueryBarTopRowUI(props: Props) {
       })
       .catch((err) => {
         // LOGRHYTHM FIX: Don't log or display abort-related errors to reduce user confusion
-        if (err.name !== 'AbortError' && !err.message.includes('aborted') && !err.message.includes('Request aborted')) {
+        if (
+          err.name !== 'AbortError' &&
+          !err.message.includes('aborted') &&
+          !err.message.includes('Request aborted')
+        ) {
           console.warn( // eslint-disable-line
             'An error occurred trying to correct the provided query for capitalization.',
             err
@@ -159,7 +163,7 @@ function QueryBarTopRowUI(props: Props) {
         if (!shutdown) {
           const dateRange = getDateRange();
           onSubmit({
-            query: query,
+            query,
             dateRange,
           });
         }

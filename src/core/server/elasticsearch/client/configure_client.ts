@@ -40,10 +40,13 @@ const addLogging = (client: Client, logger: Logger, logQueries: boolean) => {
   client.on('response', (error, event) => {
     if (error) {
       // LOGRHYTHM FIX: Filter out abort-related errors to prevent RequestAbortedError spam in logs
-      if (error.name === 'RequestAbortedError' ||
-          (error.message && (error.message.includes('abort') ||
-                           error.message.includes('Request aborted') ||
-                           error.message.includes('The user aborted')))) {
+      if (
+        error.name === 'RequestAbortedError' ||
+        (error.message &&
+          (error.message.includes('abort') ||
+            error.message.includes('Request aborted') ||
+            error.message.includes('The user aborted')))
+      ) {
         return; // Skip logging abort errors
       }
 

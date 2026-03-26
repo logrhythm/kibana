@@ -341,10 +341,12 @@ class TableListView extends React.Component<TableListViewProps, TableListViewSta
       const errorMessage = error.body?.message || error.message || '';
 
       // Skip displaying abort-related errors
-      if (error.name === 'AbortError' ||
-          errorMessage.includes('abort') ||
-          errorMessage.includes('Request aborted') ||
-          errorMessage.includes('The user aborted')) {
+      if (
+        error.name === 'AbortError' ||
+        errorMessage.includes('abort') ||
+        errorMessage.includes('Request aborted') ||
+        errorMessage.includes('The user aborted')
+      ) {
         return null;
       }
 

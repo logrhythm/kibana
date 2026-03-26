@@ -37,9 +37,12 @@ export class VisualizationRequestError extends React.Component<VisualizationRequ
     if (typeof error === 'object' && error.name === 'AbortError') {
       return null;
     }
-    if (errorMessage && (errorMessage.includes('abort') ||
+    if (
+      errorMessage &&
+      (errorMessage.includes('abort') ||
         errorMessage.includes('Request aborted') ||
-        errorMessage.includes('The user aborted'))) {
+        errorMessage.includes('The user aborted'))
+    ) {
       return null;
     }
 

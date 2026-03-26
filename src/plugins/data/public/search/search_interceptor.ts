@@ -232,7 +232,8 @@ export class SearchInterceptor {
     // LOGRHYTHM FIX: Enhanced abort error detection to prevent "aborted" messages during typing
     if (e instanceof AbortError) return;
     if (e.name === 'AbortError') return;
-    if (e.message && (e.message.includes('aborted') || e.message.includes('Request aborted'))) return;
+    if (e.message && (e.message.includes('aborted') || e.message.includes('Request aborted')))
+      return;
 
     if (e instanceof SearchTimeoutError) {
       // The SearchTimeoutError is shown by the interceptor in getSearchError (regardless of how the app chooses to handle errors)
@@ -248,8 +249,13 @@ export class SearchInterceptor {
     }
 
     // LOGRHYTHM FIX: Additional check to prevent any abort-related errors from showing as toasts
-    if (e.name === 'AbortError' ||
-        (e.message && (e.message.includes('abort') || e.message.includes('Request aborted') || e.message.includes('The user aborted')))) {
+    if (
+      e.name === 'AbortError' ||
+      (e.message &&
+        (e.message.includes('abort') ||
+          e.message.includes('Request aborted') ||
+          e.message.includes('The user aborted')))
+    ) {
       return;
     }
 

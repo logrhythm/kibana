@@ -35,10 +35,12 @@ export function EmbeddableErrorLabel(props: Props) {
   }
 
   // Also check error message for abort-related content
-  if (props.error.message &&
-      (props.error.message.includes('abort') ||
-       props.error.message.includes('Request aborted') ||
-       props.error.message.includes('The user aborted'))) {
+  if (
+    props.error.message &&
+    (props.error.message.includes('abort') ||
+      props.error.message.includes('Request aborted') ||
+      props.error.message.includes('The user aborted'))
+  ) {
     return null;
   }
 

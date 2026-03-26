@@ -52,9 +52,12 @@ export class ErrorEmbeddable extends Embeddable<EmbeddableInput, EmbeddableOutpu
     if (typeof this.error === 'object' && this.error.name === 'AbortError') {
       return;
     }
-    if (title && (title.includes('abort') ||
+    if (
+      title &&
+      (title.includes('abort') ||
         title.includes('Request aborted') ||
-        title.includes('The user aborted'))) {
+        title.includes('The user aborted'))
+    ) {
       return;
     }
 
