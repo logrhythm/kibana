@@ -165,8 +165,12 @@ export default class QueryStringInputUI extends Component<Props, State> {
     }
 
     try {
-      if (this.abortController) this.abortController.abort();
+      // LOGRHYTHM FIX: More graceful abort handling to reduce error logs
+      if (this.abortController && !this.abortController.signal.aborted) {
+        this.abortController.abort();
+      }
       this.abortController = new AbortController();
+
       const suggestions =
         (await this.services.data.autocomplete.getQuerySuggestions({
           language,
@@ -179,10 +183,13 @@ export default class QueryStringInputUI extends Component<Props, State> {
 
       return [...suggestions, ...recentSearchSuggestions];
     } catch (e) {
-      // TODO: Waiting on https://github.com/elastic/kibana/issues/51406 for a properly typed error
-      // Ignore aborted requests
-      if (e.message === 'The user aborted a request.') return;
-      throw e;
+      // LOGRHYTHM FIX: Enhanced abort error handling
+      if (e.name === 'AbortError' || e.message === 'The user aborted a request.' || e.message === 'Request aborted') {
+        return [];
+      }
+      // Only log non-abort errors
+      console.warn('Autocomplete suggestion error:', e.message);
+      return [];
     }
   };
 
@@ -208,7 +215,7 @@ export default class QueryStringInputUI extends Component<Props, State> {
     if (!this.componentIsUnmounting) {
       this.setState({ suggestions });
     }
-  }, 100);
+  }, 300);
 
   private onSubmit = (query: Query) => {
     if (this.props.onSubmit) {

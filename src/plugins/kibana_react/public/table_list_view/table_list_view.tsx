@@ -336,6 +336,18 @@ class TableListView extends React.Component<TableListViewProps, TableListViewSta
 
   renderFetchError() {
     if (this.state.fetchError) {
+      // LOGRHYTHM FIX: Filter out abort errors to prevent "aborted" messages in dashboard tables
+      const error = this.state.fetchError;
+      const errorMessage = error.body?.message || error.message || '';
+
+      // Skip displaying abort-related errors
+      if (error.name === 'AbortError' ||
+          errorMessage.includes('abort') ||
+          errorMessage.includes('Request aborted') ||
+          errorMessage.includes('The user aborted')) {
+        return null;
+      }
+
       return (
         <React.Fragment>
           <EuiCallOut
@@ -354,7 +366,7 @@ class TableListView extends React.Component<TableListViewProps, TableListViewSta
                 defaultMessage="The {entityName} listing could not be fetched: {message}."
                 values={{
                   entityName: this.props.entityName,
-                  message: this.state.fetchError.body?.message || this.state.fetchError.message,
+                  message: errorMessage,
                 }}
               />
             </p>

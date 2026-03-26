@@ -256,7 +256,7 @@ export function DiscoverFieldSearch({ onChange, value, types }: Props) {
             aria-label={searchPlaceholder}
             data-test-subj="fieldFilterSearchInput"
             compressed
-            fullWidth
+            style={{ width: 'auto' }}
             onChange={(event) => onChange('name', event.currentTarget.value)}
             placeholder={searchPlaceholder}
             value={value}

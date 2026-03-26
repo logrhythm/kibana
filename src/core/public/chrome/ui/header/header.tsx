@@ -125,7 +125,7 @@ function extendRecentlyAccessedHistoryItem(
   return {
     ...recentlyAccessed,
     href,
-    euiIconType: navLink ? navLink.euiIconType : undefined,
+    euiIconType: 'dashboardApp',
     title: titleAndAriaLabel,
   };
 }
@@ -497,73 +497,6 @@ class HeaderUI extends Component<Props, State> {
                 z-index: 21000 !important;
               }
 
-              /* Ensure main content doesn't block navbar dropdowns */
-              .application, .app-container, .dshAppContainer {
-                position: relative !important;
-                z-index: 1000 !important;
-              }
-
-              /* Make sure search/filter bars and dashboard title are positioned correctly */
-              .globalFilterBar, [data-test-subj="globalFilterBar"],
-              .kbnTopNavMenu {
-                z-index: 1100 !important;
-                margin-top: 0 !important;
-              }
-
-              /* Ensure dashboard title/breadcrumbs are visible and positioned correctly */
-              kbn-top-nav,
-              [data-test-subj="breadcrumbs"],
-              .euiBreadcrumbs,
-              .screen-title,
-              .kuiLocalBreadcrumb {
-                visibility: visible !important;
-                opacity: 1 !important;
-                display: block !important;
-                position: relative !important;
-                z-index: 1100 !important;
-              }
-
-              /* Dashboard title text visibility - DYNAMIC dashboard title */
-              .euiBreadcrumbs__list,
-              .euiBreadcrumb,
-              .euiTitle h1,
-              .kuiLocalBreadcrumb,
-              .kbnTopNavMenu__wrapper h1 {
-                visibility: visible !important;
-                opacity: 1 !important;
-                color: #343741 !important;
-                font-size: 18px !important;
-                padding: 12px 0px 0px 8px !important;
-                margin: 0 !important;
-                line-height: 1.2 !important;
-                display: block !important;
-                position: relative !important;
-                z-index: 1200 !important;
-              }
-
-              /* Ensure dynamic dashboard title is visible */
-              .kbnTopNavMenu__wrapper h1,
-              [data-test-subj*="title"] h1,
-              .screen-title h1 {
-                visibility: visible !important;
-                opacity: 1 !important;
-                display: block !important;
-                font-weight: 400 !important;
-                text-overflow: ellipsis !important;
-                overflow: hidden !important;
-                white-space: nowrap !important;
-                max-width: 400px !important;
-              }
-
-              /* Ensure kbn-top-nav wrapper is properly positioned */
-              .kbnTopNavMenu__wrapper {
-                display: block !important;
-                visibility: visible !important;
-                opacity: 1 !important;
-                position: relative !important;
-                z-index: 1100 !important;
-              }
-
               /* LogRhythm navbar: Ensure proper structure and icon visibility */
               .navbar-right {
                 visibility: visible !important;
@@ -580,6 +513,18 @@ class HeaderUI extends Component<Props, State> {
                 opacity: 1 !important;
                 font-size: 16px !important;
                 line-height: 1 !important;
+              }
+
+              .icon-administration.header-icon {
+                font-size: 22px !important;
+              }
+              
+              .icon-user.header-icon {
+                font-size: 22px !important;
+              }
+              
+              .icon-question.header-icon {
+                font-size: 22px !important;
               }
 
               /* Ensure all navbar items are visible and properly positioned */

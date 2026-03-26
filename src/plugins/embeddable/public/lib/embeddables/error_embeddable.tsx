@@ -47,6 +47,17 @@ export class ErrorEmbeddable extends Embeddable<EmbeddableInput, EmbeddableOutpu
 
   public render(dom: HTMLElement) {
     const title = typeof this.error === 'string' ? this.error : this.error.message;
+
+    // LOGRHYTHM FIX: Filter out abort errors to prevent "aborted" messages in embeddables
+    if (typeof this.error === 'object' && this.error.name === 'AbortError') {
+      return;
+    }
+    if (title && (title.includes('abort') ||
+        title.includes('Request aborted') ||
+        title.includes('The user aborted'))) {
+      return;
+    }
+
     this.dom = dom;
     ReactDOM.render(
       // @ts-ignore

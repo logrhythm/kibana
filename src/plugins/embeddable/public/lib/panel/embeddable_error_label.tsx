@@ -28,14 +28,23 @@ interface Props {
 
 export function EmbeddableErrorLabel(props: Props) {
   if (!props.error) return null;
-  const labelText =
-    props.error.name === 'AbortError'
-      ? i18n.translate('embeddableApi.panel.labelAborted', {
-          defaultMessage: 'Aborted',
-        })
-      : i18n.translate('embeddableApi.panel.labelError', {
-          defaultMessage: 'Error',
-        });
+
+  // LOGRHYTHM FIX: Hide abort errors completely to prevent "Aborted" labels in dashboard tables
+  if (props.error.name === 'AbortError') {
+    return null;
+  }
+
+  // Also check error message for abort-related content
+  if (props.error.message &&
+      (props.error.message.includes('abort') ||
+       props.error.message.includes('Request aborted') ||
+       props.error.message.includes('The user aborted'))) {
+    return null;
+  }
+
+  const labelText = i18n.translate('embeddableApi.panel.labelError', {
+    defaultMessage: 'Error',
+  });
 
   return (
     <div className="embPanel__labelWrapper">

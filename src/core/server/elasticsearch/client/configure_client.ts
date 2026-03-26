@@ -39,6 +39,14 @@ export const configureClient = (
 const addLogging = (client: Client, logger: Logger, logQueries: boolean) => {
   client.on('response', (error, event) => {
     if (error) {
+      // LOGRHYTHM FIX: Filter out abort-related errors to prevent RequestAbortedError spam in logs
+      if (error.name === 'RequestAbortedError' ||
+          (error.message && (error.message.includes('abort') ||
+                           error.message.includes('Request aborted') ||
+                           error.message.includes('The user aborted')))) {
+        return; // Skip logging abort errors
+      }
+
       const errorMessage =
         // error details for response errors provided by elasticsearch, defaults to error name/message
         `[${event.body?.error?.type ?? error.name}]: ${event.body?.error?.reason ?? error.message}`;

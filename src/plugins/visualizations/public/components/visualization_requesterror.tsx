@@ -33,6 +33,16 @@ export class VisualizationRequestError extends React.Component<VisualizationRequ
     const { error } = this.props;
     const errorMessage = typeof error === 'string' ? error : error.message;
 
+    // LOGRHYTHM FIX: Filter out abort errors to prevent "aborted" messages in visualizations
+    if (typeof error === 'object' && error.name === 'AbortError') {
+      return null;
+    }
+    if (errorMessage && (errorMessage.includes('abort') ||
+        errorMessage.includes('Request aborted') ||
+        errorMessage.includes('The user aborted'))) {
+      return null;
+    }
+
     return (
       <div className="visError" ref={this.containerDiv}>
         <EuiText size="xs" color="subdued">
