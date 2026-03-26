@@ -41,15 +41,6 @@ if [ $? -ne 0 ]; then
 fi
 rm -rf plugins/network_vis/images/
 
-getent group nginx > /dev/null || groupadd -f -g 904 -r nginx
-if ! getent passwd nginx >/dev/null ; then
-    if ! getent passwd 904 >/dev/null ; then
-      useradd -r -u 904 -g nginx -s /sbin/nologin -c "LogRhythm nginx" nginx
-    else
-      useradd -r -g nginx -s /sbin/nologin -c "LogRhythm nginx" nginx
-    fi
-fi
-
 %build
 #must install kibana dependencies before running build due to a `yarn kbn bootstrap` bug that strips auth
 cd %{name}
@@ -63,6 +54,16 @@ cd plugins/network_vis/
 cd ../../
 /usr/bin/yarn kbn bootstrap
 NODE_OPTIONS="--max-old-space-size=8192" node scripts/build --rpm --oss --skip-archives --release --verbose --allow-root
+
+%pre
+getent group nginx > /dev/null || groupadd -f -g 904 -r nginx
+if ! getent passwd nginx >/dev/null ; then
+    if ! getent passwd 904 >/dev/null ; then
+      useradd -r -u 904 -g nginx -s /sbin/nologin -c "LogRhythm nginx" nginx
+    else
+      useradd -r -g nginx -s /sbin/nologin -c "LogRhythm nginx" nginx
+    fi
+fi
 
 %install
 cd %{name}
