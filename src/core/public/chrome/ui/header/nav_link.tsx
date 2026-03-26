@@ -127,7 +127,7 @@ export function createRecentNavLink(
     label,
     title: titleAndAriaLabel,
     'aria-label': titleAndAriaLabel,
-    iconType: navLink?.euiIconType,
+    iconType: 'dashboardApp',
     /* Use href and onClick to support "open in new tab" and SPA navigation in the same link */
     onClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
       if (event.button === 0 && !isModifiedOrPrevented(event)) {
