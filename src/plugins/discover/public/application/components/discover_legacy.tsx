@@ -129,10 +129,10 @@ export function DiscoverLegacy({
       : undefined;
   const [fixedScrollEl, setFixedScrollEl] = useState<HTMLElement | undefined>();
 
-  useEffect(() => (fixedScrollEl ? opts.fixedScroll(fixedScrollEl) : undefined), [
-    fixedScrollEl,
-    opts,
-  ]);
+  useEffect(
+    () => (fixedScrollEl ? opts.fixedScroll(fixedScrollEl) : undefined),
+    [fixedScrollEl, opts]
+  );
   const fixedScrollRef = useCallback(
     (node: HTMLElement) => {
       if (node !== null) {
@@ -161,7 +161,6 @@ export function DiscoverLegacy({
           onQuerySubmit={updateQuery}
           onSavedQueryIdChange={updateSavedQueryId}
           query={state.query}
-          setMenuMountPoint={opts.setHeaderActionMenu}
           savedQueryId={state.savedQuery}
           screenTitle={savedSearch.title}
           showDatePicker={indexPattern.isTimeBased()}
