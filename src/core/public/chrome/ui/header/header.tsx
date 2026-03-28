@@ -321,6 +321,11 @@ class HeaderUI extends Component<Props, State> {
         onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
           if (!event.defaultPrevented && event.button === 0 && !isModifiedEvent(event)) {
             event.preventDefault();
+            if (path.includes('/app/kibana#')) {
+              window.location.assign(href);
+              return;
+            }
+
             application.navigateToUrl(href);
           }
         },
@@ -330,7 +335,7 @@ class HeaderUI extends Component<Props, State> {
     const sideNavLinksArray = [
       createSideNavItem('discover', 'Discover', '/app/discover', 'discoverApp', ['discover']),
       createSideNavItem('visualize', 'Visualize', '/app/visualize', 'visualizeApp', ['visualize']),
-      createSideNavItem('dashboard', 'Dashboard', '/app/dashboards#/list', 'dashboardApp', [
+      createSideNavItem('dashboard', 'Dashboard', '/app/kibana#/dashboards', 'dashboardApp', [
         'dashboard',
       ]),
       createSideNavItem('dev_tools', 'Dev Tools', '/app/dev_tools', 'devToolsApp', ['dev_tools']),
@@ -402,7 +407,7 @@ class HeaderUI extends Component<Props, State> {
               /* Essential body positioning for LogRhythm navbar */
               body, body.coreSystemRootDomElement {
                 margin-top: 50px !important;
-                position: relative !important;
+                position: static !important;
               }
 
               /* CORRECTED: LogRhythm uses Bootstrap navbar, not Material-UI! */
@@ -486,14 +491,8 @@ class HeaderUI extends Component<Props, State> {
                   pointer-events: auto !important;
               }
 
-              /* Keep side-nav tooltips visible and correctly layered */
+              /* Keep side-nav tooltips aligned with icon rail and correctly layered */
               .chrHeaderWrapper .euiNavDrawer .euiToolTip {
-                margin-top: 0 !important;
-                z-index: 21000 !important;
-              }
-
-              .chrHeaderWrapper .euiNavDrawer .euiToolTipPopover {
-                margin-top: -50px !important;
                 z-index: 21000 !important;
               }
 

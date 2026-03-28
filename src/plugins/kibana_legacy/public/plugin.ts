@@ -35,6 +35,50 @@ export class KibanaLegacyPlugin {
   public start(core: CoreStart) {
     const { application, chrome, uiSettings } = core;
 
+    // Redirect bare Analyze URLs to a default dashboard to avoid blank landing pages.
+    const defaultAnalyzeDashboardId = 'b595b4a0-d0c6-11e9-a8eb-5fa4111061ad';
+    const redirectLegacyAnalyzeLanding = () => {
+      const pathName = window.location.pathname;
+      const hash = window.location.hash || '';
+
+      const analyzeRootMatch = pathName.match(/^(.*\/analyze)\/?$/);
+      const dashboardsRootMatch = pathName.match(/^(.*\/analyze\/app\/dashboards)\/?$/);
+      const legacyKibanaAnalyzeMatch = pathName.match(/^(.*\/analyze)\/app\/kibana\/?$/);
+
+      const isBlankHash = hash === '' || hash === '#' || hash === '#/' || hash === '#/list';
+      const isLegacyDashboardRoot = /^#\/dashboard\/?(?:\?|$)/.test(hash);
+
+      if ((analyzeRootMatch || dashboardsRootMatch) && isBlankHash) {
+        const targetBase = analyzeRootMatch ? analyzeRootMatch[1] : dashboardsRootMatch![1];
+        const targetUrl = analyzeRootMatch
+          ? `${targetBase}/app/dashboards#/view/${defaultAnalyzeDashboardId}`
+          : `${targetBase}#/view/${defaultAnalyzeDashboardId}`;
+
+        if (window.location.href !== targetUrl) {
+          window.location.replace(targetUrl);
+          return true;
+        }
+      }
+
+      if (legacyKibanaAnalyzeMatch && isLegacyDashboardRoot) {
+        const targetBase = legacyKibanaAnalyzeMatch[1];
+        const targetUrl = `${targetBase}/app/dashboards#/view/${defaultAnalyzeDashboardId}`;
+        if (window.location.href !== targetUrl) {
+          window.location.replace(targetUrl);
+          return true;
+        }
+      }
+
+      return false;
+    };
+
+    if (redirectLegacyAnalyzeLanding()) {
+      return;
+    }
+
+    // Some legacy flows mutate only the hash after startup; re-check to avoid blank screens.
+    window.addEventListener('hashchange', redirectLegacyAnalyzeLanding);
+
     // Initialize the new platform compatibility layer
     setNpStart(core);
 

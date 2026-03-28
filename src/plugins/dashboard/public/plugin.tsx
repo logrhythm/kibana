@@ -180,7 +180,8 @@ declare module '../../../plugins/ui_actions/public' {
 }
 
 export class DashboardPlugin
-  implements Plugin<DashboardSetup, DashboardStart, SetupDependencies, StartDependencies> {
+  implements Plugin<DashboardSetup, DashboardStart, SetupDependencies, StartDependencies>
+{
   constructor(private initializerContext: PluginInitializerContext) {}
 
   private appStateUpdater = new BehaviorSubject<AppUpdater>(() => ({}));
@@ -195,9 +196,8 @@ export class DashboardPlugin
     core: CoreSetup<StartDependencies, DashboardStart>,
     { share, uiActions, embeddable, home, urlForwarding, data, usageCollection }: SetupDependencies
   ): DashboardSetup {
-    this.dashboardFeatureFlagConfig = this.initializerContext.config.get<
-      DashboardFeatureFlagConfig
-    >();
+    this.dashboardFeatureFlagConfig =
+      this.initializerContext.config.get<DashboardFeatureFlagConfig>();
     const expandPanelAction = new ExpandPanelAction();
     uiActions.registerAction(expandPanelAction);
     uiActions.attachAction(CONTEXT_MENU_TRIGGER, expandPanelAction.id);
@@ -371,23 +371,9 @@ export class DashboardPlugin
         return `#/list${tail || ''}`;
       }
     );
-    urlForwarding.forwardApp(
-      DashboardConstants.DASHBOARD_ID,
-      DashboardConstants.DASHBOARDS_ID,
-      (path) => {
-        const [, id, tail] = /dashboard\/?(.*?)($|\?.*)/.exec(path) || [];
-        if (!id && !tail) {
-          // unrecognized sub url
-          return '#/list';
-        }
-        if (!id && tail) {
-          // unsaved dashboard, but probably state in URL
-          return `#/create${tail || ''}`;
-        }
-        // persisted dashboard, probably with url state
-        return `#/view/${id}${tail || ''}`;
-      }
-    );
+    // Keep legacy dashboard routes on the legacy app so custom legacy vis types
+    // (for example the "network" visualization) continue to render.
+    // Do not forward `/app/kibana#/dashboard/...` to the new dashboards app.
 
     if (home) {
       home.featureCatalogue.register({

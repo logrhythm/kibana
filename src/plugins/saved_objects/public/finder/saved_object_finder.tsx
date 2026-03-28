@@ -349,7 +349,10 @@ class SavedObjectFinderUi extends React.Component<
             aria-label={i18n.translate('savedObjects.finder.searchPlaceholder', {
               defaultMessage: 'Search…',
             })}
-            fullWidth
+            style={{
+              width: '-webkit-fill-available',
+              height: 'auto',
+            }}
             value={this.state.query}
             onChange={(e) => {
               this.setState(

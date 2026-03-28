@@ -78,6 +78,9 @@ import {
 } from './saved_visualizations/_saved_vis';
 import { createSavedSearchesLoader } from '../../discover/public';
 import { DashboardStart } from '../../dashboard/public';
+import { createNetworkVisTypeDefinition } from './vis_types/network_stub_vis';
+import { createNetworkVisFn } from './vis_types/network_vis/network_vis_fn';
+import { networkVisRenderer } from './vis_types/network_vis/network_vis_renderer';
 
 /**
  * Interface for this plugin's returned setup/start contracts.
@@ -131,7 +134,8 @@ export class VisualizationsPlugin
       VisualizationsStart,
       VisualizationsSetupDeps,
       VisualizationsStartDeps
-    > {
+    >
+{
   private readonly types: TypesService = new TypesService();
   private getStartServicesOrDie?: StartServicesGetter<VisualizationsStartDeps, VisualizationsStart>;
 
@@ -150,12 +154,15 @@ export class VisualizationsPlugin
     expressions.registerRenderer(visualizationRenderer);
     expressions.registerFunction(rangeExpressionFunction);
     expressions.registerFunction(visDimensionExpressionFunction);
+    expressions.registerFunction(createNetworkVisFn);
+    expressions.registerRenderer(networkVisRenderer);
     const embeddableFactory = new VisualizeEmbeddableFactory({ start });
     embeddable.registerEmbeddableFactory(VISUALIZE_EMBEDDABLE_TYPE, embeddableFactory);
 
-    return {
-      ...this.types.setup(),
-    };
+    const typesSetup = this.types.setup();
+    // Register stub network visualization type for legacy visualizations
+    typesSetup.createBaseVisualization(createNetworkVisTypeDefinition());
+    return typesSetup;
   }
 
   public start(
