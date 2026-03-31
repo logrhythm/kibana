@@ -113,12 +113,22 @@ function QueryBarTopRowUI(props: Props) {
 
   const currentQueryText = query && query.query ? (query.query as string) : '';
 
-  // CSS loading detection hook
+  // Enhanced CSS loading detection hook with rate limiting
   const useCSSLoaded = () => {
     const [cssLoaded, setCssLoaded] = useState(false);
+    const maxRetries = useRef(20); // Limit to 20 attempts max
+    const timeoutRef = useRef<NodeJS.Timeout>();
 
     useEffect(() => {
+      let retryCount = 0;
+
       const checkCSS = () => {
+        // Stop checking if max retries reached
+        if (retryCount >= maxRetries.current) {
+          setCssLoaded(true); // Assume loaded to stop infinite loop
+          return;
+        }
+
         const testEl = document.createElement('div');
         testEl.className = 'kbnQueryBar';
         testEl.style.visibility = 'hidden';
@@ -128,14 +138,24 @@ function QueryBarTopRowUI(props: Props) {
         const hasStyles = styles.padding !== '0px' || styles.paddingLeft !== '0px';
 
         document.body.removeChild(testEl);
-        setCssLoaded(hasStyles);
 
-        if (!hasStyles) {
-          requestAnimationFrame(checkCSS);
+        if (hasStyles) {
+          setCssLoaded(true);
+        } else {
+          retryCount++;
+          // Use timeout instead of requestAnimationFrame for better performance
+          timeoutRef.current = setTimeout(checkCSS, 100);
         }
       };
 
       checkCSS();
+
+      // Cleanup function
+      return () => {
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
+      };
     }, []);
 
     return cssLoaded;

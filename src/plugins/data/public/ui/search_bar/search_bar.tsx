@@ -248,6 +248,7 @@ class SearchBarUI extends Component<SearchBarProps, State> {
 
   // member-ordering rules conflict with use-before-declaration rules
   public ro = new ResizeObserver(this.setFilterBarHeight);
+  private timeouts: NodeJS.Timeout[] = [];
 
   // Production debugging methods
   private debugLayoutState = () => {
@@ -260,7 +261,22 @@ class SearchBarUI extends Component<SearchBarProps, State> {
     if (!this.filterBarRef) return true;
 
     const styles = window.getComputedStyle(this.filterBarRef);
-    return styles.padding !== '0px' || styles.paddingLeft !== '0px';
+
+    // Enhanced CSS loading detection
+    // Check multiple properties to ensure styles are properly applied
+    const hasValidHeight = styles.minHeight !== '0px' && styles.minHeight !== 'auto';
+    const hasValidPadding = styles.padding !== '0px' || styles.paddingLeft !== '0px';
+    const hasValidTransition = styles.transition !== 'none' && styles.transition !== '';
+
+    // Check if the globalFilterGroup wrapper has proper min-height (32px from CSS)
+    const wrapper = this.filterBarWrapperRef;
+    let hasWrapperMinHeight = true;
+    if (wrapper) {
+      const wrapperStyles = window.getComputedStyle(wrapper);
+      hasWrapperMinHeight = parseInt(wrapperStyles.minHeight, 10) >= 32;
+    }
+
+    return hasValidHeight && hasValidPadding && hasValidTransition && hasWrapperMinHeight;
   };
 
   public onSave = async (savedQueryMeta: SavedQueryMeta, saveAsNew = false) => {
@@ -390,10 +406,40 @@ class SearchBarUI extends Component<SearchBarProps, State> {
       this.setFilterBarHeight();
       this.ro.observe(this.filterBarRef);
     }
+
+    // Production CSS Loading Detection - Initial check
+    if (process.env.NODE_ENV === 'production') {
+      // Wait for potential CSS chunks to load, then verify
+      const timeout1 = setTimeout(() => {
+        if (!this.checkCSSLoaded()) {
+          // Force re-render if CSS not loaded properly
+          this.forceUpdate();
+        }
+      }, 200);
+      this.timeouts.push(timeout1);
+
+      // Additional check for SPA navigation scenarios
+      const timeout2 = setTimeout(() => {
+        if (!this.checkCSSLoaded()) {
+          this.forceUpdate();
+        }
+      }, 500);
+      this.timeouts.push(timeout2);
+    }
   }
 
   public componentDidUpdate(prevProps: SearchBarProps) {
     if (this.filterBarRef) {
+      // CSS Loading Recovery - Check if styles loaded properly after navigation
+      if (!this.checkCSSLoaded()) {
+        // Force re-render after a short delay to allow CSS to load
+        const timeout = setTimeout(() => {
+          this.forceUpdate();
+          this.setFilterBarHeight();
+        }, 100);
+        this.timeouts.push(timeout);
+      }
+
       // Re-establish observation if filters or visibility changed
       if (
         prevProps.filters !== this.props.filters ||
@@ -410,6 +456,10 @@ class SearchBarUI extends Component<SearchBarProps, State> {
   }
 
   public componentWillUnmount() {
+    // Clear all pending timeouts to prevent state updates on unmounted component
+    this.timeouts.forEach((timeout) => clearTimeout(timeout));
+    this.timeouts = [];
+
     if (this.filterBarRef) {
       this.ro.unobserve(this.filterBarRef);
     }
@@ -465,6 +515,8 @@ class SearchBarUI extends Component<SearchBarProps, State> {
       const filterGroupClasses = classNames('globalFilterGroup__wrapper', {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         'globalFilterGroup__wrapper-isVisible': this.state.isFiltersVisible,
+        loading: this.props.isLoading,
+        'css-loaded': this.checkCSSLoaded(),
       });
       filterBar = (
         <div
@@ -490,8 +542,13 @@ class SearchBarUI extends Component<SearchBarProps, State> {
       );
     }
 
+    const globalQueryBarClasses = classNames('globalQueryBar', {
+      'css-loaded': this.checkCSSLoaded(),
+      loading: this.props.isLoading,
+    });
+
     return (
-      <div className="globalQueryBar" data-test-subj="globalQueryBar">
+      <div className={globalQueryBarClasses} data-test-subj="globalQueryBar">
         {queryBar}
         {filterBar}
 

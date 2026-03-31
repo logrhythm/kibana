@@ -188,7 +188,7 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
   // Global download event listener for individual row downloads
   useEffect(() => {
     const handleGlobalDownload = (event: CustomEvent) => {
-      const { sessions, downloadID } = event.detail;
+      const { downloadID } = event.detail;
       if (downloadID) {
         setDownloadId(downloadID);
       }

@@ -21,6 +21,7 @@ import angular from 'angular';
 import _ from 'lodash';
 import * as Rx from 'rxjs';
 import { Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { i18n } from '@kbn/i18n';
 import { UiActionsStart, APPLY_FILTER_TRIGGER } from '../../../../ui_actions/public';
 import { RequestAdapter, Adapters } from '../../../../inspector/public';
@@ -80,7 +81,8 @@ interface SearchEmbeddableConfig {
 
 export class SearchEmbeddable
   extends Embeddable<SearchInput, SearchOutput>
-  implements ISearchEmbeddable {
+  implements ISearchEmbeddable
+{
   private readonly savedSearch: SavedSearch;
   private $rootScope: ng.IRootScopeService;
   private $compile: ng.ICompileService;
@@ -94,6 +96,7 @@ export class SearchEmbeddable
   public readonly type = SEARCH_EMBEDDABLE_TYPE;
   private filterManager: FilterManager;
   private abortController?: AbortController;
+  private isFetching: boolean = false;
 
   private prevTimeRange?: TimeRange;
   private prevFilters?: Filter[];
@@ -138,6 +141,12 @@ export class SearchEmbeddable
 
     this.autoRefreshFetchSubscription = getServices()
       .timefilter.getAutoRefreshFetch$()
+      .pipe(
+        // Debounce rapid-fire auto-refresh calls to prevent ES call storms
+        debounceTime(300),
+        // Only trigger if we haven't already triggered recently
+        distinctUntilChanged()
+      )
       .subscribe(this.fetch);
 
     this.subscription = Rx.merge(this.getOutput$(), this.getInput$()).subscribe(() => {
@@ -174,6 +183,19 @@ export class SearchEmbeddable
 
   public destroy() {
     super.destroy();
+
+    // CRITICAL: Clean up auto-refresh subscription FIRST to prevent ES call leaks
+    if (this.autoRefreshFetchSubscription) {
+      this.autoRefreshFetchSubscription.unsubscribe();
+      this.autoRefreshFetchSubscription = undefined;
+    }
+
+    // Abort any in-flight requests
+    if (this.abortController) {
+      this.abortController.abort();
+      this.abortController = undefined;
+    }
+
     this.savedSearch.destroy();
     if (this.searchInstance) {
       this.searchInstance.remove();
@@ -184,11 +206,8 @@ export class SearchEmbeddable
     }
     if (this.subscription) {
       this.subscription.unsubscribe();
+      this.subscription = undefined;
     }
-    if (this.autoRefreshFetchSubscription) {
-      this.autoRefreshFetchSubscription.unsubscribe();
-    }
-    if (this.abortController) this.abortController.abort();
   }
 
   private initializeSearchScope() {
@@ -268,6 +287,13 @@ export class SearchEmbeddable
   private fetch = async () => {
     if (!this.searchScope) return;
 
+    // Prevent concurrent fetch calls - Critical for avoiding ES call storms
+    if (this.isFetching) {
+      return;
+    }
+
+    this.isFetching = true;
+
     const { searchSource } = this.savedSearch;
 
     // Abort any in-progress requests
@@ -316,6 +342,9 @@ export class SearchEmbeddable
       });
     } catch (error) {
       this.updateOutput({ loading: false, error });
+    } finally {
+      // CRITICAL: Reset fetching flag to allow future requests
+      this.isFetching = false;
     }
   };
 
