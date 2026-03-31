@@ -3,13 +3,28 @@
  */
 doc-table {
   @include euiScrollBar;
-  overflow: auto;
+  overflow: visible !important;
   flex: 1 1 100%;
   flex-direction: column; /* 1 */
+
+  table {
+    display: table !important;
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  thead {
+    display: table-header-group !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
 
   th {
     text-align: left;
     font-weight: bold;
+    display: table-cell !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 
   .spinner {
@@ -29,9 +44,30 @@ doc-table {
 .kbnDocTable {
   font-size: $euiFontSizeXS;
 
+  thead {
+    display: table-header-group !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: static !important;
+    z-index: 1 !important;
+  }
+
   th {
     white-space: nowrap;
     padding-right: $euiSizeS;
+    display: table-cell !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background-color: #f5f7fa !important;
+    border-bottom: 2px solid #d3dae6 !important;
+    font-weight: 600 !important;
+    padding: 8px 12px !important;
+    height: auto !important;
+    min-height: 32px !important;
+    font-size: 12px !important;
+    vertical-align: middle !important;
+    color: #343741 !important;
+    position: static !important;
 
     .fa {
       font-size: 1.1em;

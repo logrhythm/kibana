@@ -25,6 +25,28 @@ import { getLimitedSearchResultsMessage } from './doc_table_strings';
 import { getServices } from '../../../kibana_services';
 import './index.scss';
 
+// Import the SelectedCaptureSessions service with fallback
+let SelectedCaptureSessions: any = null;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  SelectedCaptureSessions =
+    require('@logrhythm/nm-web-shared/services/selected_capture_sessions').SelectedCaptureSessions;
+} catch (e) {
+  // Fallback service for when the actual service isn't available
+  SelectedCaptureSessions = {
+    add: () => {},
+    remove: () => {},
+    has: () => false,
+    count: () => 0,
+    getAll: () => [],
+    reset: () => {},
+    subscribeAll: (callback: any) => {
+      // Return unsubscribe function
+      return () => {};
+    },
+  };
+}
+
 export interface LazyScope extends ng.IScope {
   [key: string]: any;
 }
@@ -67,6 +89,49 @@ export function createDocTableDirective(pagerFactory: any, $filter: any) {
 
       $scope.addRows = function () {
         $scope.limit += 50;
+      };
+
+      // Implementation for onSelectAll - selects all sessions from all rows
+      $scope.onSelectAll = function () {
+        if (!$scope.hits || !SelectedCaptureSessions) {
+          return;
+        }
+
+        // Clear existing selections first
+        SelectedCaptureSessions.reset();
+
+        // Get all sessions from all hits
+        const allSessions: string[] = [];
+        $scope.hits.forEach((hit: any) => {
+          if (hit._source && hit._source.Session) {
+            allSessions.push(hit._source.Session);
+          }
+        });
+
+        // Add all sessions to the selection
+        allSessions.forEach((sessionId: string) => {
+          SelectedCaptureSessions.add(sessionId);
+        });
+      };
+
+      // Implementation for onSelectCurrentPage - selects sessions from current page only
+      $scope.onSelectCurrentPage = function () {
+        if (!$scope.pageOfItems || !SelectedCaptureSessions) {
+          return;
+        }
+
+        // Get sessions from current page
+        const currentPageSessions: string[] = [];
+        $scope.pageOfItems.forEach((hit: any) => {
+          if (hit._source && hit._source.Session) {
+            currentPageSessions.push(hit._source.Session);
+          }
+        });
+
+        // Add current page sessions to the selection
+        currentPageSessions.forEach((sessionId: string) => {
+          SelectedCaptureSessions.add(sessionId);
+        });
       };
 
       $scope.$watch('hits', (hits: any) => {

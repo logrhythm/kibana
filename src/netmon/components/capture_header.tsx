@@ -112,6 +112,10 @@ const CaptureHeader = (props: CaptureHeaderProps) => {
         button={button}
         ownFocus
         closePopover={() => setOpen(false)}
+        anchorPosition="downRight"
+        panelPaddingSize="s"
+        hasArrow={true}
+        repositionOnScroll={true}
       >
         <div className={classes.popoverPanel}>
           <EuiButton

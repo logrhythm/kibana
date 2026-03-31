@@ -55,6 +55,7 @@ import { createContextErrorMessageDirective } from './application/components/con
 import { DiscoverStartPlugins } from './plugin';
 import { getScopedHistory } from './kibana_services';
 import { createDiscoverLegacyDirective } from './application/components/create_discover_legacy_directive';
+import { captureDownloadDirective } from './application/angular/doc_table/components/capture_download';
 
 /**
  * returns the main inner angular module, it contains all the parts of Angular Discover
@@ -190,5 +191,6 @@ function createDocTableModule() {
     .directive('kbnTableRow', createTableRowDirective)
     .directive('toolBarPagerButtons', createToolBarPagerButtonsDirective)
     .directive('kbnInfiniteScroll', createInfiniteScrollDirective)
-    .directive('docViewer', createDocViewerDirective);
+    .directive('docViewer', createDocViewerDirective)
+    .directive('captureDownload', captureDownloadDirective);
 }

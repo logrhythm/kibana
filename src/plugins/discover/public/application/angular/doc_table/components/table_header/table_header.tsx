@@ -1,13 +1,4 @@
 /*
- * THIS FILE HAS BEEN MODIFIED FROM THE ORIGINAL SOURCE
- * This comment only applies to modifications applied after the f421eec40b5a9f31383591e30bef86724afcd2b3 commit
- *
- * Copyright 2020 LogRhythm, Inc
- * Licensed under the LogRhythm Global End User License Agreement,
- * which can be found through this page: https://logrhythm.com/about/logrhythm-terms-and-conditions/
- */
-
-/*
  * Licensed to Elasticsearch B.V. under one or more contributor
  * license agreements. See the NOTICE file distributed with
  * this work for additional information regarding copyright
@@ -25,6 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+/*
+ * THIS FILE HAS BEEN MODIFIED FROM THE ORIGINAL SOURCE
+ * This comment only applies to modifications applied after the f421eec40b5a9f31383591e30bef86724afcd2b3 commit
+ *
+ * Copyright 2020 LogRhythm, Inc
+ * Licensed under the LogRhythm Global End User License Agreement,
+ * which can be found through this page: https://logrhythm.com/about/logrhythm-terms-and-conditions/
+ */
+
 import React from 'react';
 import { IndexPattern } from '../../../../../kibana_services';
 // @ts-ignore
@@ -62,8 +63,33 @@ export function TableHeader({
   const displayedColumns = getDisplayedColumns(columns, indexPattern, hideTimeColumn, isShortDots);
 
   return (
-    <tr data-test-subj="docTableHeader" className="kbnDocTableHeader">
-      <th style={{ width: '24px' }} />
+    <tr
+      data-test-subj="docTableHeader"
+      className="kbnDocTableHeader kbn-doc-table-header table-header-row"
+      style={{
+        display: 'table-row !important',
+        visibility: 'visible !important',
+        opacity: '1 !important',
+        backgroundColor: '#f5f7fa !important',
+        borderBottom: '2px solid #d3dae6 !important',
+        position: 'relative !important',
+        zIndex: '10 !important',
+        height: 'auto !important',
+        minHeight: '40px !important',
+      }}
+    >
+      <th
+        className="kbn-doc-table-header-cell table-header-cell-first"
+        style={{
+          width: '24px',
+          display: 'table-cell !important',
+          visibility: 'visible !important',
+          opacity: '1 !important',
+          backgroundColor: '#f5f7fa !important',
+          borderBottom: '2px solid #d3dae6 !important',
+          padding: '8px 12px !important',
+        }}
+      />
       {displayedColumns.map((col) => {
         return (
           <TableHeaderColumn

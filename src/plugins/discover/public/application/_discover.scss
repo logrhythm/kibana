@@ -92,7 +92,8 @@ discover-app {
 }
 
 .dscTable {
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: visible;
 
   // SASSTODO: add a monospace modifier to the doc-table component
   .kbnDocTable__row {
