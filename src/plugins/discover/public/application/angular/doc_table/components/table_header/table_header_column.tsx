@@ -27,6 +27,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { startPcapDownload, FileType } from '@logrhythm/nm-web-shared/services/session_files';
 import { i18n } from '@kbn/i18n';
 import { EuiToolTip, EuiPopover, EuiButton } from '@elastic/eui';
 import { SortOrder } from './helpers';
@@ -108,9 +109,10 @@ if (!SelectedCaptureSessions) {
     // We'll track selections in a local Set as backup
     const localSelections = new Set();
 
-    // Wrap the existing add/remove methods to track selections locally
+    // Wrap the existing add/remove/reset methods to track selections locally
     const originalAdd = SelectedCaptureSessions.add;
     const originalRemove = SelectedCaptureSessions.remove;
+    const originalReset = SelectedCaptureSessions.reset;
 
     if (originalAdd) {
       SelectedCaptureSessions.add = function (session: any) {
@@ -123,6 +125,13 @@ if (!SelectedCaptureSessions) {
       SelectedCaptureSessions.remove = function (session: any) {
         localSelections.delete(session);
         return originalRemove.call(this, session);
+      };
+    }
+
+    if (originalReset) {
+      SelectedCaptureSessions.reset = function () {
+        localSelections.clear(); // Clear local selections too!
+        return originalReset.call(this);
       };
     }
 
@@ -173,6 +182,7 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
 }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [selectedCount, setSelectedCount] = useState(0);
+  const [downloadId, setDownloadId] = useState('');
 
   // Enhanced polling solution with error handling to prevent crashes
   useEffect(() => {
@@ -228,31 +238,55 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
         return;
       }
 
-      // TODO: Implement actual download logic
-      // For now, just clear selections
+      const sessions = SelectedCaptureSessions.getAll();
+      const startDownloadRes = await startPcapDownload(sessions);
+
+      setDownloadId(startDownloadRes.data.downloadID);
       SelectedCaptureSessions.reset();
       setIsPopoverOpen(false);
     } catch (err) {
-      // Error downloading selected sessions
+      // eslint-disable-next-line no-console
+      console.error('An error occurred creating a PCAP download for selected sessions', err);
+      alert('An error initiating a download for the PCAP(s).');
     }
   };
 
   const handleSelectAll = () => {
     if (onSelectAll) {
-      onSelectAll();
+      try {
+        onSelectAll();
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Error calling Angular onSelectAll:', error);
+      }
     }
     setIsPopoverOpen(false);
   };
 
   const handleSelectCurrentPage = () => {
     if (onSelectCurrentPage) {
-      onSelectCurrentPage();
+      try {
+        onSelectCurrentPage();
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Error calling Angular onSelectCurrentPage:', error);
+      }
     }
     setIsPopoverOpen(false);
   };
 
   const handleClearSelected = () => {
-    SelectedCaptureSessions.reset();
+    try {
+      if (SelectedCaptureSessions) {
+        SelectedCaptureSessions.reset();
+        // Force immediate update of selected count to ensure UI responsiveness
+        setSelectedCount(0);
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error clearing selections:', error);
+    }
+
     setIsPopoverOpen(false);
   };
 
@@ -333,11 +367,6 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
         maxWidth: '280px',
         zIndex: 9999,
       }}
-      panelProps={{
-        style: {
-          zIndex: 9999,
-        },
-      }}
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
         <EuiButton
@@ -347,6 +376,7 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
           isDisabled={selectedCount === 0}
           iconType="download"
           fill={false}
+          style={{ textAlign: 'left', justifyContent: 'flex-start' }}
         >
           Download Selected Sessions
         </EuiButton>
@@ -358,6 +388,7 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
           isDisabled={!onSelectAll}
           iconType="checkInCircleFilled"
           fill={false}
+          style={{ textAlign: 'left', justifyContent: 'flex-start' }}
         >
           Select All Sessions
         </EuiButton>
@@ -369,6 +400,7 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
           isDisabled={!onSelectCurrentPage}
           iconType="check"
           fill={false}
+          style={{ textAlign: 'left', justifyContent: 'flex-start' }}
         >
           Select Sessions on Current Page
         </EuiButton>
@@ -381,6 +413,7 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
           color="danger"
           iconType="cross"
           fill={false}
+          style={{ textAlign: 'left', justifyContent: 'flex-start' }}
         >
           Clear Selected Sessions
         </EuiButton>

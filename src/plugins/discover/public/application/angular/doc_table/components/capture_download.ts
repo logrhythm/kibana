@@ -185,6 +185,57 @@ export const captureDownloadDirective = () => ({
       scope.isSelected = !!newVal;
     });
 
+    // Subscribe to service changes to update checkbox when bulk operations occur
+    let unsubscribe: any = null;
+    if (SelectedCaptureSessions && typeof SelectedCaptureSessions.subscribeAll === 'function') {
+      try {
+        unsubscribe = SelectedCaptureSessions.subscribeAll((sessions) => {
+          // When service changes, check if this session is selected
+          if (scope.hasSession && scope.session && SelectedCaptureSessions) {
+            const isInService = SelectedCaptureSessions.has(scope.session);
+            if (scope.isSelected !== isInService) {
+              scope.isSelected = isInService;
+              // Use $evalAsync to safely update UI without digest conflicts
+              scope.$evalAsync(() => {
+                // Ensure the change is detected by triggering a minimal update
+                scope.isSelected = scope.isSelected;
+              });
+            }
+          }
+        });
+      } catch (error) {
+        // Could not subscribe to service changes - fallback to polling
+      }
+    } else {
+      // Fallback: Polling for service changes if subscription is not available
+      const pollInterval = setInterval(() => {
+        if (scope.hasSession && scope.session && SelectedCaptureSessions) {
+          try {
+            const isInService = SelectedCaptureSessions.has(scope.session);
+            if (scope.isSelected !== isInService) {
+              scope.isSelected = isInService;
+              // Use $evalAsync to safely update UI
+              scope.$evalAsync(() => {
+                scope.isSelected = scope.isSelected;
+              });
+            }
+          } catch (error) {
+            // Ignore polling errors
+          }
+        }
+      }, 100);
+
+      // Store cleanup function
+      unsubscribe = () => clearInterval(pollInterval);
+    }
+
+    // Cleanup on destroy
+    scope.$on('$destroy', () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    });
+
     scope.toggleSelection = function () {
       if (scope.hasSession && scope.session && SelectedCaptureSessions) {
         try {

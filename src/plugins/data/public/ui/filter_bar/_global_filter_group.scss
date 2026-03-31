@@ -31,6 +31,14 @@
   line-height: 1; // Override kuiLocalNav & kuiLocalNavRow
   overflow: hidden;
   transition: height $euiAnimSpeedNormal $euiAnimSlightResistance;
+  min-height: 32px; // Prevent collapse during CSS loading
+
+  &.loading {
+    .euiFlexGroup {
+      justify-content: flex-start !important;
+      transition: none;
+    }
+  }
 }
 
 .globalFilterGroup__filterFlexItem {
@@ -46,5 +54,14 @@
   .globalFilterGroup__wrapper-isVisible {
     // EUI Flexbox adds too much margin between responded items, this just moves it up
     margin-top: $euiSize * -1;
+  }
+}
+
+// CSS Loading Stability Rules
+.kbnQueryBar {
+  min-height: 40px;
+
+  .euiFlexGroup {
+    transition: justify-content 150ms ease-in-out;
   }
 }

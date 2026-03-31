@@ -216,17 +216,52 @@ class SearchBarUI extends Component<SearchBarProps, State> {
   }
 
   public setFilterBarHeight = () => {
-    requestAnimationFrame(() => {
-      const height =
-        this.filterBarRef && this.state.isFiltersVisible ? this.filterBarRef.clientHeight : 0;
+    const measureHeight = () => {
+      if (!this.filterBarRef || !this.state.isFiltersVisible) {
+        if (this.filterBarWrapperRef) {
+          this.filterBarWrapperRef.setAttribute('style', 'height: 0px');
+        }
+        this.debugLayoutState();
+        return;
+      }
+
+      const height = this.filterBarRef.clientHeight;
+
+      // Detect if CSS hasn't loaded (height would be minimal)
+      if (height < 10 && this.state.isFiltersVisible) {
+        // CSS not loaded yet, retry after next frame
+        this.debugLayoutState();
+        requestAnimationFrame(() => {
+          requestAnimationFrame(measureHeight);
+        });
+        return;
+      }
+
       if (this.filterBarWrapperRef) {
         this.filterBarWrapperRef.setAttribute('style', `height: ${height}px`);
       }
-    });
+      this.debugLayoutState();
+    };
+
+    requestAnimationFrame(measureHeight);
   };
 
   // member-ordering rules conflict with use-before-declaration rules
   public ro = new ResizeObserver(this.setFilterBarHeight);
+
+  // Production debugging methods
+  private debugLayoutState = () => {
+    if (process.env.NODE_ENV !== 'production') return;
+
+    // Debug logging removed for production
+  };
+
+  private checkCSSLoaded = (): boolean => {
+    if (!this.filterBarRef) return true;
+
+    const styles = window.getComputedStyle(this.filterBarRef);
+    return styles.padding !== '0px' || styles.paddingLeft !== '0px';
+  };
 
   public onSave = async (savedQueryMeta: SavedQueryMeta, saveAsNew = false) => {
     if (!this.state.query) return;
@@ -357,11 +392,28 @@ class SearchBarUI extends Component<SearchBarProps, State> {
     }
   }
 
-  public componentDidUpdate() {
+  public componentDidUpdate(prevProps: SearchBarProps) {
     if (this.filterBarRef) {
-      this.setFilterBarHeight();
+      // Re-establish observation if filters or visibility changed
+      if (
+        prevProps.filters !== this.props.filters ||
+        prevProps.showFilterBar !== this.props.showFilterBar
+      ) {
+        this.ro.unobserve(this.filterBarRef);
+        this.setFilterBarHeight();
+        this.ro.observe(this.filterBarRef);
+      } else {
+        // Just update height for other changes
+        this.setFilterBarHeight();
+      }
+    }
+  }
+
+  public componentWillUnmount() {
+    if (this.filterBarRef) {
       this.ro.unobserve(this.filterBarRef);
     }
+    this.ro.disconnect();
   }
 
   public render() {

@@ -38,6 +38,7 @@ import { TimeRange } from 'src/plugins/data/public';
 // Import with try-catch to handle missing nm-web-shared package gracefully
 let convertQuery: (query: string) => Promise<string>;
 try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   convertQuery = require('@logrhythm/nm-web-shared/services/query_mapping').convertQuery;
 } catch (e) {
   // Fallback implementation when nm-web-shared is not available
@@ -111,6 +112,36 @@ function QueryBarTopRowUI(props: Props) {
   const persistedLogRef = useRef<PersistedLog | undefined>();
 
   const currentQueryText = query && query.query ? (query.query as string) : '';
+
+  // CSS loading detection hook
+  const useCSSLoaded = () => {
+    const [cssLoaded, setCssLoaded] = useState(false);
+
+    useEffect(() => {
+      const checkCSS = () => {
+        const testEl = document.createElement('div');
+        testEl.className = 'kbnQueryBar';
+        testEl.style.visibility = 'hidden';
+        document.body.appendChild(testEl);
+
+        const styles = window.getComputedStyle(testEl);
+        const hasStyles = styles.padding !== '0px' || styles.paddingLeft !== '0px';
+
+        document.body.removeChild(testEl);
+        setCssLoaded(hasStyles);
+
+        if (!hasStyles) {
+          requestAnimationFrame(checkCSS);
+        }
+      };
+
+      checkCSS();
+    }, []);
+
+    return cssLoaded;
+  };
+
+  const cssLoaded = useCSSLoaded();
 
   const getDateRange = useCallback(() => {
     const defaultTimeSetting = uiSettings!.get('timepicker:timeDefaults');
@@ -421,14 +452,16 @@ function QueryBarTopRowUI(props: Props) {
 
   const classes = classNames('kbnQueryBar', {
     'kbnQueryBar--withDatePicker': props.showDatePicker,
+    'kbnQueryBar--cssLoaded': cssLoaded,
   });
 
   return (
     <EuiFlexGroup
       className={classes}
-      responsive={!!props.showDatePicker}
+      responsive={!!props.showDatePicker && cssLoaded}
       gutterSize="s"
-      justifyContent="flexEnd"
+      justifyContent={cssLoaded ? 'flexEnd' : 'flexStart'}
+      style={!cssLoaded ? { minHeight: '40px' } : undefined}
     >
       {renderQueryInput()}
       <EuiFlexItem grow={false}>{renderUpdateButton()}</EuiFlexItem>

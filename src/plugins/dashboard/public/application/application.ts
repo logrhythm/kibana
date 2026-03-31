@@ -85,8 +85,15 @@ export interface RenderDeps {
 }
 
 let angularModuleInstance: IModule | null = null;
+let moduleCleanupCallbacks: Array<() => void> = [];
 
 export const renderApp = (element: HTMLElement, appBasePath: string, deps: RenderDeps) => {
+  // Clean up previous instance state on navigation
+  if (angularModuleInstance && moduleCleanupCallbacks.length > 0) {
+    moduleCleanupCallbacks.forEach((cleanup) => cleanup());
+    moduleCleanupCallbacks = [];
+  }
+
   if (!angularModuleInstance) {
     angularModuleInstance = createLocalAngularModule(deps.navigation);
     // global routing stuff
@@ -97,6 +104,24 @@ export const renderApp = (element: HTMLElement, appBasePath: string, deps: Rende
       deps.scopedHistory
     );
     initDashboardApp(angularModuleInstance, deps);
+
+    // Register cleanup for search bar directives
+    moduleCleanupCallbacks.push(() => {
+      // Clear any cached search bar state
+      if (angularModuleInstance) {
+        const injector = angularModuleInstance.injector;
+        if (injector) {
+          try {
+            const searchBarService = injector.get('searchBarService', null);
+            if (searchBarService?.clearCache) {
+              searchBarService.clearCache();
+            }
+          } catch (e) {
+            // Service might not exist, ignore
+          }
+        }
+      }
+    });
   }
 
   const $injector = mountDashboardApp(appBasePath, element);
