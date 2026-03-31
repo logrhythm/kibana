@@ -55,8 +55,7 @@ if (!SelectedCaptureSessions) {
       try {
         callback(sessions);
       } catch (e) {
-        // eslint-disable-next-line no-console
-        console.error('Mock service error notifying subscriber:', e);
+        // Silently ignore subscriber errors
       }
     });
   };

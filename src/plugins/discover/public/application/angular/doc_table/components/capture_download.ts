@@ -18,6 +18,7 @@
  */
 
 import angular from 'angular';
+import { startPcapDownload } from '@logrhythm/nm-web-shared/services/session_files';
 
 // Enhanced SelectedCaptureSessions service loading with multiple fallback strategies
 // This addresses the critical issue where the service loads as 'false' instead of working object
@@ -278,18 +279,38 @@ export const captureDownloadDirective = () => ({
       }
     };
 
-    scope.downloadCapture = function () {
+    scope.downloadCapture = async function () {
       if (!scope.session || scope.session === 'undefined' || scope.session === 'null') {
         return;
       }
 
-      // TODO: Replace with your actual download URL logic
-      const url = `/api/capture/download/${scope.session}`;
-
       try {
-        window.open(url, '_blank');
+        // Check if there are selected sessions to include this one
+        const sessions =
+          SelectedCaptureSessions && !SelectedCaptureSessions.isEmpty
+            ? SelectedCaptureSessions.getAll()
+            : [scope.session];
+
+        // Use the proper PCAP download API
+        const startDownloadRes = await startPcapDownload(sessions);
+
+        if (startDownloadRes && startDownloadRes.data && startDownloadRes.data.downloadID) {
+          // Emit global event to trigger FileDownloadModal
+          const event = new CustomEvent('pcap-download-started', {
+            detail: {
+              sessions,
+              downloadID: startDownloadRes.data.downloadID,
+            },
+          });
+          window.dispatchEvent(event);
+
+          // Clear selections after successful download start
+          if (SelectedCaptureSessions && typeof SelectedCaptureSessions.reset === 'function') {
+            SelectedCaptureSessions.reset();
+          }
+        }
       } catch (error) {
-        // Error opening download URL
+        // Error handling - silently fail and let modal system handle errors
       }
     };
   },

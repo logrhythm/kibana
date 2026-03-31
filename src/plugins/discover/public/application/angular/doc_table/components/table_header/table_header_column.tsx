@@ -30,6 +30,7 @@ import React, { useState, useEffect } from 'react';
 import { startPcapDownload, FileType } from '@logrhythm/nm-web-shared/services/session_files';
 import { i18n } from '@kbn/i18n';
 import { EuiToolTip, EuiPopover, EuiButton } from '@elastic/eui';
+import FileDownloadModal from '../../../../../../../netmon/components/file_download/file_download_modal';
 import { SortOrder } from './helpers';
 
 // Enhanced SelectedCaptureSessions service loading with multiple fallback strategies
@@ -184,6 +185,21 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
   const [selectedCount, setSelectedCount] = useState(0);
   const [downloadId, setDownloadId] = useState('');
 
+  // Global download event listener for individual row downloads
+  useEffect(() => {
+    const handleGlobalDownload = (event: CustomEvent) => {
+      const { sessions, downloadID } = event.detail;
+      if (downloadID) {
+        setDownloadId(downloadID);
+      }
+    };
+
+    window.addEventListener('pcap-download-started', handleGlobalDownload as EventListener);
+    return () => {
+      window.removeEventListener('pcap-download-started', handleGlobalDownload as EventListener);
+    };
+  }, []);
+
   // Enhanced polling solution with error handling to prevent crashes
   useEffect(() => {
     const pollInterval = setInterval(() => {
@@ -245,9 +261,7 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
       SelectedCaptureSessions.reset();
       setIsPopoverOpen(false);
     } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error('An error occurred creating a PCAP download for selected sessions', err);
-      alert('An error initiating a download for the PCAP(s).');
+      // Error handling - silently fail to avoid blocking UI
     }
   };
 
@@ -256,8 +270,7 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
       try {
         onSelectAll();
       } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Error calling Angular onSelectAll:', error);
+        // Error handling - silently fail
       }
     }
     setIsPopoverOpen(false);
@@ -268,8 +281,7 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
       try {
         onSelectCurrentPage();
       } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Error calling Angular onSelectCurrentPage:', error);
+        // Error handling - silently fail
       }
     }
     setIsPopoverOpen(false);
@@ -283,8 +295,7 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
         setSelectedCount(0);
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Error clearing selections:', error);
+      // Error handling - silently fail
     }
 
     setIsPopoverOpen(false);
@@ -353,72 +364,83 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
   );
 
   return (
-    <EuiPopover
-      id="captureHeaderPopover"
-      button={button}
-      isOpen={isPopoverOpen}
-      closePopover={() => setIsPopoverOpen(false)}
-      panelPaddingSize="s"
-      anchorPosition="downCenter"
-      repositionOnScroll={true}
-      zIndex={9999}
-      panelStyle={{
-        minWidth: '220px',
-        maxWidth: '280px',
-        zIndex: 9999,
-      }}
-    >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-        <EuiButton
-          fullWidth
-          size="s"
-          onClick={handleDownloadSelected}
-          isDisabled={selectedCount === 0}
-          iconType="download"
-          fill={false}
-          style={{ textAlign: 'left', justifyContent: 'flex-start' }}
-        >
-          Download Selected Sessions
-        </EuiButton>
+    <>
+      <EuiPopover
+        id="captureHeaderPopover"
+        button={button}
+        isOpen={isPopoverOpen}
+        closePopover={() => setIsPopoverOpen(false)}
+        panelPaddingSize="s"
+        anchorPosition="downCenter"
+        repositionOnScroll={true}
+        zIndex={9999}
+        panelStyle={{
+          minWidth: '220px',
+          maxWidth: '280px',
+          zIndex: 9999,
+        }}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <EuiButton
+            fullWidth
+            size="s"
+            onClick={handleDownloadSelected}
+            isDisabled={selectedCount === 0}
+            iconType="download"
+            fill={false}
+            style={{ textAlign: 'left', justifyContent: 'flex-start' }}
+          >
+            Download Selected Sessions
+          </EuiButton>
 
-        <EuiButton
-          fullWidth
-          size="s"
-          onClick={handleSelectAll}
-          isDisabled={!onSelectAll}
-          iconType="checkInCircleFilled"
-          fill={false}
-          style={{ textAlign: 'left', justifyContent: 'flex-start' }}
-        >
-          Select All Sessions
-        </EuiButton>
+          <EuiButton
+            fullWidth
+            size="s"
+            onClick={handleSelectAll}
+            isDisabled={!onSelectAll}
+            iconType="checkInCircleFilled"
+            fill={false}
+            style={{ textAlign: 'left', justifyContent: 'flex-start' }}
+          >
+            Select All Sessions
+          </EuiButton>
 
-        <EuiButton
-          fullWidth
-          size="s"
-          onClick={handleSelectCurrentPage}
-          isDisabled={!onSelectCurrentPage}
-          iconType="check"
-          fill={false}
-          style={{ textAlign: 'left', justifyContent: 'flex-start' }}
-        >
-          Select Sessions on Current Page
-        </EuiButton>
+          <EuiButton
+            fullWidth
+            size="s"
+            onClick={handleSelectCurrentPage}
+            isDisabled={!onSelectCurrentPage}
+            iconType="check"
+            fill={false}
+            style={{ textAlign: 'left', justifyContent: 'flex-start' }}
+          >
+            Select Sessions on Current Page
+          </EuiButton>
 
-        <EuiButton
-          fullWidth
-          size="s"
-          onClick={handleClearSelected}
-          isDisabled={selectedCount === 0}
-          color="danger"
-          iconType="cross"
-          fill={false}
-          style={{ textAlign: 'left', justifyContent: 'flex-start' }}
-        >
-          Clear Selected Sessions
-        </EuiButton>
-      </div>
-    </EuiPopover>
+          <EuiButton
+            fullWidth
+            size="s"
+            onClick={handleClearSelected}
+            isDisabled={selectedCount === 0}
+            color="danger"
+            iconType="cross"
+            fill={false}
+            style={{ textAlign: 'left', justifyContent: 'flex-start' }}
+          >
+            Clear Selected Sessions
+          </EuiButton>
+        </div>
+      </EuiPopover>
+      {downloadId && (
+        <FileDownloadModal
+          downloadId={downloadId}
+          fileType={FileType.PCAP}
+          onClose={() => {
+            setDownloadId('');
+          }}
+        />
+      )}
+    </>
   );
 };
 
