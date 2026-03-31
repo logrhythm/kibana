@@ -30,7 +30,7 @@ import React, { useState, useEffect } from 'react';
 import { startPcapDownload, FileType } from '@logrhythm/nm-web-shared/services/session_files';
 import { i18n } from '@kbn/i18n';
 import { EuiToolTip, EuiPopover, EuiButton } from '@elastic/eui';
-import FileDownloadModal from '../../../../../../../netmon/components/file_download/file_download_modal';
+import FileDownloadModal from '../../../../../../../../netmon/components/file_download/file_download_modal';
 import { SortOrder } from './helpers';
 
 // Enhanced SelectedCaptureSessions service loading with multiple fallback strategies
