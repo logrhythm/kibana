@@ -29,8 +29,8 @@ import './index.scss';
 let SelectedCaptureSessions: any = null;
 try {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  SelectedCaptureSessions =
-    require('@logrhythm/nm-web-shared/services/selected_capture_sessions').SelectedCaptureSessions;
+  const module = require('@logrhythm/nm-web-shared/services/selected_capture_sessions');
+  SelectedCaptureSessions = module.SelectedCaptureSessions;
 } catch (e) {
   // Fallback service for when the actual service isn't available
   SelectedCaptureSessions = {
