@@ -287,7 +287,7 @@ export const captureDownloadDirective = () => ({
       try {
         // Check if there are selected sessions to include this one
         const sessions =
-          SelectedCaptureSessions && !SelectedCaptureSessions.isEmpty
+          SelectedCaptureSessions && SelectedCaptureSessions.count() > 0
             ? SelectedCaptureSessions.getAll()
             : [scope.session];
 
@@ -308,9 +308,23 @@ export const captureDownloadDirective = () => ({
           if (SelectedCaptureSessions && typeof SelectedCaptureSessions.reset === 'function') {
             SelectedCaptureSessions.reset();
           }
+        } else {
+          // Show user-friendly error
+          if (window.confirm) {
+            window.confirm(
+              'Download failed: Invalid server response. Please try again.\n\nClick OK to continue.'
+            );
+          }
         }
       } catch (error) {
-        // Error handling - silently fail and let modal system handle errors
+        // Show user-friendly error with details
+        if (window.confirm) {
+          window.confirm(
+            `Download failed: ${
+              error.message || 'Network error occurred'
+            }\n\nPlease check your connection and try again.\n\nClick OK to continue.`
+          );
+        }
       }
     };
   },

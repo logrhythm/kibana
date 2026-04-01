@@ -227,6 +227,71 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
     };
   }, []);
 
+  // CRITICAL: Runtime header protection to prevent disappearing headers
+  useEffect(() => {
+    const protectHeaders = () => {
+      try {
+        const headerElement = document.querySelector('thead[kbn-table-header]');
+        if (headerElement) {
+          // Force visibility with maximum specificity
+          headerElement.style.setProperty('display', 'table-header-group', 'important');
+          headerElement.style.setProperty('visibility', 'visible', 'important');
+          headerElement.style.setProperty('opacity', '1', 'important');
+
+          // Ensure it has content - if empty, trigger re-render
+          if (headerElement.children.length === 0) {
+            // Trigger a minimal re-render by updating a harmless state
+            setSelectedCount((prev) => prev);
+          }
+        }
+      } catch (error) {
+        // Header protection error - silently continue
+      }
+    };
+
+    // Protect headers immediately
+    protectHeaders();
+
+    // Set up mutation observer to watch for DOM changes that might hide headers
+    const observer = new MutationObserver((mutations) => {
+      let needsProtection = false;
+      mutations.forEach((mutation) => {
+        if (
+          mutation.type === 'attributes' &&
+          (mutation.attributeName === 'style' || mutation.attributeName === 'class')
+        ) {
+          needsProtection = true;
+        }
+      });
+
+      if (needsProtection) {
+        protectHeaders();
+      }
+    });
+
+    const headerElement = document.querySelector('thead[kbn-table-header]');
+    if (headerElement) {
+      observer.observe(headerElement, {
+        attributes: true,
+        attributeFilter: ['style', 'class'],
+        subtree: true,
+      });
+    }
+
+    // Also protect on click events that might trigger changes
+    const handleDocumentClick = (event: Event) => {
+      // Small delay to allow any DOM manipulation to complete
+      setTimeout(protectHeaders, 10);
+    };
+
+    document.addEventListener('click', handleDocumentClick);
+
+    return () => {
+      observer.disconnect();
+      document.removeEventListener('click', handleDocumentClick);
+    };
+  }, []);
+
   // Enhanced subscription fallback
   useEffect(() => {
     if (SelectedCaptureSessions && SelectedCaptureSessions.subscribeAll) {
@@ -251,17 +316,30 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
   const handleDownloadSelected = async () => {
     try {
       if (SelectedCaptureSessions.count() === 0) {
+        alert('Please select at least one capture session to download.');
         return;
       }
 
       const sessions = SelectedCaptureSessions.getAll();
+
+      // Show loading state
+      setIsPopoverOpen(false);
+
       const startDownloadRes = await startPcapDownload(sessions);
 
-      setDownloadId(startDownloadRes.data.downloadID);
-      SelectedCaptureSessions.reset();
-      setIsPopoverOpen(false);
+      if (startDownloadRes && startDownloadRes.data && startDownloadRes.data.downloadID) {
+        setDownloadId(startDownloadRes.data.downloadID);
+        SelectedCaptureSessions.reset();
+      } else {
+        alert('Download failed: Invalid server response. Please try again.');
+      }
     } catch (err) {
-      // Error handling - silently fail to avoid blocking UI
+      alert(
+        `Download failed: ${
+          err.message || 'Network error occurred'
+        }. Please check your connection and try again.`
+      );
+      setIsPopoverOpen(false);
     }
   };
 

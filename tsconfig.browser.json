@@ -3,12 +3,15 @@
   "compilerOptions": {
     "target": "es5",
     "module": "esnext",
+    "typeRoots": ["node_modules/@types", "node_modules/@testing-library", "typings"],
+    "skipLibCheck": true
   },
   "include": [
     // in the build we populate this to include **/public/**/* but
     // if we did that when running from source IDEs won't properly map
     // public files to this config file and instead just use the defaults, ie. "strict": false,
     // **/public/**/*
+    "typings/**/*"
   ],
   "exclude": [
     "src/**/__fixtures__/**/*"
