@@ -1,19 +1,13 @@
-/* ULTRA-AGGRESSIVE CSS TO FORCE TABLE HEADERS VISIBILITY */
-/* This file ensures table headers are ALWAYS visible with maximum specificity */
-
-/* CRITICAL: Nuclear-level header protection - prevent ANY attempt to hide headers */
+/* CSS TO FORCE TABLE HEADERS VISIBILITY */
+/* This file ensures table headers are always visible with proper specificity */
 thead[kbn-table-header],
-thead[kbn-table-header] *,
 .kbnDocTable thead,
-.kbnDocTable thead *,
-.kbn-table thead,
-.kbn-table thead * {
+.kbn-table thead {
   visibility: visible !important;
   opacity: 1 !important;
-  display: revert !important;
 }
 
-/* Force headers to always be present - even if JavaScript tries to hide them */
+/* Ensure headers are always visible */
 thead[kbn-table-header]:not(:empty),
 .kbnDocTable thead:not(:empty),
 .kbn-table thead:not(:empty) {
@@ -26,17 +20,17 @@ thead[kbn-table-header]:not(:empty),
   z-index: 1000 !important;
 }
 
-/* If header is empty, show loading message */
-thead[kbn-table-header]:empty::after {
-  content: "Loading table headers..." !important;
-  display: table-row !important;
-  text-align: center !important;
-  padding: 12px !important;
-  background-color: #f5f7fa !important;
-  color: #343741 !important;
-  font-weight: 600 !important;
-  border: 2px solid #d3dae6 !important;
+/* Force headers to be visible at all times */
+thead[kbn-table-header] {
+  display: table-header-group !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 1000 !important;
+  min-height: 40px !important;
 }
+
+
 
 /* Target ALL possible header combinations with MAXIMUM specificity */
 doc-table table thead,
