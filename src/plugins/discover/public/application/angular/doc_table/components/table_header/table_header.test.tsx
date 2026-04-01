@@ -25,7 +25,7 @@ import { SortOrder } from './helpers';
 import { IndexPattern, IFieldType } from '../../../../../kibana_services';
 
 function getMockIndexPattern() {
-  return ({
+  return {
     id: 'test',
     title: 'Test',
     timeFieldName: 'time',
@@ -50,7 +50,7 @@ function getMockIndexPattern() {
         } as IFieldType;
       }
     },
-  } as unknown) as IndexPattern;
+  } as unknown as IndexPattern;
 }
 
 function getMockProps(props = {}) {

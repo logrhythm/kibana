@@ -162,52 +162,6 @@ export interface SaveRuleProps {
   disabledForLanguage?: boolean;
 }
 
-// LOGRHYTHM FIX: Smart Lucene Query Preprocessing
-// Converts simple terms to proper Lucene syntax while preserving advanced queries
-const preprocessLuceneQuery = (query: string): string => {
-  if (!query || typeof query !== 'string') {
-    return query;
-  }
-
-  const trimmedQuery = query.trim();
-
-  // Don't modify empty queries
-  if (!trimmedQuery) {
-    return query;
-  }
-
-  // Advanced Lucene patterns - preserve exactly as-is
-  const advancedPatterns = [
-    /[*?]/, // Contains wildcards (* or ?)
-    /:/, // Field queries (field:value)
-    /[()]/, // Grouping with parentheses
-    /\s+(AND|OR|NOT)\s+/i, // Boolean operators
-    /^[+\-]/, // Required/prohibited (+/-)
-    /"/, // Quoted phrases
-    /\[.*\]/, // Range queries [a TO b]
-    /\{.*\}/, // Range queries {a TO b}
-    /~/, // Fuzzy queries
-    /\^/, // Boost operators
-    /\\/, // Escape characters
-  ];
-
-  // If query contains advanced Lucene syntax, preserve it exactly
-  const isAdvanced = advancedPatterns.some((pattern) => pattern.test(trimmedQuery));
-  if (isAdvanced) {
-    return trimmedQuery;
-  }
-
-  // Simple terms without spaces - add wildcards for broader matching
-  if (!/\s/.test(trimmedQuery)) {
-    const wildcardQuery = `*${trimmedQuery}*`;
-    return wildcardQuery;
-  }
-
-  // Multi-word queries - convert to phrase search
-  const phraseQuery = `"${trimmedQuery}"`;
-  return phraseQuery;
-};
-
 export const SaveRule = (props: SaveRuleProps) => {
   const { query, disabledForLanguage = false } = props;
 
@@ -225,20 +179,12 @@ export const SaveRule = (props: SaveRuleProps) => {
 
   const startSaveRule = async () => {
     try {
-      // LOGRHYTHM FIX: Apply preprocessing before convertQuery
-      const preprocessedQuery = preprocessLuceneQuery(query);
-      const newQuery = await convertQuery(preprocessedQuery);
-
+      const newQuery = await convertQuery(query);
       dispatch({ type: 'START_SAVE_RULE', query: newQuery });
     } catch (err) {
       console.error( // eslint-disable-line
-        `🔥 LOGRHYTHM SAVE RULE ERROR: Query conversion failed: '${query}'`,
-        {
-          error: err.message,
-          stack: err.stack,
-          query,
-          timestamp: new Date().toISOString(),
-        }
+        `An error occurred converting the query: '${query}'`,
+        err
       );
       dispatch({ type: 'CANCEL_SAVE_RULE' });
       return;
@@ -265,21 +211,13 @@ export const SaveRule = (props: SaveRuleProps) => {
     dispatch({ type: 'LOOKUP_START' });
 
     try {
-      // LOGRHYTHM FIX: Apply preprocessing before convertQuery
-      const preprocessedQuery = preprocessLuceneQuery(saveRuleData.query);
-      const newQuery = await convertQuery(preprocessedQuery);
+      const newQuery = await convertQuery(saveRuleData.query);
       saveRuleData.query = newQuery;
-
       dispatch({ type: 'UPDATE_RULE_DATA', ruleData: saveRuleData });
     } catch (err) {
       console.error( // eslint-disable-line
-        `🔥 LOGRHYTHM TRIGGER COUNT ERROR: Query conversion failed: '${saveRuleData.query}'`,
-        {
-          error: err.message,
-          stack: err.stack,
-          query: saveRuleData.query,
-          timestamp: new Date().toISOString(),
-        }
+        `An error occurred converting the query: '${saveRuleData.query}'`,
+        err
       );
       dispatch({ type: 'CHECK_TRIGGER_COUNT_FINISH', triggerCount: null });
       return;
@@ -389,7 +327,7 @@ export const SaveRule = (props: SaveRuleProps) => {
         }
       >
         <EuiButton fill onClick={startSaveRule} disabled={disabledForLanguage}>
-          <div className={classes.buttonContent}>
+          <div>
             <span>Save Rule</span>
             {!!disabledForLanguage && <EuiIcon className={classes.infoIcon} type="iInCircle" />}
           </div>

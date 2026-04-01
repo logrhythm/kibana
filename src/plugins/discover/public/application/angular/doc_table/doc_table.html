@@ -34,7 +34,7 @@
         ></tool-bar-pager-buttons>
       </div>
     </div>
-    <table class="kbnDocTable table" ng-if="indexPattern">
+    <table class="kbnDocTable table" ng-if="indexPattern" style="display: table; width: 100%; border-collapse: collapse; table-layout: fixed;">
       <thead
         kbn-table-header
         columns="columns"
@@ -45,6 +45,7 @@
         on-remove-column="onRemoveColumn"
         on-select-all="onSelectAll"
         on-select-current-page="onSelectCurrentPage"
+        style="display: table-header-group; visibility: visible; opacity: 1;"
       ></thead>
       <tbody>
         <tr ng-repeat="row in pageOfItems|limitTo:limit track by row._index+row._type+row._id+row._score+row._version+row._routing"
@@ -84,7 +85,7 @@
     </div>
   </div>
 
-  <table ng-if="infiniteScroll" class="kbn-table table" ng-if="indexPattern" data-test-subj="docTable">
+  <table ng-if="infiniteScroll" class="kbn-table table" ng-if="indexPattern" data-test-subj="docTable" style="display: table; width: 100%; border-collapse: collapse; table-layout: fixed;">
     <thead
       kbn-table-header
       columns="columns"
@@ -94,6 +95,8 @@
       on-move-column="onMoveColumn"
       on-remove-column="onRemoveColumn"
       on-select-all="onSelectAll"
+      on-select-current-page="onSelectCurrentPage"
+      style="display: table-header-group; visibility: visible; opacity: 1;"
     ></thead>
     <tbody>
       <tr ng-repeat="row in hits|limitTo:limit track by row._index+row._type+row._id+row._score+row._version+row._routing"

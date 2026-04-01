@@ -31,6 +31,14 @@
   line-height: 1; // Override kuiLocalNav & kuiLocalNavRow
   overflow: hidden;
   transition: height $euiAnimSpeedNormal $euiAnimSlightResistance;
+  min-height: 32px; // Prevent collapse during CSS loading
+
+  &.loading {
+    .euiFlexGroup {
+      justify-content: flex-start !important;
+      transition: none;
+    }
+  }
 }
 
 .globalFilterGroup__filterFlexItem {
@@ -46,5 +54,62 @@
   .globalFilterGroup__wrapper-isVisible {
     // EUI Flexbox adds too much margin between responded items, this just moves it up
     margin-top: $euiSize * -1;
+  }
+}
+
+// CSS Loading Stability Rules - Enhanced for Navigation Consistency
+.kbnQueryBar {
+  min-height: 40px;
+  // Force consistent layout during CSS loading
+  display: flex !important;
+
+  .euiFlexGroup {
+    transition: justify-content 150ms ease-in-out;
+    min-height: inherit; // Ensure child elements maintain height
+  }
+}
+
+// Global Query Bar - Enhanced stability
+.globalQueryBar {
+  // Force layout during navigation
+  min-height: 40px !important;
+  // Prevent layout shift during CSS loading
+  contain: layout style;
+
+  // Ensure proper initialization
+  &:not(.css-loaded) {
+    .euiFlexGroup {
+      min-height: 40px;
+      justify-content: flex-start !important;
+    }
+  }
+}
+
+// Filter Group Wrapper - Enhanced for SPA navigation
+.globalFilterGroup__wrapper {
+  line-height: 1; // Override kuiLocalNav & kuiLocalNavRow
+  overflow: hidden;
+  transition: height $euiAnimSpeedNormal $euiAnimSlightResistance;
+  min-height: 32px !important; // Force minimum height always
+  // CSS containment for better performance and stability
+  contain: layout;
+
+  // Enhanced loading state
+  &.loading,
+  &:not(.css-loaded) {
+    min-height: 32px !important;
+
+    .euiFlexGroup {
+      justify-content: flex-start !important;
+      transition: none;
+      min-height: 32px;
+    }
+  }
+
+  // Stable state indicator
+  &.css-loaded {
+    .euiFlexGroup {
+      transition: justify-content 150ms ease-in-out;
+    }
   }
 }

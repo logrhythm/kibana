@@ -91,6 +91,7 @@ interface State {
   query?: Query;
   dateRangeFrom: string;
   dateRangeTo: string;
+  cssLoadingState?: 'loading' | 'loaded' | 'failed';
 }
 
 class SearchBarUI extends Component<SearchBarProps, State> {
@@ -164,7 +165,7 @@ class SearchBarUI extends Component<SearchBarProps, State> {
     keypress has been a major source of performance issues for us in previous implementations of the query bar.
     See https://github.com/elastic/kibana/issues/14086
   */
-  public state = {
+  public state: State = {
     isFiltersVisible: true,
     showSaveQueryModal: false,
     showSaveNewQueryModal: false,
@@ -173,6 +174,7 @@ class SearchBarUI extends Component<SearchBarProps, State> {
     query: this.props.query ? { ...this.props.query } : undefined,
     dateRangeFrom: get(this.props, 'dateRangeFrom', 'now-15m'),
     dateRangeTo: get(this.props, 'dateRangeTo', 'now'),
+    cssLoadingState: process.env.NODE_ENV === 'production' ? 'loading' : 'loaded', // loading | failed | loaded
   };
 
   public isDirty = () => {
@@ -216,17 +218,149 @@ class SearchBarUI extends Component<SearchBarProps, State> {
   }
 
   public setFilterBarHeight = () => {
-    requestAnimationFrame(() => {
-      const height =
-        this.filterBarRef && this.state.isFiltersVisible ? this.filterBarRef.clientHeight : 0;
+    const measureHeight = () => {
+      if (!this.filterBarRef || !this.state.isFiltersVisible) {
+        if (this.filterBarWrapperRef) {
+          this.filterBarWrapperRef.setAttribute('style', 'height: 0px');
+        }
+        this.debugLayoutState();
+        return;
+      }
+
+      const height = this.filterBarRef.clientHeight;
+
+      // Detect if CSS hasn't loaded (height would be minimal)
+      if (height < 10 && this.state.isFiltersVisible) {
+        // CSS not loaded yet, retry after next frame
+        this.debugLayoutState();
+        requestAnimationFrame(() => {
+          requestAnimationFrame(measureHeight);
+        });
+        return;
+      }
+
       if (this.filterBarWrapperRef) {
         this.filterBarWrapperRef.setAttribute('style', `height: ${height}px`);
       }
-    });
+      this.debugLayoutState();
+    };
+
+    requestAnimationFrame(measureHeight);
   };
 
   // member-ordering rules conflict with use-before-declaration rules
   public ro = new ResizeObserver(this.setFilterBarHeight);
+  private timeouts: NodeJS.Timeout[] = [];
+  private cssRetryCount = 0;
+  private maxCssRetries = 5;
+
+  // Production debugging methods
+  private debugLayoutState = () => {
+    if (process.env.NODE_ENV !== 'production') return;
+
+    // Debug logging removed for production
+  };
+
+  private checkCSSLoaded = (): boolean => {
+    if (!this.filterBarRef) return true;
+
+    const styles = window.getComputedStyle(this.filterBarRef);
+
+    // Enhanced CSS loading detection with comprehensive checks
+    const hasValidHeight = styles.minHeight !== '0px' && styles.minHeight !== 'auto';
+    const hasValidPadding = styles.padding !== '0px' || styles.paddingLeft !== '0px';
+    const hasValidTransition = styles.transition !== 'none' && styles.transition !== '';
+
+    // Check if the globalFilterGroup wrapper has proper min-height (32px from CSS)
+    const wrapper = this.filterBarWrapperRef;
+    let hasWrapperMinHeight = true;
+    if (wrapper) {
+      const wrapperStyles = window.getComputedStyle(wrapper);
+      hasWrapperMinHeight = parseInt(wrapperStyles.minHeight, 10) >= 32;
+    }
+
+    // Additional production-specific checks
+    const hasValidDisplay = styles.display !== 'none';
+    const hasValidVisibility = styles.visibility !== 'hidden';
+
+    // Check for EUI-specific styles that should be loaded
+    const hasEuiStyles =
+      styles.boxSizing === 'border-box' ||
+      styles.fontFamily.includes('Inter') ||
+      styles.fontSize !== '16px'; // Default browser font size
+
+    // Comprehensive validation - all checks must pass
+    const isFullyLoaded =
+      hasValidHeight &&
+      hasValidPadding &&
+      hasValidTransition &&
+      hasWrapperMinHeight &&
+      hasValidDisplay &&
+      hasValidVisibility &&
+      hasEuiStyles;
+
+    // Debug logging for production troubleshooting
+    if (process.env.NODE_ENV === 'production' && !isFullyLoaded) {
+      // eslint-disable-next-line no-console
+      console.debug('SearchBar CSS not fully loaded:', {
+        hasValidHeight,
+        hasValidPadding,
+        hasValidTransition,
+        hasWrapperMinHeight,
+        hasValidDisplay,
+        hasValidVisibility,
+        hasEuiStyles,
+        minHeight: styles.minHeight,
+        padding: styles.padding,
+        transition: styles.transition,
+        fontFamily: styles.fontFamily,
+      });
+    }
+
+    return isFullyLoaded;
+  };
+
+  private retryCssLoadingRecovery = (context: string = 'unknown') => {
+    if (this.cssRetryCount >= this.maxCssRetries) {
+      // eslint-disable-next-line no-console
+      console.warn('SearchBar CSS loading recovery max retries reached:', {
+        context,
+        retryCount: this.cssRetryCount,
+      });
+      this.setState({ cssLoadingState: 'failed' });
+      return;
+    }
+
+    if (!this.checkCSSLoaded()) {
+      this.cssRetryCount++;
+      this.setState({ cssLoadingState: 'loading' });
+      const backoffDelay = Math.min(100 * Math.pow(1.5, this.cssRetryCount - 1), 1000);
+
+      const timeout = setTimeout(() => {
+        // eslint-disable-next-line no-console
+        console.debug(
+          `SearchBar CSS retry ${this.cssRetryCount}/${this.maxCssRetries} (${context})`
+        );
+        this.forceUpdate();
+        this.setFilterBarHeight();
+
+        // Continue retrying if CSS still not loaded
+        setTimeout(() => {
+          if (!this.checkCSSLoaded() && this.cssRetryCount < this.maxCssRetries) {
+            this.retryCssLoadingRecovery('retry-chain');
+          } else if (this.checkCSSLoaded()) {
+            this.setState({ cssLoadingState: 'loaded' });
+          }
+        }, 50);
+      }, backoffDelay);
+
+      this.timeouts.push(timeout);
+    } else {
+      // CSS loaded successfully - reset retry count for future navigation
+      this.cssRetryCount = 0;
+      this.setState({ cssLoadingState: 'loaded' });
+    }
+  };
 
   public onSave = async (savedQueryMeta: SavedQueryMeta, saveAsNew = false) => {
     if (!this.state.query) return;
@@ -259,7 +393,7 @@ class SearchBarUI extends Component<SearchBarProps, State> {
     }
 
     try {
-      let response;
+      let response: SavedQuery;
       if (this.props.savedQuery && !saveAsNew) {
         response = await this.savedQueryService.saveQuery(savedQueryAttributes, {
           overwrite: true,
@@ -355,13 +489,64 @@ class SearchBarUI extends Component<SearchBarProps, State> {
       this.setFilterBarHeight();
       this.ro.observe(this.filterBarRef);
     }
+
+    // Enhanced Production CSS Loading Detection
+    if (process.env.NODE_ENV === 'production') {
+      // Reset retry count for new component mount
+      this.cssRetryCount = 0;
+
+      // Initial check after mount
+      const timeout = setTimeout(() => {
+        this.retryCssLoadingRecovery('componentDidMount');
+      }, 100);
+      this.timeouts.push(timeout);
+
+      // Additional delayed check for complex SPA scenarios
+      const timeout2 = setTimeout(() => {
+        this.retryCssLoadingRecovery('componentDidMount-delayed');
+      }, 300);
+      this.timeouts.push(timeout2);
+    }
   }
 
-  public componentDidUpdate() {
+  public componentDidUpdate(prevProps: SearchBarProps) {
     if (this.filterBarRef) {
-      this.setFilterBarHeight();
+      // Enhanced CSS Loading Recovery - Check if styles loaded properly after navigation
+      if (!this.checkCSSLoaded()) {
+        // Use the retry mechanism for better handling of production CSS loading
+        const timeout = setTimeout(() => {
+          this.retryCssLoadingRecovery('componentDidUpdate');
+        }, 50);
+        this.timeouts.push(timeout);
+      }
+
+      // Re-establish observation if filters or visibility changed
+      if (
+        prevProps.filters !== this.props.filters ||
+        prevProps.showFilterBar !== this.props.showFilterBar
+      ) {
+        this.ro.unobserve(this.filterBarRef);
+        this.setFilterBarHeight();
+        this.ro.observe(this.filterBarRef);
+      } else {
+        // Just update height for other changes
+        this.setFilterBarHeight();
+      }
+    }
+  }
+
+  public componentWillUnmount() {
+    // Clear all pending timeouts to prevent state updates on unmounted component
+    this.timeouts.forEach((timeout) => clearTimeout(timeout));
+    this.timeouts = [];
+
+    // Reset CSS retry count for clean state
+    this.cssRetryCount = 0;
+
+    if (this.filterBarRef) {
       this.ro.unobserve(this.filterBarRef);
     }
+    this.ro.disconnect();
   }
 
   public render() {
@@ -377,7 +562,7 @@ class SearchBarUI extends Component<SearchBarProps, State> {
       />
     );
 
-    let queryBar;
+    let queryBar: React.ReactElement | undefined;
     if (this.shouldRenderQueryBar()) {
       queryBar = (
         <QueryBarTopRow
@@ -408,11 +593,13 @@ class SearchBarUI extends Component<SearchBarProps, State> {
       );
     }
 
-    let filterBar;
+    let filterBar: React.ReactElement | undefined;
     if (this.shouldRenderFilterBar()) {
       const filterGroupClasses = classNames('globalFilterGroup__wrapper', {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         'globalFilterGroup__wrapper-isVisible': this.state.isFiltersVisible,
+        loading: this.props.isLoading,
+        'css-loaded': this.checkCSSLoaded(),
       });
       filterBar = (
         <div
@@ -438,8 +625,13 @@ class SearchBarUI extends Component<SearchBarProps, State> {
       );
     }
 
+    const globalQueryBarClasses = classNames('globalQueryBar', {
+      'css-loaded': this.checkCSSLoaded(),
+      loading: this.props.isLoading,
+    });
+
     return (
-      <div className="globalQueryBar" data-test-subj="globalQueryBar">
+      <div className={globalQueryBarClasses} data-test-subj="globalQueryBar">
         {queryBar}
         {filterBar}
 

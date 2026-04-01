@@ -1,9 +1,69 @@
-.kbnDocTableHeader {
+/* Force table headers to always display with maximum specificity */
+.kbnDocTable thead,
+.kbn-table thead,
+table.kbnDocTable thead,
+table.kbn-table thead {
+  display: table-header-group !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.kbnDocTableHeader,
+tr.kbnDocTableHeader,
+thead .kbnDocTableHeader,
+.kbn-doc-table-header,
+.table-header-row {
   white-space: nowrap;
+  display: table-row !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  background-color: #f5f7fa !important;
+  height: auto !important;
+  min-height: 40px !important;
+  border-bottom: 2px solid #d3dae6 !important;
 }
+
+.kbnDocTableHeader th,
+tr.kbnDocTableHeader th,
+thead .kbnDocTableHeader th,
+table.kbnDocTable th,
+table.kbn-table th,
+.kbn-doc-table-header-cell,
+.table-header-column {
+  display: table-cell !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  padding: 8px 12px !important;
+  border-bottom: 2px solid #d3dae6 !important;
+  border-left: 1px solid #d3dae6 !important;
+  border-right: 1px solid #d3dae6 !important;
+  text-align: left;
+  font-weight: 600 !important;
+  color: #343741 !important;
+  background-color: #f5f7fa !important;
+  height: auto !important;
+  min-height: 32px !important;
+  font-size: 12px !important;
+  vertical-align: middle !important;
+  position: relative !important;
+}
+
+/* Specific styling for Captured column header */
+th[data-test-subj="docTableHeaderField"]:last-child,
+.kbnDocTable th:last-child,
+.kbnDocTableHeader th:last-child {
+  text-align: center !important;
+  width: 120px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
+}
+
+/* Removed conflicting column width definitions - now handled in _force_headers.scss */
+
 .kbnDocTableHeader button {
-  margin-left: $euiSizeXS;
+  margin-left: 4px;
 }
+
 .kbnDocTableHeader__move,
 .kbnDocTableHeader__sortChange {
   opacity: 0;
@@ -11,4 +71,76 @@
   &:focus {
     opacity: 1;
   }
+}
+
+/* Style for Captured column data cells - ensure perfect alignment */
+.kbnDocTable td:last-child {
+  text-align: center !important;
+  width: 120px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
+  vertical-align: middle !important;
+  padding: 8px !important;
+  box-sizing: border-box !important;
+  border-left: 1px solid #d3dae6 !important;
+  border-right: 1px solid #d3dae6 !important;
+}
+
+/* Ensure capture download elements are properly styled */
+capture-download {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 32px;
+}
+
+/* Style download buttons and checkboxes to match reference design */
+.kbnDocTable capture-download button {
+  transition: color 0.2s ease;
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  opacity: 1 !important;
+}
+
+.kbnDocTable capture-download button:hover {
+  color: #0078a4 !important;
+}
+
+.kbnDocTable capture-download input[type="checkbox"] {
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+/* Force visibility with emergency CSS */
+[data-test-subj="docTableHeader"],
+[data-test-subj="docTableHeaderField"] {
+  display: table-row !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+[data-test-subj="docTableHeaderField"] {
+  display: table-cell !important;
+}
+
+/* Table structure enforcement */
+.kbnDocTable {
+  display: table !important;
+  width: 100% !important;
+  border-collapse: collapse !important;
+  table-layout: auto !important;
+}
+
+.kbnDocTable tbody {
+  display: table-row-group !important;
+}
+
+.kbnDocTable tr {
+  display: table-row !important;
+}
+
+.kbnDocTable td {
+  display: table-cell !important;
 }

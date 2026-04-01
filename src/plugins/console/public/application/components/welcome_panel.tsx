@@ -38,7 +38,12 @@ interface Props {
 
 export function WelcomePanel(props: Props) {
   return (
-    <EuiFlyout onClose={props.onDismiss} data-test-subj="welcomePanel" size="s">
+    <EuiFlyout
+      onClose={props.onDismiss}
+      data-test-subj="welcomePanel"
+      size="s"
+      style={{ top: '4rem' }}
+    >
       <EuiFlyoutHeader hasBorder>
         <EuiTitle size="m">
           <h2>

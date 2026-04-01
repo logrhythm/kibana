@@ -38,6 +38,7 @@ import { TimeRange } from 'src/plugins/data/public';
 // Import with try-catch to handle missing nm-web-shared package gracefully
 let convertQuery: (query: string) => Promise<string>;
 try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   convertQuery = require('@logrhythm/nm-web-shared/services/query_mapping').convertQuery;
 } catch (e) {
   // Fallback implementation when nm-web-shared is not available
@@ -112,6 +113,56 @@ function QueryBarTopRowUI(props: Props) {
 
   const currentQueryText = query && query.query ? (query.query as string) : '';
 
+  // Enhanced CSS loading detection hook with rate limiting
+  const useCSSLoaded = () => {
+    const [cssLoaded, setCssLoaded] = useState(false);
+    const maxRetries = useRef(20); // Limit to 20 attempts max
+    const timeoutRef = useRef<NodeJS.Timeout>();
+
+    useEffect(() => {
+      let retryCount = 0;
+
+      const checkCSS = () => {
+        // Stop checking if max retries reached
+        if (retryCount >= maxRetries.current) {
+          setCssLoaded(true); // Assume loaded to stop infinite loop
+          return;
+        }
+
+        const testEl = document.createElement('div');
+        testEl.className = 'kbnQueryBar';
+        testEl.style.visibility = 'hidden';
+        document.body.appendChild(testEl);
+
+        const styles = window.getComputedStyle(testEl);
+        const hasStyles = styles.padding !== '0px' || styles.paddingLeft !== '0px';
+
+        document.body.removeChild(testEl);
+
+        if (hasStyles) {
+          setCssLoaded(true);
+        } else {
+          retryCount++;
+          // Use timeout instead of requestAnimationFrame for better performance
+          timeoutRef.current = setTimeout(checkCSS, 100);
+        }
+      };
+
+      checkCSS();
+
+      // Cleanup function
+      return () => {
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
+      };
+    }, []);
+
+    return cssLoaded;
+  };
+
+  const cssLoaded = useCSSLoaded();
+
   const getDateRange = useCallback(() => {
     const defaultTimeSetting = uiSettings!.get('timepicker:timeDefaults');
     return {
@@ -147,26 +198,10 @@ function QueryBarTopRowUI(props: Props) {
         });
       })
       .catch((err) => {
-        // LOGRHYTHM FIX: Don't log or display abort-related errors to reduce user confusion
-        if (
-          err.name !== 'AbortError' &&
-          !err.message.includes('aborted') &&
-          !err.message.includes('Request aborted')
-        ) {
-          console.warn( // eslint-disable-line
-            'An error occurred trying to correct the provided query for capitalization.',
-            err
-          );
-        }
-
-        // LOGRHYTHM FIX: Execute search with original query when conversion fails
-        if (!shutdown) {
-          const dateRange = getDateRange();
-          onSubmit({
-            query,
-            dateRange,
-          });
-        }
+        console.warn( // eslint-disable-line
+          'An error occurred trying to correct the provided query for capitalization.',
+          err
+        );
       });
 
     return () => {
@@ -437,14 +472,16 @@ function QueryBarTopRowUI(props: Props) {
 
   const classes = classNames('kbnQueryBar', {
     'kbnQueryBar--withDatePicker': props.showDatePicker,
+    'kbnQueryBar--cssLoaded': cssLoaded,
   });
 
   return (
     <EuiFlexGroup
       className={classes}
-      responsive={!!props.showDatePicker}
+      responsive={false}
       gutterSize="s"
-      justifyContent="flexEnd"
+      justifyContent={cssLoaded ? 'flexEnd' : 'flexStart'}
+      style={!cssLoaded ? { minHeight: '40px' } : undefined}
     >
       {renderQueryInput()}
       <EuiFlexItem grow={false}>{renderUpdateButton()}</EuiFlexItem>

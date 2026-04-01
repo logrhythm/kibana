@@ -158,17 +158,34 @@ export function createTableRowDirective($compile: ng.ICompileService) {
         }
 
         $scope.columns.forEach(function (column: any) {
-          const isFilterable = mapping(column) && mapping(column).filterable && $scope.filter;
+          if (column === 'Captured') {
+            // Render the CaptureDownload directive for the Captured column
+            // Use the session ID from the row data - check multiple possible field names
+            const sessionId =
+              $scope.flattenedRow.Session ||
+              $scope.flattenedRow.session ||
+              row._source?.Session ||
+              row._source?.session ||
+              row.fields?.Session?.[0] ||
+              row.fields?.session?.[0];
 
-          newHtmls.push(
-            cellTemplate({
-              timefield: false,
-              sourcefield: column === '_source',
-              formatted: _displayField(row, column, true),
-              filterable: isFilterable,
-              column,
-            })
-          );
+            newHtmls.push(
+              `<td class="kbnDocTableCell__dataField" style="text-align: center; vertical-align: middle; padding: 8px; width: 100px; min-width: 100px;"><capture-download session="${
+                sessionId || ''
+              }"></capture-download></td>`
+            );
+          } else {
+            const isFilterable = mapping(column) && mapping(column).filterable && $scope.filter;
+            newHtmls.push(
+              cellTemplate({
+                timefield: false,
+                sourcefield: column === '_source',
+                formatted: _displayField(row, column, true),
+                filterable: isFilterable,
+                column,
+              })
+            );
+          }
         });
 
         let $cells = $el.children();

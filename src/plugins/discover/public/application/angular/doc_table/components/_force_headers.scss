@@ -1,0 +1,484 @@
+/* CSS TO FORCE TABLE HEADERS VISIBILITY */
+/* This file ensures table headers are always visible with proper specificity */
+thead[kbn-table-header],
+.kbnDocTable thead,
+.kbn-table thead {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Ensure headers are always visible */
+thead[kbn-table-header]:not(:empty),
+.kbnDocTable thead:not(:empty),
+.kbn-table thead:not(:empty) {
+  display: table-header-group !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  height: auto !important;
+  min-height: 40px !important;
+  position: relative !important;
+  z-index: 1000 !important;
+}
+
+/* Force headers to be visible at all times */
+thead[kbn-table-header] {
+  display: table-header-group !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 1000 !important;
+  min-height: 40px !important;
+}
+
+
+
+/* Target ALL possible header combinations with MAXIMUM specificity */
+doc-table table thead,
+doc-table .kbnDocTable thead,
+doc-table .kbn-table thead,
+.kbnDocTable thead,
+.kbn-table thead,
+table.kbnDocTable thead,
+table.kbn-table thead,
+body doc-table table thead,
+body doc-table .kbnDocTable thead,
+body .kbnDocTable thead {
+  display: table-header-group !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 10 !important;
+  height: auto !important;
+  min-height: 40px !important;
+}
+
+/* Force header row to be visible with EXTREME specificity */
+doc-table table thead tr,
+doc-table .kbnDocTable thead tr,
+.kbnDocTable thead tr,
+.kbn-table thead tr,
+tr.kbnDocTableHeader,
+thead tr.kbnDocTableHeader,
+body doc-table table thead tr,
+body doc-table .kbnDocTable thead tr,
+body .kbnDocTable thead tr,
+body tr.kbnDocTableHeader,
+html body doc-table table thead tr,
+html body .kbnDocTable thead tr {
+  display: table-row !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  height: auto !important;
+  min-height: 40px !important;
+  background-color: #f5f7fa !important;
+  border-bottom: 2px solid #d3dae6 !important;
+  position: relative !important;
+  z-index: 5 !important;
+}
+
+/* Force header cells to be visible with EXTREME styling */
+doc-table table thead tr th,
+doc-table .kbnDocTable thead tr th,
+.kbnDocTable thead tr th,
+.kbn-table thead tr th,
+tr.kbnDocTableHeader th,
+thead tr.kbnDocTableHeader th,
+.kbnDocTableHeader th,
+body doc-table table thead tr th,
+body doc-table .kbnDocTable thead tr th,
+body .kbnDocTable thead tr th,
+body tr.kbnDocTableHeader th,
+html body doc-table table thead tr th,
+html body .kbnDocTable thead tr th,
+th[data-test-subj="docTableHeaderField"] {
+  display: table-cell !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  padding: 8px 12px !important;
+  border-bottom: 2px solid #d3dae6 !important;
+  text-align: left !important;
+  font-weight: 600 !important;
+  color: #343741 !important;
+  background-color: #f5f7fa !important;
+  height: auto !important;
+  min-height: 32px !important;
+  font-size: 12px !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+  position: relative !important;
+  border-left: 1px solid #d3dae6 !important;
+  border-right: 1px solid #d3dae6 !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure the table structure is ALWAYS proper */
+doc-table table,
+doc-table .kbnDocTable,
+.kbnDocTable,
+.kbn-table,
+body doc-table table,
+body .kbnDocTable,
+table[class*="kbn"] {
+  display: table !important;
+  width: 100% !important;
+  border-collapse: collapse !important;
+  table-layout: auto !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Override ANY potential hiding CSS with nuclear-level specificity */
+doc-table *,
+.kbnDocTable *,
+.kbn-table *,
+body doc-table *,
+body .kbnDocTable *,
+html body doc-table *,
+html body .kbnDocTable * {
+  box-sizing: border-box !important;
+}
+
+/* CRITICAL: Captured column header with proper sizing and overflow handling */
+.kbnDocTable thead tr th:last-child,
+.kbn-table thead tr th:last-child,
+tr.kbnDocTableHeader th:last-child,
+body .kbnDocTable thead tr th:last-child,
+html body .kbnDocTable thead tr th:last-child,
+th[data-test-subj="docTableHeaderField"]:last-child {
+  text-align: center !important;
+  width: 120px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
+  /* CRITICAL: Allow overflow for EUI popover */
+  overflow: visible !important;
+}
+
+/* Target the CSS classes we added for visibility */
+.kbn-doc-table-header,
+.table-header-row,
+tr.kbn-doc-table-header,
+tr.table-header-row {
+  display: table-row !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  background-color: #f5f7fa !important;
+  border-bottom: 2px solid #d3dae6 !important;
+}
+
+/* Column width optimizations */
+.kbnDocTable th {
+  max-width: 200px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Time column sizing */
+.kbnDocTable th:first-child + th {
+  width: 180px !important;
+  max-width: 180px !important;
+}
+
+/* IP columns sizing */
+.kbnDocTable th[data-test-subj*="SrcIP"],
+.kbnDocTable th[data-test-subj*="DestIP"] {
+  width: 120px !important;
+  max-width: 120px !important;
+}
+
+/* Application column sizing */
+.kbnDocTable th[data-test-subj*="Application"] {
+  width: 100px !important;
+  max-width: 100px !important;
+}
+
+/* Duration column sizing */
+.kbnDocTable th[data-test-subj*="Duration"] {
+  width: 80px !important;
+  max-width: 80px !important;
+}
+
+/* Session column sizing */
+.kbnDocTable th[data-test-subj*="Session"] {
+  width: 100px !important;
+  max-width: 100px !important;
+}
+
+/* DATA CELL WIDTH ENFORCEMENT - Match header widths */
+.kbnDocTable td:nth-child(1) { /* Checkbox column */
+  width: 24px !important;
+  max-width: 24px !important;
+}
+
+.kbnDocTable td:nth-child(2) { /* Time column */
+  width: 180px !important;
+  max-width: 180px !important;
+}
+
+.kbnDocTable td:nth-child(3), /* SrcIP */
+.kbnDocTable td:nth-child(4) { /* DestIP */
+  width: 120px !important;
+  max-width: 120px !important;
+}
+
+.kbnDocTable td:nth-child(5) { /* Application */
+  width: 100px !important;
+  max-width: 100px !important;
+}
+
+.kbnDocTable td:nth-child(6) { /* Duration */
+  width: 80px !important;
+  max-width: 80px !important;
+}
+
+.kbnDocTable td:nth-child(7), /* FlowCompleted */
+.kbnDocTable td:nth-child(8) { /* Session */
+  width: 100px !important;
+  max-width: 100px !important;
+}
+
+.kbnDocTable td:nth-child(9) { /* Captured */
+  width: 120px !important;
+  max-width: 120px !important;
+}
+
+/* Ensure data cells have proper box sizing and overflow handling */
+.kbnDocTable tbody td {
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* CRITICAL Z-INDEX AND OVERFLOW FIXES FOR EUI POPOVER */
+/* Fix EUI Popover visibility issues */
+
+/* MOST CRITICAL: Allow overflow in Captured column header to prevent EUI popover clipping */
+.kbnDocTable th:last-child,
+.kbnDocTable thead tr th:last-child,
+th[data-test-subj="docTableHeaderField"]:last-child {
+  overflow: visible !important;
+  z-index: 15 !important;
+}
+
+/* CRITICAL: Allow popover overflow in table header while maintaining table scrolling */
+.kbnDocTable thead,
+.kbnDocTable thead tr {
+  overflow: visible !important;
+}
+
+/* Maintain horizontal scrolling for table body while allowing header popover overflow */
+.kbnDocTable tbody {
+  overflow: inherit;
+}
+
+/* CRITICAL: Remove any overflow from table containers to prevent double scroll bars */
+doc-table,
+.doc-table,
+.kbnDocTable-container,
+.euiBasicTable,
+.euiTable,
+.kbnDocTable-wrapper,
+.table-responsive,
+.discover-table,
+.kbn-doc-table {
+  overflow: visible !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
+/* Force table to use parent scrolling instead of creating its own scroll area */
+body doc-table,
+body .kbnDocTable,
+body .discover-table {
+  overflow: visible !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
+/* CRITICAL: EUI Popover specific overrides with maximum z-index */
+.euiPopover,
+.euiPopover__panel,
+div[data-euipopover-panel] {
+  z-index: 999999 !important;
+}
+
+/* Ensure EUI popover panels are always on top */
+.euiPopover__panel {
+  box-shadow: 0 6px 16px -4px rgba(69,90,100,.08), 0 4px 6px -2px rgba(69,90,100,.12) !important;
+  border: 1px solid #d3dae6 !important;
+  border-radius: 6px !important;
+  background: #fff !important;
+}
+
+/* EUI Button styling in popover */
+.euiPopover__panel .euiButton {
+  margin-bottom: 4px !important;
+  font-size: 12px !important;
+  height: 32px !important;
+  justify-content: flex-start !important;
+}
+
+.euiPopover__panel .euiButton:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* CAPTURE HEADER POPOVER SPECIFIC FIXES */
+/* Fix popover positioning for capture table header dropdown */
+#capture_header_popover {
+  position: relative !important;
+  z-index: 10000 !important;
+}
+
+/* Ensure capture header popover panel stays anchored to button */
+#capture_header_popover .euiPopover__panel {
+  position: absolute !important;
+  top: 100% !important;
+  right: 0 !important;
+  left: auto !important;
+  transform: none !important;
+  margin-top: 4px !important;
+  z-index: 10001 !important;
+}
+
+/* Prevent popover from being clipped by table containers */
+.kbnDocTable th:last-child,
+.table-header-column {
+  position: relative !important;
+  overflow: visible !important;
+  z-index: 999 !important;
+}
+
+/* EUI ButtonIcon styling improvements */
+.euiButtonIcon {
+  background-color: transparent !important;
+  border: none !important;
+}
+
+.euiButtonIcon:hover {
+  background-color: rgba(0, 107, 180, 0.1) !important;
+}
+
+/* Professional selection counter styling */
+.eui-textXS {
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  color: #006bb4 !important;
+}
+
+/* Improved checkbox styling in table rows */
+.kbnDocTableCell__dataField input[type="checkbox"] {
+  width: 16px !important;
+  height: 16px !important;
+  margin: 0 !important;
+  cursor: pointer !important;
+  accent-color: #006bb4 !important;
+}
+
+/* Download button styling improvements */
+.kbnDocTableCell__dataField button {
+  min-width: 24px !important;
+  min-height: 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 4px !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.kbnDocTableCell__dataField button:hover {
+  background-color: rgba(0, 107, 180, 0.1) !important;
+  color: #005A8B !important;
+}
+
+/* Prevent any potential interference with EUI components */
+.euiPopover *,
+.euiButton *,
+.euiButtonIcon *,
+.euiText * {
+  box-sizing: border-box !important;
+}
+
+/* Debug helper - uncomment to visualize overflow areas */
+/*
+.kbnDocTable th:last-child {
+  background-color: rgba(255, 0, 0, 0.1) !important;
+}
+
+.euiPopover__panel {
+  border: 2px solid red !important;
+}
+*/
+
+/* ISSUE #3 FIX: EUI Button Border Styling with Maximum Specificity */
+/* Target all possible EUI button combinations to remove borders */
+.kbnDocTable .euiButton,
+.kbnDocTable .euiButtonIcon,
+.kbnDocTable button,
+.kbnDocTable capture-download button,
+body .kbnDocTable .euiButton,
+body .kbnDocTable .euiButtonIcon,
+body .kbnDocTable button,
+html body .kbnDocTable .euiButton,
+html body .kbnDocTable .euiButtonIcon,
+html body .kbnDocTable button {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: none !important;
+}
+
+/* Target specific EUI button classes */
+.kbnDocTable .euiButton--fill,
+.kbnDocTable .euiButton--empty,
+.kbnDocTable .euiButton:hover,
+.kbnDocTable .euiButton:focus,
+.kbnDocTable .euiButtonIcon:hover,
+.kbnDocTable .euiButtonIcon:focus,
+body .kbnDocTable .euiButton--fill,
+body .kbnDocTable .euiButton--empty,
+body .kbnDocTable .euiButton:hover,
+body .kbnDocTable .euiButton:focus,
+body .kbnDocTable .euiButtonIcon:hover,
+body .kbnDocTable .euiButtonIcon:focus {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Target popover buttons specifically */
+.euiPopover__panel .euiButton,
+.euiPopover__panel .euiButton--fill,
+.euiPopover__panel .euiButton--empty,
+.euiPopover__panel .euiButton:hover,
+.euiPopover__panel .euiButton:focus,
+div[data-euipopover-panel] .euiButton,
+div[data-euipopover-panel] .euiButton:hover,
+div[data-euipopover-panel] .euiButton:focus {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Target all buttons in capture dropdown area */
+.kbnDocTable th:last-child button,
+.kbnDocTable th:last-child .euiButton,
+.kbnDocTable th:last-child .euiButtonIcon,
+th[data-test-subj="docTableHeaderField"]:last-child button,
+th[data-test-subj="docTableHeaderField"]:last-child .euiButton,
+th[data-test-subj="docTableHeaderField"]:last-child .euiButtonIcon {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: none !important;
+}
+
+/* Override any potential EUI default borders on all button states */
+.kbnDocTable button:active,
+.kbnDocTable button:visited,
+.kbnDocTable .euiButton:active,
+.kbnDocTable .euiButton:visited,
+.kbnDocTable .euiButtonIcon:active,
+.kbnDocTable .euiButtonIcon:visited {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
