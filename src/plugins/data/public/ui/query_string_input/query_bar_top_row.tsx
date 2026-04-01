@@ -478,7 +478,7 @@ function QueryBarTopRowUI(props: Props) {
   return (
     <EuiFlexGroup
       className={classes}
-      responsive={!!props.showDatePicker && cssLoaded}
+      responsive={false}
       gutterSize="s"
       justifyContent={cssLoaded ? 'flexEnd' : 'flexStart'}
       style={!cssLoaded ? { minHeight: '40px' } : undefined}

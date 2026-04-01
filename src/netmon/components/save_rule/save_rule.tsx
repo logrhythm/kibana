@@ -327,7 +327,7 @@ export const SaveRule = (props: SaveRuleProps) => {
         }
       >
         <EuiButton fill onClick={startSaveRule} disabled={disabledForLanguage}>
-          <div className={classes.buttonContent}>
+          <div>
             <span>Save Rule</span>
             {!!disabledForLanguage && <EuiIcon className={classes.infoIcon} type="iInCircle" />}
           </div>

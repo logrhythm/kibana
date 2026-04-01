@@ -62,7 +62,6 @@
   min-height: 40px;
   // Force consistent layout during CSS loading
   display: flex !important;
-  flex-direction: column !important;
 
   .euiFlexGroup {
     transition: justify-content 150ms ease-in-out;

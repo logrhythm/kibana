@@ -43,8 +43,31 @@
   }
 }
 
+// Force single row layout - disable responsive wrapping behavior
+.kbnQueryBar {
+  // Ensure flex items don't wrap to new lines
+  flex-wrap: nowrap !important;
+
+  // Prevent responsive reordering on small screens
+  .euiFlexItem {
+    // Prevent flex items from growing too large and forcing wraps
+    flex-shrink: 1;
+    min-width: 0; // Allows items to shrink below their natural size
+  }
+
+  // Override responsive behavior to maintain single row
+  &.euiFlexGroup--responsive {
+    flex-direction: row !important; // Force horizontal layout
+    flex-wrap: nowrap !important;   // Prevent wrapping
+  }
+}
+
 @include euiBreakpoint('xs', 's') {
   .kbnQueryBar--withDatePicker {
+    // Force horizontal layout even on small screens
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+
     > :first-child {
       // Change the order of the query bar and date picker so that the date picker is top and the query bar still aligns with filters
       order: 1;

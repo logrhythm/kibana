@@ -24,8 +24,6 @@
  */
 
 import React, { useEffect, useRef, useState } from 'react';
-import { makeStyles } from '@material-ui/styles';
-import _ from 'lodash';
 import {
   EuiButton,
   EuiCallOut,
@@ -39,7 +37,6 @@ import {
   EuiTextColor,
   EuiOverlayMask,
 } from '@elastic/eui';
-// @ts-ignore
 import { saveAs } from '@elastic/filesaver';
 import {
   FileDownloadStatus,
@@ -50,7 +47,7 @@ import { SessionFileDownloader } from '@logrhythm/nm-web-shared/services/session
 import { toastNotifications } from '../../services/notifications';
 import FileDownloadRow from './file_download_row';
 
-const useStyles = makeStyles({
+const modalStyles = {
   modal: {
     minWidth: '600px',
   },
@@ -59,7 +56,7 @@ const useStyles = makeStyles({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-});
+};
 
 export interface FileDownloadModalProps {
   downloadId: string;
@@ -69,8 +66,6 @@ export interface FileDownloadModalProps {
 
 const FileDownloadModal = (props: FileDownloadModalProps) => {
   const { downloadId, fileType, onClose } = props;
-
-  const classes = useStyles();
 
   const [downloadStatus, setDownloadStatus] = useState<FileDownloadStatus>({
     overall: 'loading',
@@ -99,6 +94,13 @@ const FileDownloadModal = (props: FileDownloadModalProps) => {
     );
 
     downloader.current.start();
+
+    // Cleanup function to prevent memory leaks
+    return () => {
+      if (downloader.current && !downloader.current.terminated) {
+        downloader.current.abort();
+      }
+    };
   }, [downloadId, fileType]);
 
   const handleClose = () => {
@@ -120,7 +122,7 @@ const FileDownloadModal = (props: FileDownloadModalProps) => {
 
   return (
     <EuiOverlayMask>
-      <EuiModal className={classes.modal} onClose={handleClose}>
+      <EuiModal style={modalStyles.modal} onClose={handleClose}>
         <EuiModalHeader>
           <EuiModalHeaderTitle>
             <EuiTextColor
@@ -159,7 +161,7 @@ const FileDownloadModal = (props: FileDownloadModalProps) => {
             </>
           )}
         </EuiModalBody>
-        <EuiModalFooter className={classes.footer}>
+        <EuiModalFooter style={modalStyles.footer}>
           <EuiCallOut
             title="Files may be incomplete, corrupted, or contain malware."
             color="warning"
