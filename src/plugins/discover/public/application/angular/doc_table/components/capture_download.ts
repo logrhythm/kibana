@@ -306,12 +306,9 @@ export const captureDownloadDirective = () => ({
           });
           window.dispatchEvent(event);
 
-          // Clear selections after successful download start
-          if (SelectedCaptureSessions && typeof SelectedCaptureSessions.reset === 'function') {
-            setTimeout(() => {
-              SelectedCaptureSessions.reset();
-            }, 500);
-          }
+          // Note: Do NOT reset selections here. Let them stay selected.
+          // User can manually clear or selections will clear on next action.
+          // Resetting causes header re-render cascade and makes it disappear.
         } else {
           // Show user-friendly error
           if (window.confirm) {
