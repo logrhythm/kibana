@@ -39,7 +39,7 @@
       "optionsJSON": "{\"hidePanelTitles\":false,\"useMargins\":true}", 
       "version": 1, 
       "kibanaSavedObjectMeta": {
-         "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\",\"time_zone\":\"America/Denver\"}}}}"
+         "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":\"\"}}"
       }
    }, 
    "updated_at": "2019-09-26T20:13:47.723Z"

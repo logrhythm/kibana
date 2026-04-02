@@ -49,7 +49,7 @@
       "optionsJSON": "{\"useMargins\":true,\"hidePanelTitles\":false}", 
       "version": 2, 
       "kibanaSavedObjectMeta": {
-         "searchSourceJSON": "{\"filter\":[{\"meta\":{\"alias\":\"Replayed Traffic\",\"negate\":false,\"type\":\"phrase\",\"key\":\"Replayed\",\"params\":{\"query\":true},\"disabled\":false,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"match\":{\"Replayed\":{\"query\":true,\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}}],\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true,\"time_zone\":\"America/Denver\"}},\"language\":\"lucene\"}}"
+         "searchSourceJSON": "{\"filter\":[{\"meta\":{\"alias\":\"Replayed Traffic\",\"negate\":false,\"type\":\"phrase\",\"key\":\"Replayed\",\"params\":{\"query\":true},\"disabled\":false,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"match\":{\"Replayed\":{\"query\":true,\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}}],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
       }
    }, 
    "updated_at": "2020-02-28T17:29:53.533Z"

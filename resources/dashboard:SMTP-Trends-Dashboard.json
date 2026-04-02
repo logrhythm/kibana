@@ -49,7 +49,7 @@
       "optionsJSON": "{\"hidePanelTitles\":false,\"useMargins\":true}", 
       "version": 3, 
       "kibanaSavedObjectMeta": {
-         "searchSourceJSON": "{\"filter\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":\"smtp sessions\",\"disabled\":false,\"key\":\"Application.keyword\",\"negate\":false,\"params\":{\"query\":\"smtp\"},\"type\":\"phrase\",\"value\":\"smtp\",\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"match\":{\"Application.keyword\":{\"query\":\"smtp\",\"type\":\"phrase\"}}}}],\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\",\"time_zone\":\"America/Denver\"}}}}"
+         "searchSourceJSON": "{\"filter\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":\"smtp sessions\",\"disabled\":false,\"key\":\"Application.keyword\",\"negate\":false,\"params\":{\"query\":\"smtp\"},\"type\":\"phrase\",\"value\":\"smtp\",\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"match\":{\"Application.keyword\":{\"query\":\"smtp\",\"type\":\"phrase\"}}}}],\"query\":{\"language\":\"lucene\",\"query\":\"\"}}"
       }
    }, 
    "updated_at": "2019-10-01T20:37:31.718Z"
