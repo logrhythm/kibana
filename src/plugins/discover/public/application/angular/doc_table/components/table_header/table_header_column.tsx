@@ -201,6 +201,15 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
   useEffect(() => {
     console.log('🎧 [EVENT LISTENER] Setting up global download event listener');
 
+    const consumePendingDownloadId = () => {
+      const pendingDownloadId = (window as any).__pendingPcapDownloadId;
+      if (pendingDownloadId) {
+        console.log('📦 [INDIVIDUAL DOWNLOAD] Consuming pending downloadID:', pendingDownloadId);
+        setDownloadId(pendingDownloadId);
+        (window as any).__pendingPcapDownloadId = '';
+      }
+    };
+
     const handleGlobalDownload = (event: CustomEvent) => {
       console.log('📡 [INDIVIDUAL DOWNLOAD] Global event received:', event);
       console.log('📡 [INDIVIDUAL DOWNLOAD] Event detail:', event.detail);
@@ -211,12 +220,14 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
       if (downloadID) {
         console.log('🎯 [INDIVIDUAL DOWNLOAD] Setting downloadId state - MODAL SHOULD APPEAR NOW!');
         setDownloadId(downloadID);
+        (window as any).__pendingPcapDownloadId = '';
       } else {
         console.warn('⚠️ [INDIVIDUAL DOWNLOAD] No downloadID in event detail');
       }
     };
 
     window.addEventListener('pcap-download-started', handleGlobalDownload as EventListener);
+    consumePendingDownloadId();
     console.log('✅ [EVENT LISTENER] Global event listener registered');
 
     return () => {
@@ -737,7 +748,6 @@ export function TableHeaderColumn({
       data-test-subj="docTableHeaderField"
       className="kbnDocTableHeader__field kbn-doc-table-header-cell table-header-column"
       style={tableHeaderStyle}
-      key={`header-${name}-${Date.now()}`} // Force unique key to prevent React from removing
     >
       <div
         style={{

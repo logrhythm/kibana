@@ -299,68 +299,9 @@ class SearchBarUI extends Component<SearchBarProps, State> {
       hasValidVisibility &&
       hasEuiStyles;
 
-    // Debug logging for production troubleshooting
-    if (process.env.NODE_ENV === 'production' && !isFullyLoaded) {
-      // eslint-disable-next-line no-console
-      console.debug('SearchBar CSS not fully loaded:', {
-        hasValidHeight,
-        hasValidPadding,
-        hasValidTransition,
-        hasWrapperMinHeight,
-        hasValidDisplay,
-        hasValidVisibility,
-        hasEuiStyles,
-        minHeight: styles.minHeight,
-        padding: styles.padding,
-        transition: styles.transition,
-        fontFamily: styles.fontFamily,
-      });
-    }
-
     return isFullyLoaded;
   };
 
-  private retryCssLoadingRecovery = (context: string = 'unknown') => {
-    if (this.cssRetryCount >= this.maxCssRetries) {
-      // eslint-disable-next-line no-console
-      console.warn('SearchBar CSS loading recovery max retries reached:', {
-        context,
-        retryCount: this.cssRetryCount,
-      });
-      this.setState({ cssLoadingState: 'failed' });
-      return;
-    }
-
-    if (!this.checkCSSLoaded()) {
-      this.cssRetryCount++;
-      this.setState({ cssLoadingState: 'loading' });
-      const backoffDelay = Math.min(100 * Math.pow(1.5, this.cssRetryCount - 1), 1000);
-
-      const timeout = setTimeout(() => {
-        // eslint-disable-next-line no-console
-        console.debug(
-          `SearchBar CSS retry ${this.cssRetryCount}/${this.maxCssRetries} (${context})`
-        );
-        this.forceUpdate();
-        this.setFilterBarHeight();
-
-        // Continue retrying if CSS still not loaded
-        setTimeout(() => {
-          if (!this.checkCSSLoaded() && this.cssRetryCount < this.maxCssRetries) {
-            this.retryCssLoadingRecovery('retry-chain');
-          } else if (this.checkCSSLoaded()) {
-            this.setState({ cssLoadingState: 'loaded' });
-          }
-        }, 50);
-      }, backoffDelay);
-
-      this.timeouts.push(timeout);
-    } else {
-      // CSS loaded successfully - reset retry count for future navigation
-      this.cssRetryCount = 0;
-      this.setState({ cssLoadingState: 'loaded' });
-    }
-  };
 
   public onSave = async (savedQueryMeta: SavedQueryMeta, saveAsNew = false) => {
     if (!this.state.query) return;
@@ -494,31 +435,11 @@ class SearchBarUI extends Component<SearchBarProps, State> {
     if (process.env.NODE_ENV === 'production') {
       // Reset retry count for new component mount
       this.cssRetryCount = 0;
-
-      // Initial check after mount
-      const timeout = setTimeout(() => {
-        this.retryCssLoadingRecovery('componentDidMount');
-      }, 100);
-      this.timeouts.push(timeout);
-
-      // Additional delayed check for complex SPA scenarios
-      const timeout2 = setTimeout(() => {
-        this.retryCssLoadingRecovery('componentDidMount-delayed');
-      }, 300);
-      this.timeouts.push(timeout2);
     }
   }
 
   public componentDidUpdate(prevProps: SearchBarProps) {
     if (this.filterBarRef) {
-      // Enhanced CSS Loading Recovery - Check if styles loaded properly after navigation
-      if (!this.checkCSSLoaded()) {
-        // Use the retry mechanism for better handling of production CSS loading
-        const timeout = setTimeout(() => {
-          this.retryCssLoadingRecovery('componentDidUpdate');
-        }, 50);
-        this.timeouts.push(timeout);
-      }
 
       // Re-establish observation if filters or visibility changed
       if (

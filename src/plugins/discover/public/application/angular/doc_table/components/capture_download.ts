@@ -295,6 +295,8 @@ export const captureDownloadDirective = () => ({
         const startDownloadRes = await startPcapDownload(sessions);
 
         if (startDownloadRes && startDownloadRes.data && startDownloadRes.data.downloadID) {
+          (window as any).__pendingPcapDownloadId = startDownloadRes.data.downloadID;
+
           // Emit global event to trigger FileDownloadModal
           const event = new CustomEvent('pcap-download-started', {
             detail: {
@@ -306,7 +308,9 @@ export const captureDownloadDirective = () => ({
 
           // Clear selections after successful download start
           if (SelectedCaptureSessions && typeof SelectedCaptureSessions.reset === 'function') {
-            SelectedCaptureSessions.reset();
+            setTimeout(() => {
+              SelectedCaptureSessions.reset();
+            }, 500);
           }
         } else {
           // Show user-friendly error
