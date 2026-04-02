@@ -16,3 +16,10 @@
 
 @import './dashboard_app';
 
+// Dashboard panel flyout positioning
+.euiFlyout--medium {
+  min-width: 424px;
+  width: 50vw;
+  top: 4rem;
+}
+
