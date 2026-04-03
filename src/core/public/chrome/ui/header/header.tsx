@@ -542,6 +542,9 @@ class HeaderUI extends Component<Props, State> {
                 min-width: 40px !important;
                 text-align: center !important;
               }
+              .navbar-right ul{
+              display: flex !important;
+              }
             `,
             }}
           />

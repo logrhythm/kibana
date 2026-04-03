@@ -185,57 +185,32 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
   const [selectedCount, setSelectedCount] = useState(0);
   const [downloadId, setDownloadId] = useState('');
 
-  // Debug downloadId state changes
-  useEffect(() => {
-    console.log('📋 [MODAL STATE] downloadId changed:', downloadId);
-    console.log('📋 [MODAL STATE] Modal should be visible:', !!downloadId);
-
-    if (downloadId) {
-      console.log('🎉 [MODAL STATE] Modal should be rendering now with downloadId:', downloadId);
-    } else {
-      console.log('🚫 [MODAL STATE] Modal should be hidden (empty downloadId)');
-    }
-  }, [downloadId]);
-
   // Global download event listener for individual row downloads
   useEffect(() => {
-    console.log('🎧 [EVENT LISTENER] Setting up global download event listener');
-
     const consumePendingDownloadId = () => {
       const pendingDownloadId = (window as any).__pendingPcapDownloadId;
       if (pendingDownloadId) {
-        console.log('📦 [INDIVIDUAL DOWNLOAD] Consuming pending downloadID:', pendingDownloadId);
         setDownloadId(pendingDownloadId);
         (window as any).__pendingPcapDownloadId = '';
       }
     };
 
     const handleGlobalDownload = (event: CustomEvent) => {
-      console.log('📡 [INDIVIDUAL DOWNLOAD] Global event received:', event);
-      console.log('📡 [INDIVIDUAL DOWNLOAD] Event detail:', event.detail);
-
       const { downloadID } = event.detail;
-      console.log(`📡 [INDIVIDUAL DOWNLOAD] Extracted downloadID: ${downloadID}`);
 
       if (downloadID) {
-        console.log('🎯 [INDIVIDUAL DOWNLOAD] Setting downloadId state - MODAL SHOULD APPEAR NOW!');
         setDownloadId(downloadID);
         (window as any).__pendingPcapDownloadId = '';
-      } else {
-        console.warn('⚠️ [INDIVIDUAL DOWNLOAD] No downloadID in event detail');
       }
     };
 
     window.addEventListener('pcap-download-started', handleGlobalDownload as EventListener);
     consumePendingDownloadId();
-    console.log('✅ [EVENT LISTENER] Global event listener registered');
 
     return () => {
-      console.log('🧹 [EVENT LISTENER] Cleaning up global event listener');
       window.removeEventListener('pcap-download-started', handleGlobalDownload as EventListener);
     };
   }, []);
-
 
   // Enhanced subscription fallback
   useEffect(() => {
@@ -259,31 +234,20 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
   }, []);
 
   const handleDownloadSelected = async () => {
-    console.log('🚀 [BULK DOWNLOAD] Starting bulk download process');
-
     try {
       const sessionCount = SelectedCaptureSessions.count();
-      console.log(`📊 [BULK DOWNLOAD] Session count: ${sessionCount}`);
 
       if (sessionCount === 0) {
-        console.warn('⚠️ [BULK DOWNLOAD] No sessions selected, showing alert');
-        alert('Please select at least one capture session to download.');
         return;
       }
 
       const sessions = SelectedCaptureSessions.getAll();
-      console.log('📦 [BULK DOWNLOAD] Sessions to download:', sessions);
       setIsPopoverOpen(false);
 
-      console.log('🔄 [BULK DOWNLOAD] Calling startPcapDownload API...');
       const startDownloadRes = await startPcapDownload(sessions);
-      console.log('📨 [BULK DOWNLOAD] API Response received:', startDownloadRes);
 
       if (startDownloadRes && startDownloadRes.data && startDownloadRes.data.downloadID) {
         const downloadID = startDownloadRes.data.downloadID;
-        console.log(`✅ [BULK DOWNLOAD] Valid downloadID received: ${downloadID}`);
-        console.log('🎯 [BULK DOWNLOAD] Setting downloadId state - MODAL SHOULD APPEAR NOW!');
-
         (window as any).__pendingPcapDownloadId = downloadID;
         setDownloadId(downloadID);
 
@@ -297,27 +261,8 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
 
         // Note: Do NOT reset selections. Let them stay selected.
         // Resetting causes header re-render cascade and makes it disappear.
-      } else {
-        console.error('❌ [BULK DOWNLOAD] Invalid API response structure:', {
-          hasResponse: !!startDownloadRes,
-          hasData: !!(startDownloadRes && startDownloadRes.data),
-          hasDownloadID: !!(startDownloadRes && startDownloadRes.data && startDownloadRes.data.downloadID),
-          fullResponse: startDownloadRes
-        });
-        alert('Download failed: Invalid server response. Please try again.');
       }
     } catch (err) {
-      console.error('💥 [BULK DOWNLOAD] Exception caught:', err);
-      console.error('💥 [BULK DOWNLOAD] Error details:', {
-        message: err.message,
-        stack: err.stack,
-        name: err.name
-      });
-      alert(
-        `Download failed: ${
-          err.message || 'Network error occurred'
-        }. Please check your connection and try again.`
-      );
       setIsPopoverOpen(false);
     }
   };
@@ -415,7 +360,7 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
           lineHeight: 1,
         }}
       >
-{selectedCount} selected
+        {selectedCount} selected
       </span>
     </button>
   );
