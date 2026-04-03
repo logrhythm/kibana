@@ -295,6 +295,8 @@ export const captureDownloadDirective = () => ({
         const startDownloadRes = await startPcapDownload(sessions);
 
         if (startDownloadRes && startDownloadRes.data && startDownloadRes.data.downloadID) {
+          (window as any).__pendingPcapDownloadId = startDownloadRes.data.downloadID;
+
           // Emit global event to trigger FileDownloadModal
           const event = new CustomEvent('pcap-download-started', {
             detail: {
@@ -304,10 +306,9 @@ export const captureDownloadDirective = () => ({
           });
           window.dispatchEvent(event);
 
-          // Clear selections after successful download start
-          if (SelectedCaptureSessions && typeof SelectedCaptureSessions.reset === 'function') {
-            SelectedCaptureSessions.reset();
-          }
+          // Note: Do NOT reset selections here. Let them stay selected.
+          // User can manually clear or selections will clear on next action.
+          // Resetting causes header re-render cascade and makes it disappear.
         } else {
           // Show user-friendly error
           if (window.confirm) {

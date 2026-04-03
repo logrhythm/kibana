@@ -27,7 +27,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { startPcapDownload, FileType } from '@logrhythm/nm-web-shared/services/session_files';
+import { startPcapDownload } from '@logrhythm/nm-web-shared/services/session_files';
 import { i18n } from '@kbn/i18n';
 import { EuiToolTip, EuiPopover, EuiButton } from '@elastic/eui';
 import FileDownloadModal from '../../../../../../../../netmon/components/file_download/file_download_modal';
@@ -201,6 +201,15 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
   useEffect(() => {
     console.log('🎧 [EVENT LISTENER] Setting up global download event listener');
 
+    const consumePendingDownloadId = () => {
+      const pendingDownloadId = (window as any).__pendingPcapDownloadId;
+      if (pendingDownloadId) {
+        console.log('📦 [INDIVIDUAL DOWNLOAD] Consuming pending downloadID:', pendingDownloadId);
+        setDownloadId(pendingDownloadId);
+        (window as any).__pendingPcapDownloadId = '';
+      }
+    };
+
     const handleGlobalDownload = (event: CustomEvent) => {
       console.log('📡 [INDIVIDUAL DOWNLOAD] Global event received:', event);
       console.log('📡 [INDIVIDUAL DOWNLOAD] Event detail:', event.detail);
@@ -211,12 +220,14 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
       if (downloadID) {
         console.log('🎯 [INDIVIDUAL DOWNLOAD] Setting downloadId state - MODAL SHOULD APPEAR NOW!');
         setDownloadId(downloadID);
+        (window as any).__pendingPcapDownloadId = '';
       } else {
         console.warn('⚠️ [INDIVIDUAL DOWNLOAD] No downloadID in event detail');
       }
     };
 
     window.addEventListener('pcap-download-started', handleGlobalDownload as EventListener);
+    consumePendingDownloadId();
     console.log('✅ [EVENT LISTENER] Global event listener registered');
 
     return () => {
@@ -225,92 +236,6 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
     };
   }, []);
 
-  // Enhanced polling solution with error handling to prevent crashes
-  useEffect(() => {
-    const pollInterval = setInterval(() => {
-      try {
-        if (SelectedCaptureSessions && typeof SelectedCaptureSessions.count === 'function') {
-          const count = SelectedCaptureSessions.count();
-          setSelectedCount(count);
-        }
-      } catch (error) {
-        // Polling error, continue with next poll
-      }
-    }, 100);
-
-    // Initial count
-    try {
-      if (SelectedCaptureSessions && typeof SelectedCaptureSessions.count === 'function') {
-        setSelectedCount(SelectedCaptureSessions.count());
-      }
-    } catch (error) {
-      // Error getting initial count
-    }
-
-    return () => {
-      if (pollInterval) clearInterval(pollInterval);
-    };
-  }, []);
-
-  // CRITICAL: Runtime header protection to prevent disappearing headers
-  useEffect(() => {
-    const protectHeaders = () => {
-      try {
-        const headerElement = document.querySelector('thead[kbn-table-header]');
-        if (headerElement) {
-          // NUCLEAR PROTECTION: Force visibility with maximum specificity
-          headerElement.style.setProperty('display', 'table-header-group', 'important');
-          headerElement.style.setProperty('visibility', 'visible', 'important');
-          headerElement.style.setProperty('opacity', '1', 'important');
-          headerElement.style.setProperty('position', 'relative', 'important');
-          headerElement.style.setProperty('z-index', '1000', 'important');
-          headerElement.style.setProperty('min-height', '40px', 'important');
-
-          // CRITICAL: If headers are empty, force re-render immediately
-          if (headerElement.children.length === 0) {
-            // Force immediate re-render - headers must never be empty
-            setSelectedCount((prev) => prev + 0.1); // Slight change to force re-render
-
-            // Also try to restore from parent component
-            setTimeout(() => {
-              setSelectedCount((prev) => Math.floor(prev)); // Clean up decimal
-            }, 50);
-          }
-        }
-      } catch (error) {
-        // Header protection error - silently continue
-      }
-    };
-
-    // Protect headers immediately
-    protectHeaders();
-
-    // Set up mutation observer to watch for DOM changes that might hide headers
-    const observer = new MutationObserver(() => {
-      protectHeaders();
-    });
-
-    const headerElement = document.querySelector('thead[kbn-table-header]');
-    if (headerElement) {
-      observer.observe(headerElement, {
-        attributes: true,
-        childList: true,
-        subtree: true,
-      });
-    }
-
-    // Protect on click events that might trigger changes
-    const handleClick = () => {
-      setTimeout(protectHeaders, 10);
-    };
-
-    document.addEventListener('click', handleClick);
-
-    return () => {
-      observer.disconnect();
-      document.removeEventListener('click', handleClick);
-    };
-  }, []);
 
   // Enhanced subscription fallback
   useEffect(() => {
@@ -359,26 +284,25 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
         console.log(`✅ [BULK DOWNLOAD] Valid downloadID received: ${downloadID}`);
         console.log('🎯 [BULK DOWNLOAD] Setting downloadId state - MODAL SHOULD APPEAR NOW!');
 
+        (window as any).__pendingPcapDownloadId = downloadID;
         setDownloadId(downloadID);
 
-        console.log('⏰ [BULK DOWNLOAD] Setting 500ms timer to reset selections');
-        // Reset selections with a small delay to prevent component unmounting
-        setTimeout(() => {
-          console.log('🔄 [BULK DOWNLOAD] Resetting SelectedCaptureSessions');
-          if (SelectedCaptureSessions && typeof SelectedCaptureSessions.reset === 'function') {
-            SelectedCaptureSessions.reset();
-          }
-        }, 500);
+        const event = new CustomEvent('pcap-download-started', {
+          detail: {
+            sessions,
+            downloadID,
+          },
+        });
+        window.dispatchEvent(event);
+
+        // Note: Do NOT reset selections. Let them stay selected.
+        // Resetting causes header re-render cascade and makes it disappear.
       } else {
         console.error('❌ [BULK DOWNLOAD] Invalid API response structure:', {
           hasResponse: !!startDownloadRes,
           hasData: !!(startDownloadRes && startDownloadRes.data),
-          hasDownloadID: !!(
-            startDownloadRes &&
-            startDownloadRes.data &&
-            startDownloadRes.data.downloadID
-          ),
-          fullResponse: startDownloadRes,
+          hasDownloadID: !!(startDownloadRes && startDownloadRes.data && startDownloadRes.data.downloadID),
+          fullResponse: startDownloadRes
         });
         alert('Download failed: Invalid server response. Please try again.');
       }
@@ -387,7 +311,7 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
       console.error('💥 [BULK DOWNLOAD] Error details:', {
         message: err.message,
         stack: err.stack,
-        name: err.name,
+        name: err.name
       });
       alert(
         `Download failed: ${
@@ -491,7 +415,7 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
           lineHeight: 1,
         }}
       >
-        {selectedCount} selected
+{selectedCount} selected
       </span>
     </button>
   );
@@ -567,7 +491,7 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
       {downloadId && (
         <FileDownloadModal
           downloadId={downloadId}
-          fileType={FileType.PCAP}
+          fileType={'pcap' as any}
           onClose={() => {
             setDownloadId('');
           }}
@@ -739,7 +663,6 @@ export function TableHeaderColumn({
       data-test-subj="docTableHeaderField"
       className="kbnDocTableHeader__field kbn-doc-table-header-cell table-header-column"
       style={tableHeaderStyle}
-      key={`header-${name}-${Date.now()}`} // Force unique key to prevent React from removing
     >
       <div
         style={{
