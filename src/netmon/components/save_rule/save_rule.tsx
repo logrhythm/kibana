@@ -45,6 +45,7 @@ import {
   saveQueryRule,
   QueryRule,
 } from '@logrhythm/nm-web-shared/services/query_rules';
+import { preprocessQuery } from '../../utils/query_preprocessing';
 import { SaveRuleForm, SaveRuleFormDataValidation } from './save_rule_form';
 
 const useStyles = makeStyles({
@@ -179,7 +180,9 @@ export const SaveRule = (props: SaveRuleProps) => {
 
   const startSaveRule = async () => {
     try {
-      const newQuery = await convertQuery(query);
+      // Preprocess query to ensure Lucene compatibility (simple terms become wildcards)
+      const preprocessedQuery = preprocessQuery(query);
+      const newQuery = await convertQuery(preprocessedQuery);
       dispatch({ type: 'START_SAVE_RULE', query: newQuery });
     } catch (err) {
       console.error( // eslint-disable-line
@@ -211,7 +214,9 @@ export const SaveRule = (props: SaveRuleProps) => {
     dispatch({ type: 'LOOKUP_START' });
 
     try {
-      const newQuery = await convertQuery(saveRuleData.query);
+      // Preprocess query to ensure Lucene compatibility (simple terms become wildcards)
+      const preprocessedQuery = preprocessQuery(saveRuleData.query);
+      const newQuery = await convertQuery(preprocessedQuery);
       saveRuleData.query = newQuery;
       dispatch({ type: 'UPDATE_RULE_DATA', ruleData: saveRuleData });
     } catch (err) {
