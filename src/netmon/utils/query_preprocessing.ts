@@ -118,9 +118,9 @@ export function preprocessQuery(query: string): string {
     return query; // Preserve original formatting
   }
 
-  // Simple term - wrap with wildcards for valid Lucene syntax
+  // Simple term - add leading wildcard for prefix matching
   // This prevents server errors while maintaining search intent
-  return `*${trimmed}*`;
+  return `*${trimmed}`;
 }
 
 /**
@@ -128,11 +128,11 @@ export function preprocessQuery(query: string): string {
  * Used for validation and debugging
  */
 export const TEST_CASES = [
-  // Simple terms (should be wrapped)
-  { input: 'http', expected: '*http*', description: 'Simple term' },
-  { input: 'ssd', expected: '*ssd*', description: 'Simple term' },
-  { input: 'tcp', expected: '*tcp*', description: 'Simple term' },
-  { input: '  error  ', expected: '*error*', description: 'Simple term with whitespace' },
+  // Simple terms (should have leading wildcard only)
+  { input: 'http', expected: '*http', description: 'Simple term' },
+  { input: 'ssd', expected: '*ssd', description: 'Simple term' },
+  { input: 'tcp', expected: '*tcp', description: 'Simple term' },
+  { input: '  error  ', expected: '*error', description: 'Simple term with whitespace' },
 
   // Already valid Lucene (should be preserved exactly)
   { input: '*http*', expected: '*http*', description: 'Already wildcarded' },
