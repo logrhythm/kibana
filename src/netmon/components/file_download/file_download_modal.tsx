@@ -60,8 +60,7 @@ const modalStyles: Record<
     display: 'flex',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    gap: '12px',
-    flexWrap: 'wrap',
+    gap: '16rem',
   },
   footerCallout: {
     flex: '1 1 420px',
