@@ -36,6 +36,7 @@ import {
   EuiProgress,
   EuiTextColor,
   EuiOverlayMask,
+  EuiPortal,
 } from '@elastic/eui';
 import { saveAs } from '@elastic/filesaver';
 import {
@@ -47,14 +48,26 @@ import { SessionFileDownloader } from '@logrhythm/nm-web-shared/services/session
 import { toastNotifications } from '../../services/notifications';
 import FileDownloadRow from './file_download_row';
 
-const modalStyles = {
+const modalStyles: Record<
+  'modal' | 'footer' | 'footerCallout' | 'footerButton',
+  React.CSSProperties
+> = {
   modal: {
-    minWidth: '600px',
+    width: 'min(900px, 90vw)',
+    minWidth: '320px',
   },
   footer: {
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
+    gap: '12px',
+    flexWrap: 'wrap',
+  },
+  footerCallout: {
+    flex: '1 1 420px',
+  },
+  footerButton: {
+    flex: '0 0 auto',
   },
 };
 
@@ -121,67 +134,73 @@ const FileDownloadModal = (props: FileDownloadModalProps) => {
   }
 
   return (
-    <EuiOverlayMask>
-      <EuiModal style={modalStyles.modal} onClose={handleClose}>
-        <EuiModalHeader>
-          <EuiModalHeaderTitle>
-            <EuiTextColor
-              color={
-                downloadStatus.overall === 'error' || downloadStatus.overall === 'partial-success'
-                  ? 'danger'
-                  : 'default'
-              }
-            >
-              {downloadStatus.overall === 'loading' && 'Downloading Files'}
-              {downloadStatus.overall === 'partial-success' && 'Partial Success'}
-              {downloadStatus.overall === 'success' && 'Success'}
-              {downloadStatus.overall === 'error' && 'Error'}
-              {downloadStatus.overall === 'aborted' && 'Cancelled'}
-            </EuiTextColor>
-          </EuiModalHeaderTitle>
-        </EuiModalHeader>
-        <EuiModalBody>
-          {downloadStatus.overall === 'aborted' && (
-            <EuiTextColor color="warning">Lookup was cancelled.</EuiTextColor>
-          )}
-          {downloadStatus.overall !== 'aborted' && fileNames.length === 0 && (
-            <EuiProgress size="xs" color="primary" />
-          )}
-          {downloadStatus.overall !== 'aborted' && fileNames.length > 0 && (
-            <>
-              <EuiHorizontalRule />
-              {fileNames.sort().map((f) => (
-                <FileDownloadRow
-                  key={`file_${f}`}
-                  overallStatus={downloadStatus.overall as DownloadStatus}
-                  fileName={fileType === 'pcap' ? `${f}.pcap` : f}
-                  fileStatus={downloadStatus.fileStatuses[f]}
-                />
-              ))}
-            </>
-          )}
-        </EuiModalBody>
-        <EuiModalFooter style={modalStyles.footer}>
-          <EuiCallOut
-            title="Files may be incomplete, corrupted, or contain malware."
-            color="warning"
-            size="s"
-            iconType="alert"
-          />
-          {downloadStatus.overall === 'loading' && (
-            <EuiButton
+    <EuiPortal>
+      <EuiOverlayMask>
+        <EuiModal style={modalStyles.modal} onClose={handleClose}>
+          <EuiModalHeader>
+            <EuiModalHeaderTitle>
+              <EuiTextColor
+                color={
+                  downloadStatus.overall === 'error' || downloadStatus.overall === 'partial-success'
+                    ? 'danger'
+                    : 'default'
+                }
+              >
+                {downloadStatus.overall === 'loading' && 'Downloading Files'}
+                {downloadStatus.overall === 'partial-success' && 'Partial Success'}
+                {downloadStatus.overall === 'success' && 'Success'}
+                {downloadStatus.overall === 'error' && 'Error'}
+                {downloadStatus.overall === 'aborted' && 'Cancelled'}
+              </EuiTextColor>
+            </EuiModalHeaderTitle>
+          </EuiModalHeader>
+          <EuiModalBody>
+            {downloadStatus.overall === 'aborted' && (
+              <EuiTextColor color="warning">Lookup was cancelled.</EuiTextColor>
+            )}
+            {downloadStatus.overall !== 'aborted' && fileNames.length === 0 && (
+              <EuiProgress size="xs" color="primary" />
+            )}
+            {downloadStatus.overall !== 'aborted' && fileNames.length > 0 && (
+              <>
+                <EuiHorizontalRule />
+                {fileNames.sort().map((f) => (
+                  <FileDownloadRow
+                    key={`file_${f}`}
+                    overallStatus={downloadStatus.overall as DownloadStatus}
+                    fileName={fileType === 'pcap' ? `${f}.pcap` : f}
+                    fileStatus={downloadStatus.fileStatuses[f]}
+                  />
+                ))}
+              </>
+            )}
+          </EuiModalBody>
+          <EuiModalFooter style={modalStyles.footer}>
+            <EuiCallOut
+              style={modalStyles.footerCallout}
+              title="Files may be incomplete, corrupted, or contain malware."
               color="warning"
-              onClick={() => downloader.current && downloader.current.abort()}
-            >
-              Cancel Download
-            </EuiButton>
-          )}
-          {downloadStatus.overall !== 'loading' && (
-            <EuiButton onClick={handleClose}>Close</EuiButton>
-          )}
-        </EuiModalFooter>
-      </EuiModal>
-    </EuiOverlayMask>
+              size="s"
+              iconType="alert"
+            />
+            {downloadStatus.overall === 'loading' && (
+              <EuiButton
+                style={modalStyles.footerButton}
+                color="warning"
+                onClick={() => downloader.current && downloader.current.abort()}
+              >
+                Cancel Download
+              </EuiButton>
+            )}
+            {downloadStatus.overall !== 'loading' && (
+              <EuiButton style={modalStyles.footerButton} onClick={handleClose}>
+                Close
+              </EuiButton>
+            )}
+          </EuiModalFooter>
+        </EuiModal>
+      </EuiOverlayMask>
+    </EuiPortal>
   );
 };
 
