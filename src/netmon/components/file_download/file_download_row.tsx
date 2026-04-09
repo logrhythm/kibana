@@ -1,23 +1,48 @@
 /*
+ * Licensed to Elasticsearch B.V. under one or more contributor
+ * license agreements. See the NOTICE file distributed with
+ * this work for additional information regarding copyright
+ * ownership. Elasticsearch B.V. licenses this file to you under
+ * the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+/*
  * Copyright 2020 LogRhythm, Inc
  * Licensed under the LogRhythm Global End User License Agreement,
  * which can be found through this page: https://logrhythm.com/about/logrhythm-terms-and-conditions/
  */
 
 import React from 'react';
-import classnames from 'classnames';
-import { makeStyles } from '@material-ui/styles';
-import _ from 'lodash';
 import { EuiHorizontalRule, EuiIcon, EuiProgress, EuiTextColor, EuiToolTip } from '@elastic/eui';
-// @ts-ignore
-import { saveAs } from '@elastic/filesaver';
 import { SingleFileStatus, DownloadStatus } from '@logrhythm/nm-web-shared/services/session_files';
 
-const useStyles = makeStyles({
+const rowStyles: Record<
+  | 'fileDownloadItem'
+  | 'tooltip'
+  | 'infoIcon'
+  | 'fileDownloadText'
+  | 'fileDownloadProgress'
+  | 'progressOngoingText'
+  | 'progressText'
+  | 'statusIcon',
+  React.CSSProperties
+> = {
   fileDownloadItem: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: '24px',
   },
   tooltip: {
     cursor: 'pointer',
@@ -26,14 +51,15 @@ const useStyles = makeStyles({
     marginLeft: '2px',
   },
   fileDownloadText: {
-    width: '337.5px',
+    flex: '1 1 60%',
+    minWidth: 0,
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
   },
   fileDownloadProgress: {
-    width: '237.5px',
-    marginLeft: '25px',
+    flex: '1 1 40%',
+    minWidth: '180px',
   },
   progressOngoingText: {
     marginBottom: '1em',
@@ -45,7 +71,7 @@ const useStyles = makeStyles({
   statusIcon: {
     marginRight: '12px',
   },
-});
+};
 
 export interface FileDownloadRowProps {
   overallStatus: DownloadStatus;
@@ -56,14 +82,12 @@ export interface FileDownloadRowProps {
 const FileDownloadRow = (props: FileDownloadRowProps) => {
   const { overallStatus, fileName, fileStatus } = props;
 
-  const classes = useStyles();
-
   const renderFileName = () => (
     <EuiTextColor color={fileStatus.status === 'failure' ? 'danger' : 'default'}>
       {fileName.length < 42 && fileName}
       {fileName.length >= 42 && (
         <EuiToolTip content={fileName}>
-          <div className={classes.tooltip}>{`${fileName.substr(0, 38)}...`}</div>
+          <div style={rowStyles.tooltip}>{`${fileName.substring(0, 38)}...`}</div>
         </EuiToolTip>
       )}
     </EuiTextColor>
@@ -78,7 +102,7 @@ const FileDownloadRow = (props: FileDownloadRowProps) => {
           <EuiProgress value={0} max={100} size="xs" color="primary" />
         ) : (
           <>
-            <div className={classes.progressOngoingText}>
+            <div style={rowStyles.progressOngoingText}>
               {fileStatus.status === 'locating' && 'Locating'}
               {fileStatus.status === 'waiting' && 'Waiting'}
               {fileStatus.status === 'downloading' &&
@@ -95,19 +119,19 @@ const FileDownloadRow = (props: FileDownloadRowProps) => {
       case 'failure':
         return (
           <EuiTextColor
-            className={classes.progressText}
+            style={rowStyles.progressText}
             color={fileStatus.status === 'failure' ? 'danger' : 'default'}
           >
             <EuiIcon
-              className={classes.statusIcon}
+              style={rowStyles.statusIcon}
               type={fileStatus.status === 'success' ? 'check' : 'cross'}
             />
             {fileStatus.status === 'success' && <div>Success</div>}
             {fileStatus.status === 'failure' && (
               <EuiToolTip content={fileStatus.message}>
-                <div className={classes.tooltip}>
+                <div style={rowStyles.tooltip}>
                   Error
-                  <EuiIcon className={classes.infoIcon} type="iInCircle" />
+                  <EuiIcon style={rowStyles.infoIcon} type="iInCircle" />
                 </div>
               </EuiToolTip>
             )}
@@ -118,11 +142,11 @@ const FileDownloadRow = (props: FileDownloadRowProps) => {
 
   return (
     <React.Fragment>
-      <div className={classes.fileDownloadItem}>
-        <span className={classnames(classes.fileDownloadText, 'fileDownloadText')}>
+      <div style={rowStyles.fileDownloadItem}>
+        <span style={rowStyles.fileDownloadText} className="fileDownloadText">
           {renderFileName()}
         </span>
-        <span className={classes.fileDownloadProgress}>{renderFileStatus()}</span>
+        <span style={rowStyles.fileDownloadProgress}>{renderFileStatus()}</span>
       </div>
       <EuiHorizontalRule />
     </React.Fragment>
