@@ -60,6 +60,13 @@ const useStyles = makeStyles(
 const LogRhythmNavbar = () => {
   const classes = useStyles();
 
+  const fallbackAuthState: AuthContextValue = {
+    licensed: true,
+    role: 'admin',
+    username: 'system',
+    timeToResetPass: false,
+  } as AuthContextValue;
+
   const [authState, setAuthState] = useState<AuthContextValue>(undefined);
 
   const checkingToken = useSessionSync('token');
@@ -84,12 +91,8 @@ const LogRhythmNavbar = () => {
     return unsub;
   }, [checkingToken, checkingNotifications]);
 
-  if (authState === undefined) {
-    return null;
-  }
-
   return (
-    <AuthContext.Provider value={[authState, setAuthState]}>
+    <AuthContext.Provider value={[authState ?? fallbackAuthState, setAuthState]}>
       <BlockingProcessContext.Provider value={blockingProcessContextState}>
         <SnackbarProvider
           maxSnack={7}

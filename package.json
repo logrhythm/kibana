@@ -87,6 +87,7 @@
     "**/minimist": "^1.2.5",
     "**/node-jose/node-forge": "^0.10.0",
     "**/prismjs": "1.22.0",
+    "**/chroma-js": "1.4.1",
     "**/react-syntax-highlighter": "^15.3.1",
     "**/react-syntax-highlighter/**/highlight.js": "^10.4.1",
     "**/@types/babel__traverse": "7.0.6",

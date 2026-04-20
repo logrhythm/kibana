@@ -3119,7 +3119,52 @@
   dependencies:
     "@octokit/openapi-types" "^12.11.0"
 
-"@opentelemetry/api-metrics@npm:lodash@4.17.20", "@opentelemetry/api@npm:lodash@4.17.20", "@opentelemetry/auto-instrumentations-node@npm:lodash@4.17.20", "@opentelemetry/core@npm:lodash@4.17.20", "@opentelemetry/instrumentation@npm:lodash@4.17.20", "@opentelemetry/node@npm:lodash@4.17.20", "@opentelemetry/resources@npm:lodash@4.17.20", "@opentelemetry/sdk-metrics@npm:lodash@4.17.20", "@opentelemetry/semantic-conventions@npm:lodash@4.17.20", "@opentelemetry/tracing@npm:lodash@4.17.20":
+"@opentelemetry/api-metrics@npm:lodash@4.17.20":
+  version "4.17.20"
+  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
+  integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
+
+"@opentelemetry/api@npm:lodash@4.17.20":
+  version "4.17.20"
+  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
+  integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
+
+"@opentelemetry/auto-instrumentations-node@npm:lodash@4.17.20":
+  version "4.17.20"
+  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
+  integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
+
+"@opentelemetry/core@npm:lodash@4.17.20":
+  version "4.17.20"
+  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
+  integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
+
+"@opentelemetry/instrumentation@npm:lodash@4.17.20":
+  version "4.17.20"
+  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
+  integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
+
+"@opentelemetry/node@npm:lodash@4.17.20":
+  version "4.17.20"
+  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
+  integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
+
+"@opentelemetry/resources@npm:lodash@4.17.20":
+  version "4.17.20"
+  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
+  integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
+
+"@opentelemetry/sdk-metrics@npm:lodash@4.17.20":
+  version "4.17.20"
+  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
+  integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
+
+"@opentelemetry/semantic-conventions@npm:lodash@4.17.20":
+  version "4.17.20"
+  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
+  integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
+
+"@opentelemetry/tracing@npm:lodash@4.17.20":
   version "4.17.20"
   resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
   integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
@@ -9502,15 +9547,10 @@ chownr@^2.0.0:
   resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/chownr/-/chownr-2.0.0.tgz#15bfbe53d2eab4cf70f18a8cd68ebe5b3cb1dece"
   integrity sha512-bIomtDF5KGpdogkLd9VspvFzk9KfpyyGlS8YFVZl7TGPBHL5snIOnxeshwVgPteQ9b4Eydl+pVbIyE1DcvCWgQ==
 
-chroma-js@^1.4.1:
+chroma-js@1.4.1, chroma-js@^1.4.1, chroma-js@^2.0.4, chroma-js@^2.1.0:
   version "1.4.1"
-  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/chroma-js/-/chroma-js-1.4.1.tgz#eb2d9c4d1ff24616be84b35119f4d26f8205f134"
+  resolved "https://registry.yarnpkg.com/chroma-js/-/chroma-js-1.4.1.tgz#eb2d9c4d1ff24616be84b35119f4d26f8205f134"
   integrity sha512-jTwQiT859RTFN/vIf7s+Vl/Z2LcMrvMv3WUFmd/4u76AdlFC0NTNgqEEFPcRiHmAswPsMiQEDZLM8vX8qXpZNQ==
-
-chroma-js@^2.0.4, chroma-js@^2.1.0:
-  version "2.6.0"
-  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/chroma-js/-/chroma-js-2.6.0.tgz#578743dd359698a75067a19fa5571dec54d0b70b"
-  integrity sha512-BLHvCB9s8Z1EV4ethr6xnkl/P2YRFOGqfgvuMG/MyCbZPrTA+NeiByY6XvgF0zP4/2deU2CXnWyMa3zu1LqQ3A==
 
 chrome-trace-event@^1.0.2:
   version "1.0.4"

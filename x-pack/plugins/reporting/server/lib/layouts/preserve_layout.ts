@@ -7,13 +7,13 @@
 import path from 'path';
 import {
   getDefaultLayoutSelectors,
-  Layout,
   LayoutSelectorDictionary,
   LayoutTypes,
   PageSizeParams,
   Size,
   LayoutInstance,
 } from './';
+import { Layout } from './layout';
 
 // We use a zoom of two to bump up the resolution of the screenshot a bit.
 const ZOOM: number = 2;
