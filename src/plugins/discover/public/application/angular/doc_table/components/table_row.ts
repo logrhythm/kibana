@@ -84,16 +84,20 @@ export function createTableRowDirective($compile: ng.ICompileService) {
         // add/remove $details children
         ///
 
-        $detailsTr.toggle($scope.open);
-
         if (!$scope.open) {
           // close the child scope if it exists
-          $detailsScope.$destroy();
+          if ($detailsScope) {
+            $detailsScope.$destroy();
+          }
+          // empty the details row and hide it
+          $detailsTr.empty();
+          $detailsTr.hide();
           // no need to go any further
           return;
-        } else {
-          $detailsScope = $scope.$new();
         }
+
+        // Opening the details row
+        $detailsScope = $scope.$new();
 
         // empty the details and rebuild it
         $detailsTr.html(detailsHtml);
@@ -102,6 +106,9 @@ export function createTableRowDirective($compile: ng.ICompileService) {
         $detailsScope.uriEncodedId = encodeURIComponent($detailsScope.hit._id);
 
         $compile($detailsTr)($detailsScope);
+
+        // Show the details row
+        $detailsTr.show();
       };
 
       $scope.$watchMulti(['indexPattern.timeFieldName', 'row.highlight', '[]columns'], () => {
