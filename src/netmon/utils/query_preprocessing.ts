@@ -50,9 +50,8 @@ function isValidLuceneExpression(term: string): boolean {
     return true;
   }
 
-  // Field queries (field:value) — must have a non-empty value after the colon
-  // Rejects malformed patterns like "test:" or "application :" which cause parsing errors
-  if (/\w+\s*:\s*\S/.test(trimmed)) {
+  // Field queries (field:value)
+  if (/\w+:/.test(trimmed)) {
     return true;
   }
 
@@ -159,15 +158,6 @@ export const TEST_CASES = [
   { input: '', expected: '', description: 'Empty string' },
   { input: '   ', expected: '', description: 'Whitespace only' },
   { input: 'host?', expected: 'host?', description: 'Question mark wildcard' },
-
-  // Malformed field queries — no value after colon, treated as simple terms to avoid parsing errors
-  { input: 'test:', expected: 'test:*', description: 'Trailing colon — malformed field query' },
-  {
-    input: 'application :',
-    expected: 'application :*',
-    description: 'Space before colon — malformed field query',
-  },
-  { input: 'src_ip:', expected: 'src_ip:*', description: 'Field name with no value' },
 ];
 
 /**

@@ -26,26 +26,6 @@ import { toMountPoint } from '../../../../kibana_react/public';
 import { getNotifications } from '../../services';
 import { SearchRequest } from '..';
 
-// Shard failure reason types that indicate a user query syntax problem
-const QUERY_PARSING_ERROR_TYPES = [
-  'parsing_exception',
-  'query_shard_exception',
-  'query_parsing_exception',
-];
-
-function isQueryParsingError(response: SearchResponse<any>): boolean {
-  const failures: any[] = response._shards?.failures ?? [];
-  return failures.some(
-    (f) =>
-      QUERY_PARSING_ERROR_TYPES.includes(f?.reason?.type) ||
-      QUERY_PARSING_ERROR_TYPES.includes(f?.reason?.caused_by?.type)
-  );
-}
-
-// Prevents the "Invalid search query" toast from appearing multiple times when
-// a dashboard fires one search per panel and all panels receive the same error.
-let queryParsingToastVisible = false;
-
 export function handleResponse(request: SearchRequest, response: SearchResponse<any>) {
   if (response.timed_out) {
     getNotifications().toasts.addWarning({
@@ -56,63 +36,29 @@ export function handleResponse(request: SearchRequest, response: SearchResponse<
   }
 
   if (response._shards && response._shards.failed) {
-    if (isQueryParsingError(response)) {
-      // Show a user-friendly message when the failure is caused by invalid query syntax.
-      // Guard with a flag so that a dashboard with many panels only shows this once.
-      if (!queryParsingToastVisible) {
-        queryParsingToastVisible = true;
-        const toast = getNotifications().toasts.addWarning({
-          title: i18n.translate('data.search.searchSource.fetch.queryParsingErrorTitle', {
-            defaultMessage: 'Invalid search query',
-          }),
-          text: toMountPoint(
-            <>
-              {i18n.translate('data.search.searchSource.fetch.queryParsingErrorDescription', {
-                defaultMessage:
-                  'Your search query contains unsupported syntax. Please check your search terms and try again.',
-              })}
-            </>
-          ),
-        });
-        // Reset the flag once the toast is dismissed (removed from the list) so that
-        // a subsequent invalid search will show the toast again.
-        const sub = getNotifications()
-          .toasts.get$()
-          .subscribe((toasts) => {
-            if (!toasts.find((t) => t.id === toast.id)) {
-              queryParsingToastVisible = false;
-              sub.unsubscribe();
-            }
-          });
+    const title = i18n.translate('data.search.searchSource.fetch.shardsFailedNotificationMessage', {
+      defaultMessage: '{shardsFailed} of {shardsTotal} shards failed',
+      values: {
+        shardsFailed: response._shards.failed,
+        shardsTotal: response._shards.total,
+      },
+    });
+    const description = i18n.translate(
+      'data.search.searchSource.fetch.shardsFailedNotificationDescription',
+      {
+        defaultMessage: 'The data you are seeing might be incomplete or wrong.',
       }
-    } else {
-      const title = i18n.translate(
-        'data.search.searchSource.fetch.shardsFailedNotificationMessage',
-        {
-          defaultMessage: '{shardsFailed} of {shardsTotal} shards failed',
-          values: {
-            shardsFailed: response._shards.failed,
-            shardsTotal: response._shards.total,
-          },
-        }
-      );
-      const description = i18n.translate(
-        'data.search.searchSource.fetch.shardsFailedNotificationDescription',
-        {
-          defaultMessage: 'The data you are seeing might be incomplete or wrong.',
-        }
-      );
+    );
 
-      const text = toMountPoint(
-        <>
-          {description}
-          <EuiSpacer size="s" />
-          <ShardFailureOpenModalButton request={request.body} response={response} title={title} />
-        </>
-      );
+    const text = toMountPoint(
+      <>
+        {description}
+        <EuiSpacer size="s" />
+        <ShardFailureOpenModalButton request={request.body} response={response} title={title} />
+      </>
+    );
 
-      getNotifications().toasts.addWarning({ title, text });
-    }
+    getNotifications().toasts.addWarning({ title, text });
   }
 
   return response;
