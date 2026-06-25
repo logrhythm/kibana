@@ -50,6 +50,7 @@ import {
 import { SEARCH_EMBEDDABLE_TYPE } from './constants';
 import { SavedSearch } from '../..';
 import { SAMPLE_SIZE_SETTING, SORT_DEFAULT_ORDER_SETTING } from '../../../common';
+import { showInvalidQueryToast } from '../../../../data/public';
 
 interface SearchScope extends ng.IScope {
   columns?: string[];
@@ -341,7 +342,30 @@ export class SearchEmbeddable
         this.searchScope!.totalHitCount = resp.hits.total;
       });
     } catch (error) {
-      this.updateOutput({ loading: false, error });
+      // Check whether this is a query syntax error from ES (search_phase_execution_exception).
+      // The raw HttpFetchError carries the ES error object in error.body.attributes.error.
+      const QUERY_ERROR_TYPES = [
+        'search_phase_execution_exception',
+        'parsing_exception',
+        'query_shard_exception',
+        'query_parsing_exception',
+      ];
+      const attrError = error?.body?.attributes?.error;
+      const esType =
+        (typeof attrError === 'object' ? attrError?.type : undefined) || attrError?.caused_by?.type;
+      const msg = error?.message ?? '';
+      const isQueryError =
+        error?.name === 'QuerySyntaxError' ||
+        QUERY_ERROR_TYPES.includes(esType) ||
+        msg.includes('search_phase_execution_exception') ||
+        msg.includes('all shards failed');
+
+      if (isQueryError) {
+        showInvalidQueryToast();
+        this.updateOutput({ loading: false, error: undefined });
+      } else {
+        this.updateOutput({ loading: false, error });
+      }
     } finally {
       // CRITICAL: Reset fetching flag to allow future requests
       this.isFetching = false;

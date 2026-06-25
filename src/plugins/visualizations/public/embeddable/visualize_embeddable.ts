@@ -47,6 +47,7 @@ import {
 import { buildPipeline } from '../legacy/build_pipeline';
 import { Vis, SerializedVis } from '../vis';
 import { getExpressions, getUiActions } from '../services';
+import { showInvalidQueryToast } from '../../../../plugins/data/public';
 import { VIS_EVENT_TO_TRIGGER } from './events';
 import { VisualizeEmbeddableFactoryDeps } from './visualize_embeddable_factory';
 import { TriggerId } from '../../../ui_actions/public';
@@ -94,7 +95,8 @@ type ExpressionLoader = InstanceType<ExpressionsStart['ExpressionLoader']>;
 
 export class VisualizeEmbeddable
   extends Embeddable<VisualizeInput, VisualizeOutput>
-  implements ReferenceOrValueEmbeddable<VisualizeByValueInput, VisualizeByReferenceInput> {
+  implements ReferenceOrValueEmbeddable<VisualizeByValueInput, VisualizeByReferenceInput>
+{
   private handler?: ExpressionLoader;
   private timefilter: TimefilterContract;
   private timeRange?: TimeRange;
@@ -271,6 +273,37 @@ export class VisualizeEmbeddable
       this.abortController.abort();
     }
     this.renderComplete.dispatchError();
+
+    // Show the user-friendly toast for query syntax errors.
+    // This path bypasses renderErrorHandler (custom onRenderError is set), so we
+    // must call showInvalidQueryToast() here. The deduplication flag ensures only
+    // one toast appears even when multiple panels fire simultaneously.
+    //
+    // The error object arriving here is the inner { message, name, type } from
+    // execution_contract.getData() — message contains the full ES error string
+    // e.g. "[esaggs] > [search_phase_execution_exception]: all shards failed"
+    const QUERY_ERROR_TYPES = [
+      'search_phase_execution_exception',
+      'parsing_exception',
+      'query_shard_exception',
+      'query_parsing_exception',
+    ];
+    const msg = error.message ?? '';
+    const errType = (error as any).type ?? '';
+    if (
+      error.name === 'QuerySyntaxError' ||
+      QUERY_ERROR_TYPES.includes(errType) ||
+      msg.includes('search_phase_execution_exception') ||
+      msg.includes('all shards failed') ||
+      msg.includes('parsing_exception') ||
+      msg.includes('query_shard_exception')
+    ) {
+      showInvalidQueryToast();
+      // Pass undefined so EmbeddableErrorLabel renders nothing for this panel
+      this.updateOutput({ loading: false, error: undefined });
+      return;
+    }
+
     this.updateOutput({ loading: false, error });
   };
 

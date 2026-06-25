@@ -50,9 +50,24 @@ const addLogging = (client: Client, logger: Logger, logQueries: boolean) => {
         return; // Skip logging abort errors
       }
 
+      const esErrorType = event?.body?.error?.type;
+      const esErrorReason = event?.body?.error?.reason ?? '';
+
+      // LOGRHYTHM FIX: Suppress log spam from invalid user queries — these are expected user
+      // input errors, not infrastructure problems. The UI toast handles user communication.
+      if (
+        esErrorType === 'search_phase_execution_exception' ||
+        esErrorType === 'parsing_exception' ||
+        esErrorType === 'query_shard_exception' ||
+        esErrorType === 'query_parsing_exception' ||
+        esErrorReason.includes('all shards failed')
+      ) {
+        return;
+      }
+
       const errorMessage =
         // error details for response errors provided by elasticsearch, defaults to error name/message
-        `[${event.body?.error?.type ?? error.name}]: ${event.body?.error?.reason ?? error.message}`;
+        `[${esErrorType ?? error.name}]: ${esErrorReason || error.message}`;
 
       logger.error(errorMessage);
     }

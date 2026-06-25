@@ -194,6 +194,16 @@ function getDurationAsMs(duration: number | Duration) {
 function getLoggerClass(log: Logger, logQueries = false) {
   return class ElasticsearchClientLogging {
     public error(err: string | Error) {
+      // LOGRHYTHM FIX: Suppress log spam from invalid user queries.
+      const msg = typeof err === 'string' ? err : err.message ?? '';
+      if (
+        msg.includes('search_phase_execution_exception') ||
+        msg.includes('all shards failed') ||
+        msg.includes('parsing_exception') ||
+        msg.includes('query_shard_exception')
+      ) {
+        return;
+      }
       log.error(err);
     }
 
