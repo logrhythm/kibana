@@ -299,6 +299,12 @@ export class VisualizeEmbeddable
       msg.includes('query_shard_exception')
     ) {
       showInvalidQueryToast();
+      // Clear stale visualization content so panels show empty instead of old data
+      if (this.domNode) {
+        while (this.domNode.firstChild) {
+          this.domNode.removeChild(this.domNode.firstChild);
+        }
+      }
       // Pass undefined so EmbeddableErrorLabel renders nothing for this panel
       this.updateOutput({ loading: false, error: undefined });
       return;
@@ -325,8 +331,15 @@ export class VisualizeEmbeddable
 
     const expressions = getExpressions();
     this.handler = new expressions.ExpressionLoader(this.domNode, undefined, {
-      onRenderError: (element: HTMLElement, error: ExpressionRenderError) => {
-        this.onContainerError(error);
+      onRenderError: (element: HTMLElement, error: ExpressionRenderError, handlers) => {
+        try {
+          this.onContainerError(error);
+        } catch (e) {
+          // onContainerError must never prevent handlers.done() from firing,
+          // otherwise the panel freezes grey indefinitely.
+        }
+        // handlers.done() MUST always be called — it clears the loading overlay.
+        handlers.done();
       },
     });
 

@@ -124,10 +124,11 @@ export class SearchInterceptor {
     } else if (isPainlessError(e)) {
       return new PainlessError(e, request);
     } else if (isQuerySyntaxError(e)) {
-      // Tag the error so expression-pipeline/embeddable render guards can suppress
-      // the "Error" badge and panel-body rendering for query syntax problems.
-      // The name survives createError() in the expression execution engine.
-      const tagged = e instanceof Error ? e : new Error(e?.body?.message || 'Invalid search query');
+      // Use the ES error body message (e.g. "[search_phase_execution_exception]: all shards failed")
+      // rather than the HTTP status text ("Bad Request") so the message survives the expression
+      // pipeline and the message-based checks in onContainerError can match it.
+      const message = e?.body?.message || e?.message || 'Invalid search query';
+      const tagged = new Error(message);
       tagged.name = 'QuerySyntaxError';
       return tagged;
     } else {

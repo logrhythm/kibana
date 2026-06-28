@@ -60,27 +60,33 @@ export function showInvalidQueryToast() {
 
   _invalidQueryToastVisible = true;
 
-  const toast = notifications.toasts.addWarning({
-    title: i18n.translate('data.search.searchSource.fetch.invalidQueryTitle', {
-      defaultMessage: 'Invalid search query',
-    }),
-    text: toMountPoint(
-      <span>
-        {i18n.translate('data.search.searchSource.fetch.invalidQueryDescription', {
-          defaultMessage:
-            'Your search query contains unsupported syntax. Please check your search terms and try again.',
-        })}
-      </span>
-    ),
-  });
+  try {
+    const toast = notifications.toasts.addWarning({
+      title: i18n.translate('data.search.searchSource.fetch.invalidQueryTitle', {
+        defaultMessage: 'Invalid search query',
+      }),
+      text: toMountPoint(
+        <span>
+          {i18n.translate('data.search.searchSource.fetch.invalidQueryDescription', {
+            defaultMessage:
+              'Your search query contains unsupported syntax. Please check your search terms and try again.',
+          })}
+        </span>
+      ),
+    });
 
-  // Reset the guard once the toast disappears so future bad queries show it again
-  const sub = notifications.toasts.get$().subscribe((toasts) => {
-    if (!toasts.find((t) => t.id === toast.id)) {
-      _invalidQueryToastVisible = false;
-      sub.unsubscribe();
-    }
-  });
+    // Reset the guard once the toast disappears so future bad queries show it again
+    const sub = notifications.toasts.get$().subscribe((toasts) => {
+      if (!toasts.find((t) => t.id === toast.id)) {
+        _invalidQueryToastVisible = false;
+        sub.unsubscribe();
+      }
+    });
+  } catch (e) {
+    // If the toast itself fails (e.g. i18n / toMountPoint not ready in ISO build),
+    // reset the guard so the next invalid query can try again.
+    _invalidQueryToastVisible = false;
+  }
 }
 
 export function handleResponse(request: SearchRequest, response: SearchResponse<any>) {

@@ -46,6 +46,7 @@ try {
 }
 import { doesKueryExpressionHaveLuceneSyntaxError } from '../../../common/es_query';
 import { useKibana } from '../../../../kibana_react/public';
+import { showInvalidQueryToast } from '../../search';
 
 import { IndexPattern } from '../../../index_patterns';
 import QueryStringInputUI from './query_string_input';
@@ -58,6 +59,22 @@ import { withKibana } from '../../../../kibana_react/public';
 
 // Create wrapped QueryStringInput with Kibana services
 const QueryStringInputWithServices = withKibana(QueryStringInputUI);
+
+// A query guaranteed to match zero documents. Used to clear panels when the
+// user submits an invalid query instead of showing stale/all-data results.
+const NO_MATCH_QUERY = '_id:__no_match_placeholder__';
+
+// Detect "field:" patterns (no value after colon) that Lucene rejects.
+// convertQuery only fixes capitalisation; it passes these through unchanged
+// and ES returns all docs for that field or a parsing error.
+function isMalformedLuceneQuery(queryText: string): boolean {
+  const trimmed = queryText.trim();
+  if (!trimmed) return false;
+  // Matches "word:" or "word :" at end-of-string, or "word:" followed only by whitespace
+  return (
+    /\b\w[\w.]*\s*:\s*$/.test(trimmed) || /\b\w[\w.]*\s*:\s+(?=\b\w[\w.]*\s*:\s*$)/.test(trimmed)
+  );
+}
 
 import { SaveRule } from '../../../../../netmon/components/save_rule/save_rule';
 
@@ -89,6 +106,7 @@ interface Props {
 
 function QueryBarTopRowUI(props: Props) {
   const [isDateRangeInvalid, setIsDateRangeInvalid] = useState(false);
+  const [displayQuery, setDisplayQuery] = useState<Query | undefined>(props.query);
 
   const kibana = useKibana<IDataPluginServices>();
   const { uiSettings, notifications, storage, appName, docLinks } = kibana.services;
@@ -176,8 +194,29 @@ function QueryBarTopRowUI(props: Props) {
     persistedLogRef.current = getQueryLog(uiSettings!, storage, appName, query.language);
   }, [query, queryLanguage, uiSettings, storage, appName]);
 
+  // Keep displayQuery in sync with external query changes (saved query load, X-clear, etc.)
+  // Skip when the incoming query is the no-match placeholder we submitted ourselves —
+  // in that case displayQuery already holds the user's malformed text and must not be overwritten.
+  useEffect(() => {
+    if (props.query && props.query.query !== NO_MATCH_QUERY) {
+      setDisplayQuery(props.query);
+    }
+  }, [props.query]);
+
   useEffect(() => {
     if (!query || !query.query || typeof query.query !== 'string') return;
+
+    // Skip re-processing when the placeholder we submitted flows back as props.query
+    if (query.query === NO_MATCH_QUERY) return;
+
+    // Intercept before convertQuery — it only fixes capitalisation and passes
+    // "field:" through unchanged, which causes ES to return all/previous data.
+    if (isMalformedLuceneQuery(query.query)) {
+      showInvalidQueryToast();
+      setDisplayQuery(query); // keep user's typed text visible
+      onSubmit({ query: { ...query, query: NO_MATCH_QUERY }, dateRange: getDateRange() });
+      return;
+    }
 
     let shutdown: boolean = false;
     convertQuery(query.query)
@@ -202,6 +241,10 @@ function QueryBarTopRowUI(props: Props) {
           'An error occurred trying to correct the provided query for capitalization.',
           err
         );
+        // Fallback: submit the raw query so ES can validate it.
+        if (!shutdown && query) {
+          onSubmit({ query, dateRange: getDateRange() });
+        }
       });
 
     return () => {
@@ -214,6 +257,12 @@ function QueryBarTopRowUI(props: Props) {
       persistedLogRef.current.add(query.query);
     }
     event.preventDefault();
+    if (query && typeof query.query === 'string' && isMalformedLuceneQuery(query.query)) {
+      showInvalidQueryToast();
+      setDisplayQuery(query); // keep user's typed text visible
+      onSubmit({ query: { ...query, query: NO_MATCH_QUERY }, dateRange: getDateRange() });
+      return;
+    }
     onSubmit({ query, dateRange: getDateRange() });
   }
 
@@ -286,6 +335,15 @@ function QueryBarTopRowUI(props: Props) {
       return;
     }
 
+    // Intercept before convertQuery — it only fixes capitalisation and passes
+    // "field:" through unchanged, which causes ES to return all/previous data.
+    if (isMalformedLuceneQuery(submitQuery.query)) {
+      showInvalidQueryToast();
+      setDisplayQuery(submitQuery); // keep user's typed text visible
+      props.onSubmit({ query: { ...submitQuery, query: NO_MATCH_QUERY }, dateRange });
+      return;
+    }
+
     convertQuery(submitQuery.query)
       .then((newQueryText) => {
         if (!submitQuery) return;
@@ -307,6 +365,8 @@ function QueryBarTopRowUI(props: Props) {
           'An error occurred trying to correct the provided query for capitalization.',
           err
         );
+        // Fallback: submit raw query so ES validates it.
+        props.onSubmit({ query: submitQuery, dateRange });
       });
   }
 
@@ -325,9 +385,12 @@ function QueryBarTopRowUI(props: Props) {
           disableAutoFocus={props.disableAutoFocus}
           indexPatterns={indexPatterns!}
           prepend={prepend}
-          query={query!}
+          query={displayQuery ?? query!}
           screenTitle={screenTitle}
-          onChange={onQueryChange}
+          onChange={(newQuery) => {
+            setDisplayQuery(newQuery);
+            onQueryChange(newQuery);
+          }}
           onSubmit={onInputSubmit}
           persistedLog={persistedLogRef.current}
         />
