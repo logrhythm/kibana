@@ -61,6 +61,19 @@ export class ErrorEmbeddable extends Embeddable<EmbeddableInput, EmbeddableOutpu
       return;
     }
 
+    // Suppress panel-body error rendering for query syntax errors.
+    // Checks both tagged name and message content since the expression pipeline may re-wrap.
+    if (
+      (typeof this.error === 'object' && this.error.name === 'QuerySyntaxError') ||
+      (title &&
+        (title.includes('search_phase_execution_exception') ||
+          title.includes('all shards failed') ||
+          title.includes('parsing_exception') ||
+          title.includes('query_shard_exception')))
+    ) {
+      return;
+    }
+
     this.dom = dom;
     ReactDOM.render(
       // @ts-ignore

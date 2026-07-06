@@ -32,6 +32,26 @@ import {
 import { SearchUsageCollector } from './collectors';
 import { SearchTimeoutError, PainlessError, isPainlessError, TimeoutErrorMode } from './errors';
 import { toMountPoint } from '../../../kibana_react/public';
+import { showInvalidQueryToast } from './fetch/handle_response';
+
+// Detects whether an HTTP-level error from the search route is caused by invalid query syntax.
+// The server route (search.ts) forwards err.body.error into attributes.error, so for a
+// search_phase_execution_exception the shape is: e.body.attributes.error.type
+function isQuerySyntaxError(e: any): boolean {
+  const attrError = e?.body?.attributes?.error;
+  if (!attrError) return false;
+  const type =
+    (typeof attrError === 'object' ? attrError.type : undefined) ||
+    attrError?.caused_by?.type ||
+    attrError?.root_cause?.[0]?.type;
+  const QUERY_ERR_TYPES = [
+    'search_phase_execution_exception',
+    'parsing_exception',
+    'query_shard_exception',
+    'query_parsing_exception',
+  ];
+  return QUERY_ERR_TYPES.includes(type);
+}
 
 export interface SearchInterceptorDeps {
   http: CoreSetup['http'];
@@ -103,6 +123,14 @@ export class SearchInterceptor {
       return abortError;
     } else if (isPainlessError(e)) {
       return new PainlessError(e, request);
+    } else if (isQuerySyntaxError(e)) {
+      // Use the ES error body message (e.g. "[search_phase_execution_exception]: all shards failed")
+      // rather than the HTTP status text ("Bad Request") so the message survives the expression
+      // pipeline and the message-based checks in onContainerError can match it.
+      const message = e?.body?.message || e?.message || 'Invalid search query';
+      const tagged = new Error(message);
+      tagged.name = 'QuerySyntaxError';
+      return tagged;
     } else {
       return e;
     }
@@ -245,6 +273,12 @@ export class SearchInterceptor {
         title: 'Search Error',
         text: toMountPoint(e.getErrorMessage(this.application)),
       });
+      return;
+    }
+
+    // Show the single user-friendly toast for query syntax errors (HTTP 400 full-failure path)
+    if (e.name === 'QuerySyntaxError') {
+      showInvalidQueryToast();
       return;
     }
 
