@@ -236,7 +236,6 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
     };
   }, []);
 
-
   // Enhanced subscription fallback
   useEffect(() => {
     if (SelectedCaptureSessions && SelectedCaptureSessions.subscribeAll) {
@@ -301,8 +300,12 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
         console.error('❌ [BULK DOWNLOAD] Invalid API response structure:', {
           hasResponse: !!startDownloadRes,
           hasData: !!(startDownloadRes && startDownloadRes.data),
-          hasDownloadID: !!(startDownloadRes && startDownloadRes.data && startDownloadRes.data.downloadID),
-          fullResponse: startDownloadRes
+          hasDownloadID: !!(
+            startDownloadRes &&
+            startDownloadRes.data &&
+            startDownloadRes.data.downloadID
+          ),
+          fullResponse: startDownloadRes,
         });
         alert('Download failed: Invalid server response. Please try again.');
       }
@@ -311,7 +314,7 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
       console.error('💥 [BULK DOWNLOAD] Error details:', {
         message: err.message,
         stack: err.stack,
-        name: err.name
+        name: err.name,
       });
       alert(
         `Download failed: ${
@@ -358,7 +361,7 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
     setIsPopoverOpen(false);
   };
 
-  // FIXED: Compact button perfectly aligned with data column
+  // Compact button aligned with data column — inherits color from th for dark mode compat
   const button = (
     <button
       onClick={() => {
@@ -372,32 +375,22 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
         cursor: 'pointer',
         padding: '4px 6px',
         borderRadius: '3px',
-        border: '1px solid #d3dae6',
-        backgroundColor: isPopoverOpen ? '#f5f7fa' : 'transparent',
-        background: isPopoverOpen ? '#f5f7fa' : 'transparent',
+        border: '1px solid currentColor',
+        backgroundColor: 'transparent',
+        background: 'transparent',
         outline: 'none',
         transition: 'all 0.1s ease',
         minHeight: '24px',
         maxHeight: '24px',
         fontSize: '11px',
         margin: '0 auto',
-      }}
-      onMouseEnter={(e) => {
-        if (!isPopoverOpen) {
-          (e.target as HTMLElement).style.backgroundColor = '#f5f7fa';
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (!isPopoverOpen) {
-          (e.target as HTMLElement).style.backgroundColor = 'transparent';
-        }
+        opacity: 0.8,
       }}
       aria-label="Open capture session menu"
     >
       <i
         className="fa fa-th-large"
         style={{
-          color: '#006bb4',
           fontSize: '10px',
           width: '12px',
           height: '12px',
@@ -408,14 +401,13 @@ const CaptureHeaderDropdown: React.FC<CaptureHeaderProps> = ({
       />
       <span
         style={{
-          color: '#006bb4',
           fontWeight: 500,
           whiteSpace: 'nowrap',
           fontSize: '10px',
           lineHeight: 1,
         }}
       >
-{selectedCount} selected
+        {selectedCount} selected
       </span>
     </button>
   );
@@ -632,16 +624,8 @@ export function TableHeaderColumn({
 
   // FIXED: Enhanced styling with proper overflow handling for popover alignment
   const tableHeaderStyle = {
-    display: 'table-cell !important',
-    visibility: 'visible !important',
-    opacity: '1 !important',
-    padding: '8px 12px !important',
-    borderBottom: '2px solid #d3dae6 !important',
     textAlign: (name === 'Captured' ? 'center' : 'left') as 'center' | 'left',
     fontWeight: 600,
-    color: '#343741 !important',
-    backgroundColor: '#f5f7fa !important',
-    fontSize: '12px !important',
     verticalAlign: 'middle' as 'middle',
     whiteSpace: 'nowrap' as 'nowrap',
     width: name === 'Captured' ? '120px' : 'auto',
@@ -649,9 +633,7 @@ export function TableHeaderColumn({
     maxWidth: name === 'Captured' ? '120px' : '120px',
     position: 'relative' as 'relative',
     zIndex: name === 'Captured' ? 9999 : 10,
-    border: '1px solid #d3dae6 !important',
-    // CRITICAL: Allow overflow for popover positioning
-    overflow: name === 'Captured' ? 'visible !important' : 'hidden',
+    overflow: name === 'Captured' ? ('visible' as any) : 'hidden',
   } as any;
 
   // BULLETPROOF: This component MUST always render - never return null or empty
@@ -685,8 +667,7 @@ export function TableHeaderColumn({
             style={{
               fontWeight: 600,
               fontSize: '12px',
-              color: '#343741',
-              minWidth: '50px', // Force minimum width
+              minWidth: '50px',
               display: 'inline-block',
             }}
           >
@@ -714,10 +695,9 @@ export function TableHeaderColumn({
               style={{
                 fontWeight: 600,
                 fontSize: '12px',
-                color: '#343741',
                 flex: '1',
                 textAlign: 'left',
-                minWidth: '50px', // Force minimum width
+                minWidth: '50px',
               }}
             >
               {safeDisplayName}
@@ -754,9 +734,9 @@ export function TableHeaderColumn({
                   background: 'none',
                   border: 'none',
                   cursor: 'pointer',
-                  color: '#006bb4',
                   fontSize: '12px',
                   padding: '2px',
+                  opacity: 0.7,
                 }}
               />
             </EuiToolTip>

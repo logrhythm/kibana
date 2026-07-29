@@ -4417,3 +4417,429 @@ input:focus {
   -webkit-box-shadow: none;
   box-shadow: none;
 }
+
+/* ==========================================================================
+   EUI dark mode overrides — all rules use html.Night prefix for specificity,
+   ensuring they beat equal-specificity webpack-injected <style> blocks.
+   ========================================================================== */
+
+/* --- Root element: override EUI light CSS html { color: #343741; background-color: #fafbfd }
+   The light CSS sets color on <html> which all plain <th>/<td> inherit.
+   html.Night specificity (1 element + 1 class) beats plain html (1 element). --- */
+html.Night {
+  color: #DFE5EF !important;
+  background-color: #131313 !important;
+}
+
+/* --- Page / Layout --- */
+html.Night .euiPage,
+html.Night .euiPageBody,
+html.Night .euiPageContent,
+html.Night .euiPageContent--horizontalCenter {
+  background-color: #1a1b20;
+}
+
+html.Night body {
+  background-color: #131313;
+  color: #DFE5EF;
+}
+
+/* --- Dashboard table column headers: plain <th> in .table.table-condensed ---
+   These inherit color from html, so html.Night fixes them. Belt-and-suspenders: */
+html.Night .table th,
+html.Night .table thead th,
+html.Night .table-condensed th {
+  color: #DFE5EF !important;
+  background-color: #25262E !important;
+  border-color: #343741 !important;
+}
+html.Night .table td {
+  color: #DFE5EF;
+  border-color: #343741;
+}
+html.Night .table {
+  background-color: #1f2121;
+  color: #DFE5EF;
+}
+html.Night .table tr {
+  color: #DFE5EF;
+}
+
+/* --- Panels & Popups --- */
+html.Night .euiPanel {
+  background-color: #1D1E24;
+  border-color: #343741;
+  color: #DFE5EF;
+}
+html.Night .euiPopover__panel,
+html.Night .euiPopover__panel .euiPanel {
+  background-color: #1D1E24 !important;
+  border-color: #343741 !important;
+  color: #DFE5EF !important;
+}
+html.Night .euiOverlayMask {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* --- Flyout & Modal --- */
+html.Night .euiFlyout {
+  background-color: #1D1E24;
+  color: #DFE5EF;
+}
+html.Night .euiModal {
+  background-color: #1D1E24;
+  color: #DFE5EF;
+}
+html.Night .euiModal__closeIcon {
+  background-color: transparent;
+}
+
+/* --- Context menus & dropdowns --- */
+html.Night .euiContextMenuPanel,
+html.Night .euiContextMenu__panel {
+  background-color: #1D1E24 !important;
+  color: #DFE5EF !important;
+}
+html.Night .euiContextMenuItem {
+  color: #DFE5EF;
+}
+html.Night .euiContextMenuItem:hover {
+  background-color: #343741;
+}
+
+/* --- Filter bar (saved queries, "change all filters", Lucene popup) --- */
+html.Night .euiFilterGroup {
+  background-color: #1D1E24;
+  border-color: #343741;
+}
+html.Night .euiFilterButton {
+  color: #DFE5EF;
+}
+html.Night .euiFilterButton:hover:not(:disabled),
+html.Night .euiFilterButton:focus:not(:disabled) {
+  background-color: #343741;
+}
+html.Night .euiFilterSelectItem {
+  background-color: #1D1E24;
+  color: #DFE5EF;
+}
+html.Night .euiFilterSelectItem:hover,
+html.Night .euiFilterSelectItem:focus,
+html.Night .euiFilterSelectItem-isFocused {
+  background-color: #343741;
+}
+html.Night .euiFilterGroup__popoverPanel {
+  background-color: #1D1E24;
+}
+
+/* "saved query" popover & "Add filter" popover */
+html.Night .euiSearchBar__filtersHolder .euiPopover__panel,
+html.Night .euiSearchBar .euiPopover__panel {
+  background-color: #1D1E24 !important;
+  color: #DFE5EF !important;
+  border-color: #343741 !important;
+}
+
+/* --- Quick select / date picker popover --- */
+html.Night .euiQuickSelectPopover__content,
+html.Night .euiQuickSelectPopover__section {
+  background-color: #1D1E24;
+  color: #DFE5EF;
+}
+html.Night .euiDatePicker .react-datepicker,
+html.Night .euiDatePicker .react-datepicker__header {
+  background-color: #1D1E24;
+  color: #DFE5EF;
+  border-color: #343741;
+}
+html.Night .euiSuperDatePicker__absoluteDateFormRow {
+  background-color: #1D1E24;
+}
+
+/* --- Form inputs --- */
+html.Night .euiFieldText,
+html.Night .euiFieldNumber,
+html.Night .euiFieldSearch,
+html.Night .euiFieldPassword,
+html.Night .euiTextArea,
+html.Night .euiSelect,
+html.Night .euiComboBox__inputWrap {
+  background-color: #1a1a20;
+  color: #DFE5EF;
+  border-color: #535966;
+}
+html.Night .euiFormRow__label,
+html.Night .euiFormLabel {
+  color: #98a2b3;
+}
+html.Night .euiFormControlLayout {
+  background-color: #1a1a20;
+}
+html.Night .euiComboBoxOption {
+  color: #DFE5EF;
+}
+html.Night .euiComboBoxOptionsList {
+  background-color: #1D1E24;
+  border-color: #343741;
+}
+html.Night .euiComboBoxOption:hover,
+html.Night .euiComboBoxOption.euiComboBoxOption-isFocused {
+  background-color: #343741;
+}
+
+/* --- SuperSelect --- */
+html.Night .euiSuperSelectControl,
+html.Night .euiSuperSelect__listbox {
+  background-color: #1a1a20;
+  color: #DFE5EF;
+  border-color: #535966;
+}
+html.Night .euiSuperSelect__item {
+  color: #DFE5EF;
+}
+html.Night .euiSuperSelect__item:hover,
+html.Night .euiSuperSelect__item:focus {
+  background-color: #343741;
+}
+
+/* --- Buttons (fill variants — text invisible when same as bg) --- */
+html.Night .euiButton--primary.euiButton--fill {
+  background-color: #1BA9F5;
+  border-color: #1BA9F5;
+  color: #000 !important;
+}
+html.Night .euiButton--secondary.euiButton--fill {
+  background-color: #7DE2D1;
+  border-color: #7DE2D1;
+  color: #000 !important;
+}
+html.Night .euiButton--warning.euiButton--fill {
+  background-color: #FFCE7A;
+  border-color: #FFCE7A;
+  color: #000 !important;
+}
+html.Night .euiButton--danger.euiButton--fill {
+  background-color: #F66;
+  border-color: #F66;
+  color: #000 !important;
+}
+html.Night .euiButton--text.euiButton--fill {
+  background-color: #98A2B3;
+  border-color: #98A2B3;
+  color: #000 !important;
+}
+/* Non-fill button text colors */
+html.Night .euiButton--primary {
+  color: #1BA9F5;
+  border-color: #1BA9F5;
+}
+html.Night .euiButton--secondary {
+  color: #7DE2D1;
+  border-color: #7DE2D1;
+}
+html.Night .euiButton--text {
+  color: #DFE5EF;
+  border-color: #98A2B3;
+}
+html.Night .euiButtonEmpty {
+  color: #1ba9f5;
+}
+html.Night .euiButtonEmpty--text {
+  color: #DFE5EF;
+}
+
+/* "Edit" button (dashboard toolbar) and dev tools buttons */
+html.Night .euiButton {
+  color: inherit;
+}
+
+/* --- Tables (header white background fix) --- */
+html.Night .euiTable {
+  background-color: #1D1E24;
+  color: #DFE5EF;
+}
+html.Night .euiTableHeaderCell,
+html.Night .euiTableFooterCell {
+  background-color: #25262E;
+  color: #DFE5EF;
+  border-color: #343741;
+}
+html.Night .euiTableRow {
+  background-color: #1D1E24;
+}
+html.Night .euiTableRow:hover {
+  background-color: #2c2d36;
+}
+html.Night .euiTableRow.euiTableRow-isSelected {
+  background-color: #232635;
+}
+html.Night .euiTableRowCell {
+  color: #DFE5EF;
+  border-color: #343741;
+}
+html.Night .euiTableFooterCell {
+  background-color: #25262E;
+}
+html.Night .euiTableHeaderButton,
+html.Night .euiInMemoryTable .euiTableHeaderCell button {
+  color: #DFE5EF;
+}
+html.Night .euiTableHeaderButton:hover .euiTableCellContent__text,
+html.Night .euiTableHeaderButton:focus .euiTableCellContent__text {
+  color: #1BA9F5;
+}
+
+/* --- Typography & links --- */
+html.Night .euiText {
+  color: #DFE5EF;
+}
+html.Night .euiText a {
+  color: #1ba9f5;
+}
+html.Night .euiTitle {
+  color: #DFE5EF;
+}
+html.Night .euiLink {
+  color: #1ba9f5;
+}
+html.Night .euiCheckbox .euiCheckbox__label,
+html.Night .euiRadio .euiRadio__label {
+  color: #DFE5EF;
+}
+
+/* --- Tabs --- */
+html.Night .euiTab {
+  color: #DFE5EF;
+}
+html.Night .euiTab.euiTab-isSelected {
+  color: #1ba9f5;
+  border-bottom-color: #1ba9f5;
+}
+html.Night .euiTab__content {
+  color: inherit;
+}
+
+/* --- Code blocks (Discover Inspect request/response) --- */
+html.Night .euiCodeBlock {
+  background-color: #1a1a20 !important;
+  color: #DFE5EF !important;
+}
+html.Night .euiCodeBlock__pre {
+  color: #DFE5EF !important;
+}
+html.Night .euiCodeBlock__code {
+  color: #DFE5EF !important;
+}
+
+/* --- Accordion & side nav --- */
+html.Night .euiAccordion__button {
+  color: #DFE5EF;
+}
+html.Night .euiSideNav__item .euiSideNav__itemButton {
+  color: #DFE5EF;
+}
+html.Night .euiSideNav__item.euiSideNav__item--selected > .euiSideNav__itemButton {
+  color: #1ba9f5;
+}
+
+/* --- Nav drawer --- */
+html.Night .euiNavDrawer {
+  background-color: #1D1E24;
+  border-right-color: #343741;
+}
+html.Night .euiNavDrawerMenu {
+  background-color: #1D1E24;
+}
+
+/* --- Header & breadcrumbs --- */
+html.Night .euiHeader {
+  background-color: #1D1E24;
+  border-color: #343741;
+}
+html.Night .euiHeaderBreadcrumbs .euiBreadcrumb,
+html.Night .euiHeaderBreadcrumbs .euiBreadcrumb__truncation {
+  color: #DFE5EF;
+}
+
+/* --- List groups --- */
+html.Night .euiListGroup {
+  background-color: transparent;
+}
+html.Night .euiListGroupItem__button {
+  color: #DFE5EF;
+}
+html.Night .euiListGroupItem:hover .euiListGroupItem__button,
+html.Night .euiListGroupItem:focus .euiListGroupItem__button {
+  color: #DFE5EF;
+}
+html.Night .euiListGroupItem--isActive .euiListGroupItem__button,
+html.Night .euiListGroupItem--isActive:hover .euiListGroupItem__button {
+  color: #1ba9f5;
+}
+
+/* --- Dashboard table visualization headers --- */
+html.Night .kbnAggTable th,
+html.Night .kbnAggTable thead tr,
+html.Night .kbnAggTable__paginated th {
+  background-color: #25262E !important;
+  color: #DFE5EF !important;
+  border-color: #343741 !important;
+}
+html.Night .kbnAggTable__paginated tr:hover td,
+html.Night .kbnAggTable .kbnTableCellFilter {
+  background-color: #2c2d36 !important;
+}
+html.Night .kbnAggTable td {
+  color: #DFE5EF;
+  border-color: #343741;
+}
+
+/* --- Discover / all table headers (kbnDocTable) --- */
+html.Night .kbnDocTable th,
+html.Night doc-table .kbnDocTable th,
+html.Night table.kbnDocTable th,
+html.Night doc-table th,
+html.Night th[data-test-subj="docTableHeaderField"] {
+  background-color: #25262E !important;
+  color: #DFE5EF !important;
+  border-bottom-color: #343741 !important;
+  border-left-color: #343741 !important;
+  border-right-color: #343741 !important;
+}
+html.Night .kbnDocTable thead tr,
+html.Night .kbnDocTable thead {
+  background-color: #25262E !important;
+  border-color: #343741 !important;
+}
+html.Night .kbnDocTable td {
+  background-color: #1D1E24;
+  color: #DFE5EF;
+  border-color: #343741;
+}
+html.Night .kbnDocTable tr:hover td {
+  background-color: #2c2d36 !important;
+}
+
+/* --- All popover panels (beats _force_headers.scss background: #fff !important) --- */
+html.Night .euiPopover__panel,
+html.Night div[data-euipopover-panel] {
+  background-color: #1D1E24 !important;
+  background: #1D1E24 !important;
+  border-color: #343741 !important;
+  color: #DFE5EF !important;
+}
+
+/* --- Visualization containers --- */
+html.Night .visualization,
+html.Night .visWrapper,
+html.Night .visChart,
+html.Night .visEditor,
+html.Night .visLegend {
+  background-color: transparent;
+}
+html.Night .visWrapper__column {
+  background-color: #1D1E24;
+}
+html.Night canvas {
+  background-color: transparent;
+}

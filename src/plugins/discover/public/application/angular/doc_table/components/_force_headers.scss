@@ -309,6 +309,64 @@ div[data-euipopover-panel] {
   background: #fff !important;
 }
 
+/* Dark mode overrides — must beat the !important rules above */
+html.Night .euiPopover__panel {
+  background: #1D1E24 !important;
+  border-color: #343741 !important;
+  color: #DFE5EF !important;
+}
+
+html.Night .kbnDocTableHeader,
+html.Night tr.kbnDocTableHeader,
+html.Night thead .kbnDocTableHeader,
+html.Night .kbn-doc-table-header,
+html.Night .table-header-row,
+html.Night tr.kbn-doc-table-header,
+html.Night tr.table-header-row,
+html.Night doc-table table thead tr,
+html.Night doc-table .kbnDocTable thead tr,
+html.Night .kbnDocTable thead tr,
+html.Night .kbn-table thead tr,
+html.Night tr.kbnDocTableHeader,
+html.Night thead tr.kbnDocTableHeader,
+html.Night body doc-table table thead tr,
+html.Night body doc-table .kbnDocTable thead tr,
+html.Night body .kbnDocTable thead tr,
+html.Night body tr.kbnDocTableHeader,
+html.Night html body doc-table table thead tr,
+html.Night html body .kbnDocTable thead tr {
+  background-color: #25262E !important;
+  border-bottom-color: #343741 !important;
+}
+
+html.Night .kbnDocTableHeader th,
+html.Night tr.kbnDocTableHeader th,
+html.Night thead .kbnDocTableHeader th,
+html.Night table.kbnDocTable th,
+html.Night table.kbn-table th,
+html.Night .kbn-doc-table-header-cell,
+html.Night .table-header-column,
+html.Night doc-table table thead tr th,
+html.Night doc-table .kbnDocTable thead tr th,
+html.Night .kbnDocTable thead tr th,
+html.Night .kbn-table thead tr th,
+html.Night tr.kbnDocTableHeader th,
+html.Night thead tr.kbnDocTableHeader th,
+html.Night .kbnDocTableHeader th,
+html.Night body doc-table table thead tr th,
+html.Night body doc-table .kbnDocTable thead tr th,
+html.Night body .kbnDocTable thead tr th,
+html.Night body tr.kbnDocTableHeader th,
+html.Night html body doc-table table thead tr th,
+html.Night html body .kbnDocTable thead tr th,
+html.Night th[data-test-subj="docTableHeaderField"] {
+  background-color: #25262E !important;
+  color: #DFE5EF !important;
+  border-bottom-color: #343741 !important;
+  border-left-color: #343741 !important;
+  border-right-color: #343741 !important;
+}
+
 /* EUI Button styling in popover */
 .euiPopover__panel .euiButton {
   margin-bottom: 4px !important;
