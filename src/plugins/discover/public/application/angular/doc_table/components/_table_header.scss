@@ -60,6 +60,33 @@ th[data-test-subj="docTableHeaderField"]:last-child,
 
 /* Removed conflicting column width definitions - now handled in _force_headers.scss */
 
+/* Dark mode: override hardcoded light backgrounds */
+html.Night {
+  .kbnDocTableHeader,
+  tr.kbnDocTableHeader,
+  thead .kbnDocTableHeader,
+  .kbn-doc-table-header,
+  .table-header-row {
+    background-color: #25262E !important;
+    border-bottom-color: #343741 !important;
+  }
+
+  .kbnDocTableHeader th,
+  tr.kbnDocTableHeader th,
+  thead .kbnDocTableHeader th,
+  table.kbnDocTable th,
+  table.kbn-table th,
+  .kbn-doc-table-header-cell,
+  .table-header-column,
+  th[data-test-subj="docTableHeaderField"] {
+    background-color: #25262E !important;
+    color: #DFE5EF !important;
+    border-bottom-color: #343741 !important;
+    border-left-color: #343741 !important;
+    border-right-color: #343741 !important;
+  }
+}
+
 .kbnDocTableHeader button {
   margin-left: 4px;
 }

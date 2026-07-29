@@ -40,14 +40,18 @@ if (window.__kbnStrictCsp__ && window.__kbnCspNotEnforced__) {
     }
 
     var stylesheetTarget = document.querySelector('head meta[name="add-styles-here"]')
-    function loadStyleSheet(url, cb) {
+    function loadStyleSheet(url, cb, appendToEnd) {
       var dom = document.createElement('link');
       dom.rel = 'stylesheet';
       dom.type = 'text/css';
       dom.href = url;
       dom.addEventListener('error', failure);
       dom.addEventListener('load', cb);
-      document.head.insertBefore(dom, stylesheetTarget);
+      if (appendToEnd) {
+        document.head.appendChild(dom);
+      } else {
+        document.head.insertBefore(dom, stylesheetTarget);
+      }
     }
 
     var scriptsTarget = document.querySelector('head meta[name="add-scripts-here"]')
@@ -61,7 +65,7 @@ if (window.__kbnStrictCsp__ && window.__kbnCspNotEnforced__) {
       document.head.insertBefore(dom, scriptsTarget);
     }
 
-    function load(urls, cb) {
+    function load(urls, cb, appendCssToEnd) {
       var pending = urls.length;
       urls.forEach(function (url) {
         var innerCb = function () {
@@ -72,9 +76,9 @@ if (window.__kbnStrictCsp__ && window.__kbnCspNotEnforced__) {
         }
 
         if (typeof url !== 'string') {
-          load(url, innerCb);
+          load(url, innerCb, appendCssToEnd);
         } else if (url.slice(-4) === '.css') {
-          loadStyleSheet(url, innerCb);
+          loadStyleSheet(url, innerCb, appendCssToEnd);
         } else {
           loadScript(url, innerCb);
         }
@@ -91,11 +95,12 @@ if (window.__kbnStrictCsp__ && window.__kbnCspNotEnforced__) {
       ], function () {
         __kbnBundles__.get('entry/core/public').__kbnBootstrap__();
 
+        // Load theme CSS AFTER webpack bundles so dark theme overrides webpack-injected styles
         load([
           {{#each styleSheetPaths}}
             '{{this}}',
           {{/each}}
-        ]);
+        ], undefined, true);
       });
     });
   }

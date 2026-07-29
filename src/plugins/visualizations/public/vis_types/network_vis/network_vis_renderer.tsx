@@ -403,7 +403,16 @@ const networkVisRenderer: ExpressionRenderDefinition<NetworkVisRenderValue> = {
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('width', String(width));
     svg.setAttribute('height', String(height));
-    svg.style.backgroundColor = params.canvasBackgroundColor || '#FFFFFF';
+    const isDarkMode = document.documentElement.classList.contains('Night');
+    const defaultLightBg = '#FFFFFF';
+    const hasCustomBg =
+      params.canvasBackgroundColor &&
+      params.canvasBackgroundColor.toLowerCase() !== defaultLightBg.toLowerCase();
+    svg.style.backgroundColor = hasCustomBg
+      ? params.canvasBackgroundColor
+      : isDarkMode
+      ? '#1D1E24'
+      : '#FFFFFF';
 
     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     svg.appendChild(g);
@@ -522,7 +531,11 @@ const networkVisRenderer: ExpressionRenderDefinition<NetworkVisRenderValue> = {
         text.setAttribute('y', String(node.y + nodeSize / 2 + 12));
         text.setAttribute('text-anchor', 'middle');
         text.setAttribute('font-size', '10');
-        text.setAttribute('fill', params.labelColor || '#000000');
+        const hasCustomLabel = params.labelColor && params.labelColor.toLowerCase() !== '#000000';
+        text.setAttribute(
+          'fill',
+          hasCustomLabel ? params.labelColor : isDarkMode ? '#DFE5EF' : '#000000'
+        );
         text.setAttribute('pointer-events', 'none');
         text.textContent = node.id.length > 18 ? `${node.id.slice(0, 15)}...` : node.id;
         g.appendChild(text);
@@ -541,7 +554,7 @@ const networkVisRenderer: ExpressionRenderDefinition<NetworkVisRenderValue> = {
       bg.setAttribute('y', String(legendY - 14));
       bg.setAttribute('width', '170');
       bg.setAttribute('height', String(24 + legendKeys.length * lineHeight));
-      bg.setAttribute('fill', '#efefef');
+      bg.setAttribute('fill', isDarkMode ? '#343741' : '#efefef');
       bg.setAttribute('fill-opacity', '0.9');
       legendGroup.appendChild(bg);
 

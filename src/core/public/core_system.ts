@@ -186,6 +186,14 @@ export class CoreSystem {
     try {
       const injectedMetadata = await this.injectedMetadata.start();
       const uiSettings = await this.uiSettings.start();
+
+      // Sync Kibana's theme:darkMode setting to document.documentElement CSS classes
+      // so that nm-web-shared's getUiTheme() (which reads these classes) works correctly.
+      uiSettings.get$<boolean>('theme:darkMode').subscribe((isDark) => {
+        document.documentElement.classList.toggle('Night', isDark);
+        document.documentElement.classList.toggle('Day', !isDark);
+      });
+
       const docLinks = this.docLinks.start({ injectedMetadata });
       const http = await this.http.start();
       const savedObjects = await this.savedObjects.start({ http });

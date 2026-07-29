@@ -29190,7 +29190,7 @@ titleize@^1.0.1:
   resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/titleize/-/titleize-1.0.1.tgz#21bc24fcca658eadc6d3bd3c38f2bd173769b4c5"
   integrity sha512-rUwGDruKq1gX+FFHbTl5qjI7teVO7eOe+C8IcQ7QT+1BK3eEUXJqbZcBOeaRP4FwSC/C1A5jDoIVta0nIQ9yew==
 
-tmp@0.0.30, tmp@0.1.0, tmp@^0.0.29, tmp@^0.0.33, tmp@^0.2.5, tmp@~0.2.1:
+tmp@0.0.30, tmp@0.1.0, tmp@^0.0.29, tmp@^0.0.33, tmp@^0.2.7, tmp@~0.2.1:
   version "0.1.0"
   resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/tmp/-/tmp-0.1.0.tgz#ee434a4e22543082e294ba6201dcc6eafefa2877"
   integrity sha512-J7Z2K08jbGcdA1kkQpJSqLF6T0tdQqpR2pnSUXsIchbPdTI9v3e85cLW0d6WDhwuAleOV71j2xWs8qMPfK7nKw==
@@ -31963,10 +31963,10 @@ ws@^8.2.3:
   resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/ws/-/ws-8.19.0.tgz#ddc2bdfa5b9ad860204f5a72a4863a8895fd8c8b"
   integrity sha512-blAT2mjOEIi0ZzruJfIhb3nps74PRWTCz1IjglWEEpQl5XS/UNama6u2/rjFkDDouqr4L67ry+1aGIALViWjDg==
 
-ws@^8.20.1:
-  version "8.20.1"
-  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/ws/-/ws-8.20.1.tgz#91a9ae2b312ccf98e0a85ec499b48cef45ab0ddb"
-  integrity sha512-It4dO0K5v//JtTXuPkfEOaI3uUN87iYPnqo/ZzqCoG3g8uhA66QUMs/SrM0YK7/NAu+r4LMh/9dq2A7k+rHs+w==
+ws@^8.21.0:
+  version "8.21.1"
+  resolved "https://logrhythm.jfrog.io/logrhythm/api/npm/npm-virtual/ws/-/ws-8.21.1.tgz#045650cd4b1207809e7547146223c3814a9af586"
+  integrity sha512-+0NTnW77fFN/DjQi6k/Sq/Yvk4Sgajw7urW8V+asjXnRgDs9gyGkdb7EzgfhA4goXsRIZKE28fzIXBHEzhuiWw==
 
 x-default-browser@^0.4.0:
   version "0.4.0"
