@@ -630,7 +630,7 @@ export function TableHeaderColumn({
     whiteSpace: 'nowrap' as 'nowrap',
     width: name === 'Captured' ? '120px' : 'auto',
     minWidth: name === 'Captured' ? '120px' : 'auto',
-    maxWidth: name === 'Captured' ? '120px' : '120px',
+    maxWidth: name === 'Captured' ? '120px' : 'none',
     position: 'relative' as 'relative',
     zIndex: name === 'Captured' ? 9999 : 10,
     overflow: name === 'Captured' ? ('visible' as any) : 'hidden',

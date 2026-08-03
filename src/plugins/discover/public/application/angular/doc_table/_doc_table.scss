@@ -192,9 +192,17 @@ table {
   }
 }
 
+// Ensure data cells have white background in light mode
+.kbnDocTable td,
+.kbn-table td,
+doc-table table td {
+  background-color: #fff !important;
+}
+
 // Dark mode: override hardcoded light table-header backgrounds
 html.Night {
   .kbnDocTable th,
+  .kbn-table th,
   doc-table .kbnDocTable th,
   table.kbnDocTable th,
   doc-table th {
@@ -204,19 +212,26 @@ html.Night {
   }
 
   .kbnDocTable thead,
+  .kbn-table thead,
   doc-table .kbnDocTable thead,
-  .kbnDocTable thead tr {
+  doc-table table thead,
+  .kbnDocTable thead tr,
+  .kbn-table thead tr {
     background-color: #25262E !important;
     border-bottom-color: #343741 !important;
   }
 
-  .kbnDocTable td {
-    background-color: #1D1E24;
-    color: #DFE5EF;
-    border-color: #343741;
+  .kbnDocTable td,
+  .kbn-table td,
+  doc-table table td {
+    background-color: #1D1E24 !important;
+    color: #DFE5EF !important;
+    border-color: #343741 !important;
   }
 
-  .kbnDocTable tr:hover td {
-    background-color: #2c2d36;
+  .kbnDocTable tr:hover td,
+  .kbn-table tr:hover td,
+  doc-table table tr:hover td {
+    background-color: #2c2d36 !important;
   }
 }
