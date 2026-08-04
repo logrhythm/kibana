@@ -1,5 +1,21 @@
 .kbnDocViewerTable {
   margin-top: $euiSizeS;
+
+  tbody tr td {
+    background-color: #fff !important;
+  }
+}
+
+html.Night .kbnDocViewerTable {
+  tbody tr td {
+    background-color: #1D1E24 !important;
+    color: #DFE5EF !important;
+    border-color: #343741 !important;
+  }
+
+  tbody tr:hover td {
+    background-color: #2c2d36 !important;
+  }
 }
 
 .kbnDocViewer {
