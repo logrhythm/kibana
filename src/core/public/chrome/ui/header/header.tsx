@@ -500,6 +500,24 @@ class HeaderUI extends Component<Props, State> {
               .navbar-right {
                 visibility: visible !important;
                 opacity: 1 !important;
+                flex-shrink: 0 !important;
+                white-space: nowrap !important;
+              }
+
+              /* Prevent the inner ul from wrapping the right-side icons.
+                 white-space: nowrap keeps inline-block children on one line
+                 without touching Bootstrap's dropdown flex/block internals. */
+              .navbar-right > ul {
+                white-space: nowrap !important;
+                list-style: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+              }
+
+              /* Keep each icon wrapper as inline-block with middle alignment */
+              .navbar-right > ul > div {
+                display: inline-block !important;
+                vertical-align: middle !important;
               }
 
               /* Ensure LogRhythm icons are properly displayed */
@@ -517,16 +535,16 @@ class HeaderUI extends Component<Props, State> {
               .icon-administration.header-icon {
                 font-size: 22px !important;
               }
-              
+
               .icon-user.header-icon {
                 font-size: 22px !important;
               }
-              
+
               .icon-question.header-icon {
                 font-size: 22px !important;
               }
 
-              /* Ensure all navbar items are visible and properly positioned */
+              /* Ensure all navbar items are visible — keep inline-block for Bootstrap dropdown compat */
               .navbar-right .nav-item,
               .navbar-right .dropdown {
                 display: inline-block !important;
@@ -541,6 +559,13 @@ class HeaderUI extends Component<Props, State> {
                 opacity: 1 !important;
                 min-width: 40px !important;
                 text-align: center !important;
+              }
+
+              /* Fix icon vertical centering: JSS sets margin-top:1rem which pushes
+                 icons ~7px below center in a 50px navbar. Reduce to align centrally. */
+              .navbar-right .header-icon {
+                margin-top: 0.4rem !important;
+                vertical-align: middle !important;
               }
             `,
             }}
